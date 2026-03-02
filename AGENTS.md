@@ -56,11 +56,11 @@ The solution must remain extensible so additional dashboard variables can be add
 This section describes current reality as of March 2, 2026.
 
 - Existing architecture:
-  - Flat repository with script-first workflow.
-  - Core pipeline scripts: `fetch_etf_prices.py`, `fetch_weo_gdp.py`, `build_combined_etf_weo.py`, `main.py`.
-  - `main.py` orchestrates end-to-end refresh (ETF -> WEO -> combined annual output).
-  - `etf_return_validation.ipynb` is used for one-ticker interactive validation/debugging.
-  - `etf_prices.csv`, `weo_gdp.csv`, and `etf_weo_combined_annual.csv` are current generated outputs.
+  - Script-first workflow with directory separation (`src/`, `data/outputs/`, `notebooks/`, `docs/`).
+  - Core pipeline scripts live under `src/`: `fetch_etf_prices.py`, `fetch_weo_gdp.py`, `build_combined_etf_weo.py`, `main.py`.
+  - `src/main.py` orchestrates end-to-end refresh (ETF -> WEO -> combined annual output).
+  - `notebooks/etf_return_validation.ipynb` is used for one-ticker interactive validation/debugging.
+  - `data/outputs/etf_prices.csv`, `data/outputs/weo_gdp.csv`, and `data/outputs/etf_weo_combined_annual.csv` are generated outputs.
 - Known inconsistencies/technical debt:
   - Upstream Yahoo history can include unexplained level breaks for some tickers; return calculations require defensive checks.
   - IMF WEO October 2025 is fixed as baseline, but schema contracts and mapping validations remain lightweight.
@@ -79,7 +79,7 @@ This section describes current reality as of March 2, 2026.
   - Generated CSV may reflect prior logic versions and should be treated as derived, not source-of-truth logic.
 - Undocumented conventions currently in use:
   - Date window defaults to `start = "2015-01-01"` and dynamic end date (`today`) in ETF fetch script.
-  - Output file path defaults to repository root (`etf_prices.csv`).
+  - Output file paths default to `data/outputs/`.
   - Country-ticker mapping currently lives inline in Python scripts.
 
 ---
@@ -177,10 +177,10 @@ Performance is secondary at current project stage.
 - Mocking allowed: Yes, if tests are introduced.
 - Deterministic test requirement: Yes for any future automated tests.
 - Manual validation (current enforcement):
-  - Run pipeline end-to-end (`uv run python main.py`) or run the three scripts in sequence.
-  - Confirm `etf_prices.csv`, `weo_gdp.csv`, and `etf_weo_combined_annual.csv` are produced and readable.
+  - Run pipeline end-to-end (`uv run python src/main.py`) or run the three scripts in `src/` in sequence.
+  - Confirm `data/outputs/etf_prices.csv`, `data/outputs/weo_gdp.csv`, and `data/outputs/etf_weo_combined_annual.csv` are produced and readable.
   - Spot-check sample columns, date range, and country/ticker coverage for plausibility.
-  - Use `etf_return_validation.ipynb` for one-ticker deep checks when investigating discrepancies.
+  - Use `notebooks/etf_return_validation.ipynb` for one-ticker deep checks when investigating discrepancies.
 
 ---
 

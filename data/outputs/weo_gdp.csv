@@ -1,0 +1,840 @@
+country_name,country_code,indicator,indicator_label,frequency,year,value
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,1233914000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,1262645000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,1381106000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,1417158000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,1386289000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1362665000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,1655838000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1725433000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1742311000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1795492000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1829508000000
+Australia,AUS,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1948227000000
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.34
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.694
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.38
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.791
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.936
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2020,-1.953
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2021,5.418
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2022,4.132
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2023,2.066
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.023
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.809
+Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.149
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,379584000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,393579000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,414780000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,452787000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,443033000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,434050000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,480786000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,472145000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,511833000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,523956000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,566456000000
+Austria,AUT,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,604198000000
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2015,1.303
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.117
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.272
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.484
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.755
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2020,-6.318
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2021,4.795
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2022,5.278
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2023,-0.955
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2024,-0.989
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.27
+Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.764
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,461091000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,474141000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,500733000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,542885000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,536787000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,529269000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,598920000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,594081000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,644840000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,664365000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,716980000000
+Belgium,BEL,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,761174000000
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2015,1.474
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2016,1.193
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.475
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.878
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.443
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2020,-4.793
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.207
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2022,4.26
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.202
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.019
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.065
+Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.98
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,1800046000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,1796622000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,2063519000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,1916934000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,1873286000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1476092000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,1670650000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1951849000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,2191137000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,2179413000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,2256910000000
+Brazil,BRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,2292690000000
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2015,-3.546
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2016,-3.276
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.323
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.784
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.221
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2020,-3.277
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2021,4.763
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2022,3.017
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2023,3.242
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2024,3.396
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.4
+Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.942
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,50766000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,53929000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,59288000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,66318000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,68639000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,70658000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,84477000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,90719000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,102434000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,112232000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,127924000000
+Bulgaria,BGR,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,142203000000
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2015,3.398
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2016,3.027
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.746
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.549
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2019,3.789
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2020,-3.216
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2021,7.781
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2022,4.039
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.887
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.811
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2025,3.05
+Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.089
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,1556508000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,1527996000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,1649266000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,1725300000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,1743725000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1655685000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,2022382000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,2190411000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,2173340000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,2243637000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,2283599000000
+Canada,CAN,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,2420837000000
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2015,0.65
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2016,1.039
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2017,3.034
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.743
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.908
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2020,-5.038
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2021,5.951
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2022,4.189
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.529
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.555
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.153
+Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.541
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,11307226000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,11448003000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,12503299000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,14110963000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,14572410000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,15103357000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,18190803000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,18307816000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,18270351000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,18749759000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,19398577000000
+China,CHN,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,20650754000000
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2015,7.018
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2016,6.776
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2017,6.891
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2018,6.759
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2019,6.065
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2020,2.337
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2021,8.556
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2022,3.112
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2023,5.377
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2024,5.003
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2025,4.796
+China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2026,4.163
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,2442731000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,2469726000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,2587955000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,2782838000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,2723094000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,2645806000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,2968405000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,2796987000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,3061093000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,3160902000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,3361557000000
+France,FRA,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,3558562000000
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2015,0.998
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2016,0.735
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.268
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.593
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.091
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2020,-7.603
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.794
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2022,2.801
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.619
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.102
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.671
+France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.911
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,3425446000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,3535812000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,3764023000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,4057272000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,3960332000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,3938244000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,4358147000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,4204327000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,4563523000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,4684182000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,5013574000000
+Germany,DEU,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,5328184000000
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2015,1.663
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.217
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.806
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.133
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2019,0.973
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2020,-4.127
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2021,3.913
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2022,1.807
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2023,-0.872
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2024,-0.496
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.191
+Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.944
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,194587000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,193044000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,200310000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,213396000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,207329000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,191210000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,218449000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,219053000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,243569000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,257067000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,282019000000
+Greece,GRC,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,304838000000
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2015,-0.228
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2016,-0.032
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.473
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.065
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.277
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2020,-9.196
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2021,8.654
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2022,5.744
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2023,2.332
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.272
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.964
+Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.043
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,309386000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,320860000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,341271000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,361731000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,363075000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,344941000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,368954000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,358680000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,381043000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,406863000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,428233000000
+Hong Kong,HKG,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,446646000000
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.388
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.175
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2017,3.796
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.847
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2019,-1.672
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2020,-6.545
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.454
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2022,-3.684
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2023,3.224
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.505
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.438
+Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.122
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,2103588000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,2294797000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,2651474000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,2702930000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,2835606000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,2674852000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,3167271000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,3346107000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,3638490000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,3909892000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,4125213000000
+India,IND,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,4505629000000
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2015,7.996
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2016,8.256
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2017,6.795
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2018,6.454
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2019,3.871
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2020,-5.778
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2021,9.69
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2022,7.609
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2023,9.191
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2024,6.495
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2025,6.646
+India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2026,6.159
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,860854000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,931877000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,1015619000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,1042272000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,1119100000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1059055000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,1186510000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1319101000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1371169000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1396300000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1443256000000
+Indonesia,IDN,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1550236000000
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2015,4.876
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2016,5.033
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2017,5.07
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2018,5.174
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2019,5.019
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2020,-2.066
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2021,3.703
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2022,5.307
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2023,5.049
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2024,5.03
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2025,4.861
+Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2026,4.942
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,1845615000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,1886590000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,1970027000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,2100387000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,2019831000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1905956000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,2180657000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,2105723000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,2305270000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,2372059000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,2543677000000
+Italy,ITA,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,2701544000000
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2015,0.886
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2016,1.236
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.604
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2018,0.827
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2019,0.429
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2020,-8.868
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2021,8.931
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2022,4.821
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2023,0.715
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2024,0.726
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.546
+Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.759
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,4444931000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,5003678000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,4930837000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,5040881000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,5117995000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,5054069000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,5039148000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,4263231000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,4204573000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,4019382000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,4279828000000
+Japan,JPN,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,4463634000000
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2015,1.561
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2016,0.754
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.675
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2018,0.643
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2019,-0.402
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2020,-4.169
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2021,2.697
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2022,0.96
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.245
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2024,0.104
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.076
+Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.633
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,114606000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,109399000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,120688000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,138655000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,140855000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,111048000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,148346000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,183539000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,165396000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,160226000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,157469000000
+Kuwait,KWT,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,162895000000
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2015,0.593
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.926
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2017,-4.712
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.743
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.264
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2020,-4.817
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2021,1.672
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2022,6.759
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2023,-1.667
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2024,-2.56
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.574
+Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.927
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,301355000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,301256000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,319109000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,358783000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,365178000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,337456000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,373785000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,407830000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,399949000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,422227000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,470572000000
+Malaysia,MYS,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,505364000000
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2015,5.007
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2016,4.45
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2017,5.813
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2018,4.843
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2019,4.413
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2020,-5.457
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2021,3.315
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2022,9.032
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2023,3.537
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2024,5.105
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2025,4.5
+Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2026,4
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,1213294000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,1112233000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,1190721000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,1256300000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,1304106000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1121065000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,1316569000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1466935000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1798318000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1856366000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1862740000000
+Mexico,MEX,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,2030999000000
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.702
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2016,1.772
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.872
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.972
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2019,-0.393
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2020,-8.354
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.048
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2022,3.71
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2023,3.354
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.427
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.99
+Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.544
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,775822000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,796944000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,847934000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,930155000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,929006000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,931814000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,1055173000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1047364000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1135803000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1214562000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1320635000000
+Netherlands,NLD,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1413076000000
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.121
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.425
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.783
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.26
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.3
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2020,-3.877
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.278
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2022,5.007
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2023,-0.601
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.08
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.433
+Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.222
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,299930000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,313623000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,339229000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,356163000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,321071000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,300410000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,348481000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,374850000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,336555000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,371408000000
+Pakistan,PAK,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,410495000000
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2015,3.812
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2016,4.072
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2017,4.609
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2018,6.096
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2019,3.12
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2020,-0.943
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2021,5.77
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2022,6.18
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2023,-0.212
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.51
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.676
+Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.578
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,306446000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,318627000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,328481000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,346842000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,376823000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,361751000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,394087000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,404353000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,437055000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,461617000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,494158000000
+Philippines,PHL,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,533922000000
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2015,6.348
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2016,7.149
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2017,6.931
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2018,6.341
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2019,6.119
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2020,-9.518
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2021,5.715
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2022,7.581
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2023,5.519
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2024,5.692
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2025,5.435
+Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2026,5.731
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,479729000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,472883000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,528497000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,594641000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,602592000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,605930000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,689253000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,695734000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,812959000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,914553000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1039619000000
+Poland,POL,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1109962000000
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2015,4.432
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2016,3.031
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2017,5.152
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2018,6.246
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2019,4.581
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2020,-2.036
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.927
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2022,5.255
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2023,0.25
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.923
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2025,3.243
+Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.136
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,693415000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,689279000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,741266000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,886564000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,888888000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,767303000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,982661000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1239075000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1218585000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1239805000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1268535000000
+Saudi Arabia,SAU,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1316250000000
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2015,4.655
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2016,1.704
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.182
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2018,3.227
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.652
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2020,-3.805
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.52
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2022,12.001
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2023,0.543
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.997
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2025,4.021
+Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.978
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,307999000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,319646000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,343673000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,377124000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,376162000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,349166000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,436591000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,509018000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,505440000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,547387000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,574185000000
+Singapore,SGP,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,606225000000
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.977
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2016,3.748
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2017,4.477
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2018,3.452
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.308
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2020,-3.815
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2021,9.757
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2022,4.108
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.821
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2024,4.388
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.226
+Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.823
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,346663000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,323493000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,381317000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,405093000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,389245000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,337876000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,419878000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,407430000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,381334000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,401076000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,426383000000
+South Africa,ZAF,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,443643000000
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2015,1.322
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2016,0.665
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.158
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.557
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2019,0.26
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2020,-6.169
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2021,4.859
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2022,2.058
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2023,0.806
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2024,0.535
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.149
+South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.151
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,1539212000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,1578816000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,1710197000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,1824251000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,1751046000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1744455000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,1942314000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1799363000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1844801000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1875388000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1858572000000
+South Korea,KOR,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1936617000000
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.92
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2016,3.172
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2017,3.433
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2018,3.176
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.314
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2020,-0.7
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2021,4.613
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2022,2.728
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.583
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.004
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.896
+South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.83
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,1206287000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,1242673000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,1321288000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,1432292000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,1403651000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,1288751000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,1462216000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,1449990000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1619949000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1725152000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1891371000000
+Spain,ESP,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,2041830000000
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2015,4.061
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.915
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.896
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.395
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.961
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2020,-10.94
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.683
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2022,6.37
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2023,2.461
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2024,3.455
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.908
+Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.958
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,501602000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,513058000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,535172000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,549649000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,530894000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,544266000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,631693000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,575071000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,578991000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,603715000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,662318000000
+Sweden,SWE,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,711503000000
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2015,4.388
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.131
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.883
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.77
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.608
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2020,-1.934
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2021,5.226
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2022,1.255
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2023,-0.204
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2024,0.82
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.75
+Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.932
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,693814000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,687766000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,695507000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,725889000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,721896000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,741288000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,814696000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,828513000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,894815000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,938153000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1002666000000
+Switzerland,CHE,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1074588000000
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2015,1.571
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.098
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2017,1.428
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.862
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.163
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2020,-2.293
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2021,5.573
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2022,3.124
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2023,0.737
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.363
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2025,0.946
+Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.275
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,534515000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,543081000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,591687000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,610690000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,613512000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,676861000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,776965000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,765624000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,757335000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,797004000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,884387000000
+Taiwan,TWN,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,971448000000
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2015,1.465
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2016,2.165
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2017,3.662
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.905
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2019,3.055
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2020,3.42
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.72
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2022,2.684
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2023,1.122
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2024,4.837
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2025,3.674
+Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.113
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,401296000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,413366000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,456357000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,506754000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,543977000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,500462000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,506195000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,495645000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,515906000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,526518000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,558573000000
+Thailand,THA,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,561509000000
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2015,3.134
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2016,3.435
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2017,4.178
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2018,4.223
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.115
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2020,-6.05
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2021,1.542
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2022,2.627
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2023,2.009
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.54
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2025,2
+Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.6
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,868204000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,870339000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,863906000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,807318000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,775223000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,730345000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,827673000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,924752000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,1153295000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,1358251000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,1565471000000
+Turkey,TUR,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,1576110000000
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2015,5.806
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2016,3.324
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2017,7.826
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2018,3.468
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.302
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2020,1.803
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2021,11.811
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2022,5.441
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2023,5.045
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2024,3.328
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2025,3.494
+Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.693
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,2928558000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,2699086000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,2682384000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,2875024000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,2853074000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,2698705000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,3144079000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,3125404000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,3371118000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,3644636000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,3958780000000
+United Kingdom,GBR,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,4225639000000
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.223
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2016,1.922
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.657
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2018,1.405
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2019,1.624
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2020,-10.297
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2021,8.576
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2022,4.839
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2023,0.397
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2024,1.101
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2025,1.308
+United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.264
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,18295000000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,18804900000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,19612100000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,20656525000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,21539975000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,21375275000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,23725650000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,26054600000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,27811500000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,29298025000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,30615743000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,31821293000000
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2015,2.946
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2016,1.82
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2017,2.458
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2018,2.967
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2019,2.584
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2020,-2.081
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2021,6.152
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2022,2.524
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2023,2.935
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.793
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.017
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.102
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2015,236795000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2016,252146000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2017,277071000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2018,304470000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2019,331818000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2020,346310000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2021,370076000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2022,411068000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2023,433008000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,459472000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,484726000000
+Vietnam,VNM,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,511059000000
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2015,6.987
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2016,6.69
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2017,6.94
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2018,7.465
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2019,7.359
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2020,2.865
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2021,2.554
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2022,8.538
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2023,5.065
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2024,7.091
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2025,6.457
+Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2026,5.595

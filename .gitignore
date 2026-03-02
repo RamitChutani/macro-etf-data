@@ -3,4 +3,3 @@ __pycache__/
 .cache/
 .uv-cache/
 *.csv#
-docs/worklog/*.md

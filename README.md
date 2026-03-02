@@ -2,6 +2,13 @@
 
 Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP data (Oct 2025 baseline), and build a merged annual ETF-vs-macro dataset.
 
+## Repository Layout
+
+- `src/`: pipeline scripts
+- `data/outputs/`: generated CSV outputs
+- `notebooks/`: interactive validation notebooks
+- `docs/`: references and worklogs
+
 ## Current Capabilities
 
 - Fetch ETF daily price data for configured country-focused tickers.
@@ -19,20 +26,20 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 1. Full pipeline (recommended):
 
 ```bash
-uv run python main.py
+uv run python src/main.py
 ```
 
 2. Step-by-step (equivalent):
 
 ```bash
-uv run python fetch_etf_prices.py --start 2015-01-01 --output etf_prices.csv
-uv run python fetch_weo_gdp.py --start-year 2015 --end-year 2026 --output weo_gdp.csv
-uv run python build_combined_etf_weo.py --etf-csv etf_prices.csv --weo-csv weo_gdp.csv --output etf_weo_combined_annual.csv
+uv run python src/fetch_etf_prices.py --start 2015-01-01 --output data/outputs/etf_prices.csv
+uv run python src/fetch_weo_gdp.py --start-year 2015 --end-year 2026 --output data/outputs/weo_gdp.csv
+uv run python src/build_combined_etf_weo.py --etf-csv data/outputs/etf_prices.csv --weo-csv data/outputs/weo_gdp.csv --output data/outputs/etf_weo_combined_annual.csv
 ```
 
 ## Validation Notebook
 
-Run Jupyter and open `etf_return_validation.ipynb`:
+Run Jupyter and open `notebooks/etf_return_validation.ipynb`:
 
 ```bash
 uv run jupyter notebook
@@ -40,6 +47,6 @@ uv run jupyter notebook
 
 ## Outputs
 
-- `etf_prices.csv`
-- `weo_gdp.csv`
-- `etf_weo_combined_annual.csv`
+- `data/outputs/etf_prices.csv`
+- `data/outputs/weo_gdp.csv`
+- `data/outputs/etf_weo_combined_annual.csv`
