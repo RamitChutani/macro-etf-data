@@ -21,7 +21,7 @@ If a rule here conflicts with the base file, this file takes precedence for this
 ### Purpose
 
 This project is intended to automate retrieval of ETF pricing data for selected country-focused tickers from Yahoo Finance and combine it with country-level macroeconomic indicators (for example GDP).  
-The target output is a CSV or Excel workbook for internal use at a wealth management firm, with data tables and a dashboard view (second sheet when using Excel).  
+The target output is a CSV or Excel workbook for internal use at a wealth management firm, with data tables and an interactive Excel KPI dashboard (second sheet when using Excel) that supports slicers/filters and linked visuals.  
 The stakeholder uses this output to compare ETF performance versus underlying country performance and identify potential market mispricing for further investigation and investment decision support.  
 The solution must remain extensible so additional dashboard variables can be added later based on stakeholder requirements.
 
@@ -30,7 +30,7 @@ The solution must remain extensible so additional dashboard variables can be add
 - In scope:
   - Automated ETF data retrieval from `yfinance` for selected tickers
   - Integration of country-level macro data from IMF World Economic Outlook (October 2025 edition)
-  - Output generation as CSV and/or Excel (including a dashboard sheet for Excel outputs)
+  - Output generation as CSV and/or Excel (including an interactive KPI dashboard sheet for Excel outputs)
   - Python environment managed with `uv` and `pyproject.toml`
 - Out of scope (current state):
   - Production API/service layer
@@ -44,7 +44,7 @@ The solution must remain extensible so additional dashboard variables can be add
 - IMF macro inputs are sourced from World Economic Outlook October 2025 data, including 2025 and 2026 GDP projections where available.
 - Output is generated in at least one supported format (`.csv` or `.xlsx`), and Excel mode contains:
   - one sheet with tabular data
-  - one sheet with dashboard-ready views/metrics
+  - one sheet with interactive KPI dashboard views/metrics (filters/slicers and linked visuals)
 - Dataset includes consistent date alignment and country/ticker mappings needed for ETF-vs-macro comparison.
 - Dashboard design supports adding new stakeholder-requested variables without rewriting the full pipeline.
 - Changes do not silently alter ticker universe, macro series definitions, or output schema without explicit documentation.
@@ -65,6 +65,7 @@ This section describes current reality as of March 2, 2026.
   - Upstream Yahoo history can include unexplained level breaks for some tickers; return calculations require defensive checks.
   - IMF WEO October 2025 is fixed as baseline, but schema contracts and mapping validations remain lightweight.
   - Output schema expectations can still drift if downstream users assume legacy ETF artifact formats.
+  - Excel dashboard chart rendering for negative annual/CAGR values remains unreliable in some environments (open issue; deferred).
   - No automated test suite currently present.
 - Areas that must remain stable:
   - Existing ticker dictionary semantics (country-to-ticker mapping) unless explicitly changed.
@@ -78,7 +79,7 @@ This section describes current reality as of March 2, 2026.
   - Some historical artifacts and stakeholder comparisons were based on prior schema versions.
   - Generated CSV may reflect prior logic versions and should be treated as derived, not source-of-truth logic.
 - Undocumented conventions currently in use:
-  - Date window defaults to `start = "2015-01-01"` and dynamic end date (`today`) in ETF fetch script.
+  - ETF fetch defaults to full Yahoo history (`period = "max"`) with dynamic end date (`today`) unless `--start` is explicitly passed.
   - Output file paths default to `data/outputs/`.
   - Country-ticker mapping currently lives inline in Python scripts.
 
@@ -136,6 +137,7 @@ This section describes current reality as of March 2, 2026.
 - Ask for approval before structural refactors (file/folder reorganization, notebook-to-package conversion, major pipeline rewrites).
 - Treat `etf_prices.csv` as a generated artifact; regenerate intentionally and avoid accidental churn.
 - Keep session work notes under `docs/worklog/` as local-only artifacts unless explicitly requested to track in git.
+- If user language is ambiguous, ask a clarifying question before making edits or adding/removing files.
 - Treat external API responses from `yfinance` as untrusted and potentially incomplete; handle missing fields defensively.
 - Treat macroeconomic source data as untrusted and version-sensitive; validate units/frequency before merge.
 - Do not silently switch IMF WEO edition/version without explicit user approval.

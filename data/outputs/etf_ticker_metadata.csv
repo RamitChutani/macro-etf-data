@@ -1,0 +1,44 @@
+label,ticker,exchange,currency,quote_type,included,reason
+Australia,SAUS.L,LSE,GBp,ETF,yes,
+Austria,XB4A.L,,,,no,unsupported currency None
+Belgium,BEL.L,YHD,,MUTUALFUND,no,unsupported currency None
+Brazil,XMBR.L,LSE,GBp,ETF,yes,
+Bulgaria,BGX.L,LSE,EUR,ETF,no,unsupported currency EUR
+Canada,CSCA.L,LSE,GBp,ETF,yes,
+China_1,IASH.L,LSE,GBp,ETF,yes,
+China_2,FRCH.L,LSE,GBP,ETF,yes,
+France_1,ISFR.L,LSE,GBp,ETF,yes,
+France_2,CACC.L,,,,no,unsupported currency None
+Germany,XDAX.L,LSE,GBp,ETF,yes,
+Greece,GRE.L,YHD,,MUTUALFUND,no,unsupported currency None
+Hong Kong,HKDU.L,LSE,USD,ETF,no,unsupported currency USD
+India_1,IIND.L,LSE,GBP,ETF,yes,
+India_2,FRIN.L,LSE,GBP,ETF,yes,
+Indonesia,INDO.L,LSE,USD,ETF,no,unsupported currency USD
+Italy,CMIB.L,LSE,EUR,ETF,no,unsupported currency EUR
+Japan_1,LCJP.L,LSE,GBP,ETF,yes,
+Japan_2,IJPN.L,LSE,GBp,ETF,yes,
+Kuwait,MKUW.L,LSE,USD,ETF,no,unsupported currency USD
+Malaysia,XCX3.L,LSE,GBp,ETF,yes,
+Mexico,XMEX.L,LSE,GBp,ETF,yes,
+Netherlands,IAEA.L,,,,no,unsupported currency None
+Pakistan,XBAK.L,LSE,USD,ETF,no,unsupported currency USD
+Philippines,XPHG.L,LSE,GBp,ETF,yes,
+Poland,SPOL.L,LSE,GBp,ETF,yes,
+Saudi Arabia,IKSA.L,LSE,USD,ETF,no,unsupported currency USD
+Singapore,XBAS.L,,,,no,unsupported currency None
+South Africa,SRSA.L,LSE,GBp,ETF,yes,
+South Korea_1,CSKR.L,LSE,USD,ETF,no,unsupported currency USD
+South Korea_2,FLRK.L,LSE,GBP,ETF,yes,
+Spain_1,CS1.L,LSE,GBp,ETF,yes,
+Spain_2,XESP.L,,,,no,unsupported currency None
+Sweden,OMXS.L,LSE,GBp,ETF,yes,
+Switzerland,CHUSD.L,,,,no,unsupported currency None
+Taiwan_1,XMTW.L,LSE,GBp,ETF,yes,
+Taiwan_2,FRXT.L,LSE,GBP,ETF,yes,
+Thailand,XCX4.L,LSE,GBp,ETF,yes,
+Turkey,TURL.L,LSE,GBp,ETF,yes,
+United Kingdom_1,CUKX.L,LSE,GBp,ETF,yes,
+United Kingdom_2,CSUK.L,LSE,GBp,ETF,yes,
+United States,SPXL.L,LSE,GBP,ETF,yes,
+Vietnam,XFVT.L,LSE,GBp,ETF,yes,

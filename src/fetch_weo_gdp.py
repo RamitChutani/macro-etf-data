@@ -51,6 +51,7 @@ ETF_COUNTRY_TO_ISO3 = {
 INDICATOR_LABELS = {
     "NGDPD": "GDP, current prices (U.S. dollars)",
     "NGDP_RPCH": "Real GDP growth (percent change)",
+    "NGDPD_PCH": "Nominal GDP growth (percent change, derived from NGDPD)",
 }
 
 
@@ -151,6 +152,52 @@ def write_csv(rows: list[dict[str, str]], output_path: str) -> None:
         writer.writerows(rows)
 
 
+def append_nominal_growth_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Derive nominal GDP growth (YoY %) from NGDPD level rows."""
+    out = list(rows)
+    by_country: dict[str, dict[int, float]] = {}
+    for row in rows:
+        if row.get("indicator") != "NGDPD":
+            continue
+        country = row.get("country_code", "")
+        year_str = row.get("year", "")
+        value_str = row.get("value", "")
+        try:
+            year = int(year_str)
+            value = float(value_str)
+        except (TypeError, ValueError):
+            continue
+        by_country.setdefault(country, {})[year] = value
+
+    for country_code, levels in by_country.items():
+        years = sorted(levels)
+        for y in years:
+            prev = levels.get(y - 1)
+            cur = levels.get(y)
+            if prev in (None, 0) or cur is None:
+                continue
+            growth_pct = ((cur / prev) - 1.0) * 100.0
+            out.append(
+                {
+                    "country_name": next(
+                        (
+                            r.get("country_name", country_code)
+                            for r in rows
+                            if r.get("country_code") == country_code
+                        ),
+                        country_code,
+                    ),
+                    "country_code": country_code,
+                    "indicator": "NGDPD_PCH",
+                    "indicator_label": INDICATOR_LABELS["NGDPD_PCH"],
+                    "frequency": "A",
+                    "year": str(y),
+                    "value": f"{growth_pct:.6f}",
+                }
+            )
+    return out
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Fetch IMF WEO GDP data (NGDPD, NGDP_RPCH) for ETF countries."
@@ -204,6 +251,7 @@ def main() -> None:
     for row in rows:
         row["country_name"] = code_to_country.get(row["country_code"], row["country_code"])
 
+    rows = append_nominal_growth_rows(rows)
     rows.sort(key=lambda r: (r["country_name"], r["indicator"], r["year"]))
     write_csv(rows, args.output)
     print(f"Wrote {len(rows)} rows to {args.output}")

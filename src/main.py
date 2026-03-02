@@ -20,13 +20,32 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Orchestrate ETF fetch, WEO fetch, and combined annual dataset build."
     )
-    parser.add_argument("--start-date", default="2015-01-01")
+    parser.add_argument(
+        "--start-date",
+        default=None,
+        help="Optional ETF start date (YYYY-MM-DD). If omitted, fetches full ETF history.",
+    )
     parser.add_argument("--end-date")
     parser.add_argument("--start-year", type=int, default=2015)
     parser.add_argument("--end-year", type=int, default=2026)
     parser.add_argument("--etf-output", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-output", default="data/outputs/weo_gdp.csv")
     parser.add_argument("--combined-output", default="data/outputs/etf_weo_combined_annual.csv")
+    parser.add_argument("--dashboard-output", default="data/outputs/etf_gdp_dashboard_mvp.xlsx")
+    parser.add_argument(
+        "--history-charts-output",
+        default="data/outputs/etf_price_history_charts.xlsx",
+    )
+    parser.add_argument(
+        "--skip-dashboard",
+        action="store_true",
+        help="Skip Excel MVP dashboard generation step.",
+    )
+    parser.add_argument(
+        "--skip-history-charts",
+        action="store_true",
+        help="Skip separate ETF history-charts workbook generation step.",
+    )
     args = parser.parse_args()
 
     py = sys.executable
@@ -34,11 +53,11 @@ def main() -> None:
     etf_cmd = [
         py,
         str(script_dir / "fetch_etf_prices.py"),
-        "--start",
-        args.start_date,
         "--output",
         args.etf_output,
     ]
+    if args.start_date:
+        etf_cmd.extend(["--start", args.start_date])
     if args.end_date:
         etf_cmd.extend(["--end", args.end_date])
 
@@ -67,6 +86,28 @@ def main() -> None:
     run_step(etf_cmd)
     run_step(weo_cmd)
     run_step(combined_cmd)
+    if not args.skip_dashboard:
+        dashboard_cmd = [
+            py,
+            str(script_dir / "build_excel_dashboard_mvp.py"),
+            "--etf-csv",
+            args.etf_output,
+            "--weo-csv",
+            args.weo_output,
+            "--output",
+            args.dashboard_output,
+        ]
+        run_step(dashboard_cmd)
+    if not args.skip_history_charts:
+        history_cmd = [
+            py,
+            str(script_dir / "build_etf_history_charts_workbook.py"),
+            "--etf-csv",
+            args.etf_output,
+            "--output",
+            args.history_charts_output,
+        ]
+        run_step(history_cmd)
     print("Pipeline completed.")
 
 

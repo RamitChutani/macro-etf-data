@@ -176,12 +176,20 @@ def load_weo_gdp(weo_csv: str) -> pd.DataFrame:
         .reset_index()
         .rename_axis(None, axis=1)
     )
-    return pivot.rename(
+    pivot = pivot.rename(
         columns={
             "NGDPD": "gdp_current_usd",
             "NGDP_RPCH": "gdp_real_growth_pct",
+            "NGDPD_PCH": "gdp_nominal_growth_pct",
         }
     )
+    # Backward-compatible fallback if nominal growth rows are missing.
+    if "gdp_nominal_growth_pct" not in pivot.columns and "gdp_current_usd" in pivot.columns:
+        pivot = pivot.sort_values(["country_code", "year"]).copy()
+        pivot["gdp_nominal_growth_pct"] = (
+            pivot.groupby("country_code")["gdp_current_usd"].pct_change() * 100.0
+        )
+    return pivot
 
 
 def build_combined_dataset(etf_csv: str, weo_csv: str) -> pd.DataFrame:
@@ -189,8 +197,15 @@ def build_combined_dataset(etf_csv: str, weo_csv: str) -> pd.DataFrame:
     gdp = load_weo_gdp(weo_csv)
 
     merged = etf_annual.merge(gdp, on=["country_code", "year"], how="left")
-    merged["etf_minus_gdp_growth_pct"] = (
-        merged["etf_return_pct"] - merged["gdp_real_growth_pct"]
+    merged["gdp_real_minus_etf_growth_pct"] = (
+        merged["gdp_real_growth_pct"] - merged["etf_return_pct"]
+    )
+    merged["gdp_nominal_minus_etf_growth_pct"] = (
+        merged["gdp_nominal_growth_pct"] - merged["etf_return_pct"]
+    )
+    # Keep existing column name for compatibility; this now explicitly tracks real GDP minus ETF.
+    merged["gdp_minus_etf_growth_pct"] = (
+        merged["gdp_real_growth_pct"] - merged["etf_return_pct"]
     )
     return merged[
         [
@@ -204,7 +219,10 @@ def build_combined_dataset(etf_csv: str, weo_csv: str) -> pd.DataFrame:
             "etf_return_pct",
             "gdp_current_usd",
             "gdp_real_growth_pct",
-            "etf_minus_gdp_growth_pct",
+            "gdp_nominal_growth_pct",
+            "gdp_real_minus_etf_growth_pct",
+            "gdp_nominal_minus_etf_growth_pct",
+            "gdp_minus_etf_growth_pct",
         ]
     ].sort_values(["country_name", "ticker", "year"])
 
