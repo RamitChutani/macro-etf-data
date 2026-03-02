@@ -1,0 +1,7 @@
+country_name,country_code,indicator,indicator_label,frequency,year,value
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2024,29298025000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2025,30615743000000
+United States,USA,NGDPD,"GDP, current prices (U.S. dollars)",A,2026,31821293000000
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2024,2.793
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2025,2.017
+United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.102

@@ -29,7 +29,7 @@ The solution must remain extensible so additional dashboard variables can be add
 
 - In scope:
   - Automated ETF data retrieval from `yfinance` for selected tickers
-  - Integration of country-level macro data from an approved source (source currently undecided)
+  - Integration of country-level macro data from IMF World Economic Outlook (October 2025 edition)
   - Output generation as CSV and/or Excel (including a dashboard sheet for Excel outputs)
   - Python environment managed with `uv` and `pyproject.toml`
 - Out of scope (current state):
@@ -41,6 +41,7 @@ The solution must remain extensible so additional dashboard variables can be add
 ### Success Criteria
 
 - Pipeline runs end-to-end in the project environment and refreshes ETF + macro datasets without manual data edits.
+- IMF macro inputs are sourced from World Economic Outlook October 2025 data, including 2025 and 2026 GDP projections where available.
 - Output is generated in at least one supported format (`.csv` or `.xlsx`), and Excel mode contains:
   - one sheet with tabular data
   - one sheet with dashboard-ready views/metrics
@@ -61,7 +62,7 @@ This section describes current reality as of March 2, 2026.
   - `etf_prices.csv` is a large checked-in artifact used as current output.
 - Known inconsistencies/technical debt:
   - Macro data retrieval is not implemented yet; only ETF price extraction exists.
-  - Data source for macro series is still undecided, so ingestion contracts are not defined.
+  - IMF WEO October 2025 is selected as source, but ingestion contracts and country mapping rules are not yet implemented.
   - Notebook comments indicate a simplified adjusted-close-only schema, but current CSV includes a much wider schema with multiple field/index variants (including volume-derived columns), indicating artifact/code drift across runs.
   - No formal module boundaries; logic, experimentation, and output generation are mixed in notebook cells.
   - README is minimal and does not document run instructions, data contract, or update policy.
@@ -72,7 +73,7 @@ This section describes current reality as of March 2, 2026.
   - Python 3.12+ compatibility and current dependency manager (`uv`).
 - Areas intentionally marked for future refactor:
   - Possible extraction of notebook logic into importable Python modules/scripts.
-  - Formalization of macro-data ingestion once source/provider is selected.
+  - Formalization of IMF WEO ingestion and country mapping logic.
   - Formalization of output schema, dashboard metric definitions, and validation checks.
 - Constraints imposed by legacy decisions:
   - Current behavior and data lineage are tied to notebook execution order/state.
@@ -117,6 +118,7 @@ This section describes current reality as of March 2, 2026.
 - Do not introduce new folder/module structures proactively; architecture is evolving and requires explicit user sign-off before structural changes.
 - Preserve output file naming/location conventions unless change is explicitly requested.
 - Keep external data fetch boundaries explicit (`yfinance` only unless approved otherwise).
+- Pin macro baseline to IMF World Economic Outlook October 2025 unless user explicitly approves source/version change.
 - Keep dashboard variables and derived metrics explicitly defined and traceable to source columns/series.
 
 ---
@@ -135,6 +137,7 @@ This section describes current reality as of March 2, 2026.
 - Treat `etf_prices.csv` as a generated artifact; regenerate intentionally and avoid accidental churn.
 - Treat external API responses from `yfinance` as untrusted and potentially incomplete; handle missing fields defensively.
 - Treat macroeconomic source data as untrusted and version-sensitive; validate units/frequency before merge.
+- Do not silently switch IMF WEO edition/version without explicit user approval.
 - Do not add auto-download side effects to `main.py` or import-time code without explicit request.
 
 ---
@@ -192,10 +195,10 @@ Conservative.
 ## 11. Open Questions / Design Tensions
 
 - Notebook-first workflow vs modular Python package pipeline.
-- Which macro data source to use (for example FRED, World Bank, IMF, OECD) and what licensing/access constraints apply.
 - Source of truth for schema: notebook comments/current logic vs existing checked-in CSV shape.
 - Should ticker universe live in code, config file, or external data source.
 - Policy for regenerating and versioning large data artifacts in git.
+- Exact IMF WEO extraction format and country-name normalization strategy for joining with ETF ticker labels.
 - How dashboard metrics should be prioritized for lead-generation vs portfolio decision support.
 - Whether to add automated validation/tests before further feature growth.
 
