@@ -56,32 +56,31 @@ The solution must remain extensible so additional dashboard variables can be add
 This section describes current reality as of March 2, 2026.
 
 - Existing architecture:
-  - Flat repository with notebook-first workflow.
-  - `yf_data.ipynb` contains the effective business logic (ticker list, ETF download, frame shaping, CSV export).
-  - `main.py` exists but only prints a hello-world message and is not part of the data pipeline.
-  - `etf_prices.csv` is a large checked-in artifact used as current output.
+  - Flat repository with script-first workflow.
+  - Core pipeline scripts: `fetch_etf_prices.py`, `fetch_weo_gdp.py`, `build_combined_etf_weo.py`, `main.py`.
+  - `main.py` orchestrates end-to-end refresh (ETF -> WEO -> combined annual output).
+  - `etf_return_validation.ipynb` is used for one-ticker interactive validation/debugging.
+  - `etf_prices.csv`, `weo_gdp.csv`, and `etf_weo_combined_annual.csv` are current generated outputs.
 - Known inconsistencies/technical debt:
-  - Macro data retrieval is not implemented yet; only ETF price extraction exists.
-  - IMF WEO October 2025 is selected as source, but ingestion contracts and country mapping rules are not yet implemented.
-  - Notebook comments indicate a simplified adjusted-close-only schema, but current CSV includes a much wider schema with multiple field/index variants (including volume-derived columns), indicating artifact/code drift across runs.
-  - No formal module boundaries; logic, experimentation, and output generation are mixed in notebook cells.
-  - README is minimal and does not document run instructions, data contract, or update policy.
+  - Upstream Yahoo history can include unexplained level breaks for some tickers; return calculations require defensive checks.
+  - IMF WEO October 2025 is fixed as baseline, but schema contracts and mapping validations remain lightweight.
+  - Output schema expectations can still drift if downstream users assume legacy ETF artifact formats.
   - No automated test suite currently present.
 - Areas that must remain stable:
   - Existing ticker dictionary semantics (country-to-ticker mapping) unless explicitly changed.
   - CSV output remains consumable by downstream analysis workflows.
   - Python 3.12+ compatibility and current dependency manager (`uv`).
 - Areas intentionally marked for future refactor:
-  - Possible extraction of notebook logic into importable Python modules/scripts.
+  - Possible extraction of shared return-validation logic from notebook into reusable Python modules.
   - Formalization of IMF WEO ingestion and country mapping logic.
   - Formalization of output schema, dashboard metric definitions, and validation checks.
 - Constraints imposed by legacy decisions:
-  - Current behavior and data lineage are tied to notebook execution order/state.
+  - Some historical artifacts and stakeholder comparisons were based on prior schema versions.
   - Generated CSV may reflect prior logic versions and should be treated as derived, not source-of-truth logic.
 - Undocumented conventions currently in use:
-  - Date window defaults to `start = "2015-01-01"` and dynamic end date (`today`) in notebook.
+  - Date window defaults to `start = "2015-01-01"` and dynamic end date (`today`) in ETF fetch script.
   - Output file path defaults to repository root (`etf_prices.csv`).
-  - Country-ticker mapping currently lives inline in notebook code.
+  - Country-ticker mapping currently lives inline in Python scripts.
 
 ---
 
@@ -90,7 +89,7 @@ This section describes current reality as of March 2, 2026.
 ### Stack
 
 - Language: Python (3.12+)
-- Framework: Jupyter Notebook workflow (no web framework)
+- Framework: Script-based CLI workflow with optional Jupyter notebook for validation (no web framework)
 - Runtime: Local Python virtual environment (`.venv`) and `uv` project tooling
 - Database: None
 - Infrastructure: Local filesystem artifacts only
@@ -99,7 +98,7 @@ This section describes current reality as of March 2, 2026.
 
 - Development setup assumptions:
   - `uv` is available for dependency/environment management.
-  - Notebook is run from repository root so relative export path is stable.
+  - Commands are run from repository root so relative paths are stable.
 - OS assumptions:
   - No strict OS lock-in, but current workflow is validated on Linux-like shell environments.
 - Deployment target:
@@ -113,7 +112,8 @@ This section describes current reality as of March 2, 2026.
 
 ## 4. Architectural Rules (Project-Specific)
 
-- Treat `yf_data.ipynb` as the current canonical pipeline implementation unless the user explicitly approves migration to scripts/modules.
+- Treat `.py` scripts as the canonical pipeline implementation.
+- Treat `etf_return_validation.ipynb` as a validation/debug surface, not the source of truth for production refresh outputs.
 - Keep data acquisition logic and ticker definitions deterministic within a run; avoid hidden randomness or non-repeatable sampling.
 - Do not introduce new folder/module structures proactively; architecture is evolving and requires explicit user sign-off before structural changes.
 - Preserve output file naming/location conventions unless change is explicitly requested.
@@ -135,6 +135,7 @@ This section describes current reality as of March 2, 2026.
 
 - Ask for approval before structural refactors (file/folder reorganization, notebook-to-package conversion, major pipeline rewrites).
 - Treat `etf_prices.csv` as a generated artifact; regenerate intentionally and avoid accidental churn.
+- Keep session work notes under `docs/worklog/` as local-only artifacts unless explicitly requested to track in git.
 - Treat external API responses from `yfinance` as untrusted and potentially incomplete; handle missing fields defensively.
 - Treat macroeconomic source data as untrusted and version-sensitive; validate units/frequency before merge.
 - Do not silently switch IMF WEO edition/version without explicit user approval.
@@ -176,9 +177,10 @@ Performance is secondary at current project stage.
 - Mocking allowed: Yes, if tests are introduced.
 - Deterministic test requirement: Yes for any future automated tests.
 - Manual validation (current enforcement):
-  - Run notebook end-to-end.
-  - Confirm `etf_prices.csv` is produced and readable.
-  - Spot-check sample columns and date range for plausibility.
+  - Run pipeline end-to-end (`uv run python main.py`) or run the three scripts in sequence.
+  - Confirm `etf_prices.csv`, `weo_gdp.csv`, and `etf_weo_combined_annual.csv` are produced and readable.
+  - Spot-check sample columns, date range, and country/ticker coverage for plausibility.
+  - Use `etf_return_validation.ipynb` for one-ticker deep checks when investigating discrepancies.
 
 ---
 
@@ -194,11 +196,12 @@ Conservative.
 
 ## 11. Open Questions / Design Tensions
 
-- Notebook-first workflow vs modular Python package pipeline.
+- Script-first workflow with notebook-assisted validation vs full modular package structure.
 - Source of truth for schema: notebook comments/current logic vs existing checked-in CSV shape.
 - Should ticker universe live in code, config file, or external data source.
 - Policy for regenerating and versioning large data artifacts in git.
 - Exact IMF WEO extraction format and country-name normalization strategy for joining with ETF ticker labels.
+- How to standardize handling of Yahoo price-level anomalies/breakpoints across all tickers and periods.
 - How dashboard metrics should be prioritized for lead-generation vs portfolio decision support.
 - Whether to add automated validation/tests before further feature growth.
 
@@ -209,3 +212,5 @@ Conservative.
 - v0.1 - Initial repository created with Python project scaffolding and placeholder `main.py`.
 - v0.2 - Data workflow implemented in `yf_data.ipynb` using `yfinance` and `pandas`.
 - v0.3 - CSV artifact (`etf_prices.csv`) committed as generated output; schema drift now exists between notebook intent comments and current artifact shape.
+- v0.4 - Pipeline migrated to script-first flow (`fetch_etf_prices.py`, `fetch_weo_gdp.py`, `build_combined_etf_weo.py`, orchestrated by `main.py`).
+- v0.5 - Added `etf_return_validation.ipynb` for one-ticker visual/return diagnostics and anomaly investigation.

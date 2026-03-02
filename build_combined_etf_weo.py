@@ -88,14 +88,21 @@ COUNTRY_TO_ISO3 = {
 
 def choose_etf_price_columns(columns: list[str]) -> dict[str, tuple[str, str]]:
     """Return ticker -> (price_column_name, source_field) with Adj Close fallback."""
-    pattern = re.compile(r"\('([^']+)', '([^']+)'\)_price")
+    legacy_pattern = re.compile(r"\('([^']+)', '([^']+)'\)_price")
     ticker_fields: dict[str, dict[str, str]] = {}
     for col in columns:
-        match = pattern.match(col)
-        if not match:
+        legacy_match = legacy_pattern.match(col)
+        if legacy_match:
+            field, ticker = legacy_match.groups()
+            ticker_fields.setdefault(ticker, {})[field] = col
             continue
-        field, ticker = match.groups()
-        ticker_fields.setdefault(ticker, {})[field] = col
+
+        # New format from fetch_etf_prices.py: "<Label> - <TICKER> - Adj Close"
+        parts = col.rsplit(" - ", 2)
+        if len(parts) == 3:
+            _, ticker, field = parts
+            if field in {"Adj Close", "Close"}:
+                ticker_fields.setdefault(ticker, {})[field] = col
 
     selected: dict[str, tuple[str, str]] = {}
     for ticker, fields in ticker_fields.items():
