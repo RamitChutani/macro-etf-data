@@ -1,0 +1,17 @@
+country,original_label,original_ticker,current_status,recommendation,recommended_ticker,confidence,notes
+Austria,Austria,XB4A.L,excluded,manual_review,,low,No reliable LSE ETF candidate found via yfinance search; likely delisted or wrong Yahoo symbol.
+Belgium,Belgium,BEL.L,excluded,manual_review,,low,Yahoo resolves as non-LSE mutual fund; no clear LSE ETF replacement surfaced.
+Bulgaria,Bulgaria,BGX.L,included,keep_existing,BGX.L,high,Valid LSE ETF in EUR; now included after relaxing GBP-only rule.
+France,France_2,CACC.L,excluded,drop_duplicate,ISFR.L,high,France exposure already covered by ISFR.L; CACC.L appears invalid on Yahoo.
+Greece,Greece,GRE.L,excluded,manual_review,0IWZ.L,low,Current GRE.L unusable; 0IWZ.L surfaced but requires manual product validation.
+Hong Kong,Hong Kong,HKDU.L,included,keep_existing,HKDU.L,high,Valid LSE ETF in USD; now included.
+Indonesia,Indonesia,INDO.L,included,replace_candidate,HIDR.L,medium,INDO.L has near-empty history; HIDR.L/HIDD.L surfaced as better LSE candidates.
+Italy,Italy,CMIB.L,included,manual_review,,medium,Currently includes only sparse history in Yahoo; likely needs replacement after manual issuer check.
+Kuwait,Kuwait,MKUW.L,included,keep_existing,MKUW.L,high,Valid LSE ETF in USD; now included.
+Netherlands,Netherlands,IAEA.L,excluded,manual_review,,low,No reliable LSE candidate found in yfinance search; ticker appears dead.
+Pakistan,Pakistan,XBAK.L,included,keep_existing,XBAK.L,high,Valid LSE ETF in USD with full history.
+Saudi Arabia,Saudi Arabia,IKSA.L,included,keep_existing,IKSA.L,high,Valid LSE ETF in USD with full history.
+Singapore,Singapore,XBAS.L,excluded,manual_review,0JLR.L,low,XBAS.L appears invalid; 0JLR.L surfaced but requires manual validation.
+South Korea,South Korea_1,CSKR.L,included,keep_existing,CSKR.L,high,Valid LSE ETF in USD with full history.
+Spain,Spain_2,XESP.L,excluded,drop_duplicate,CS1.L,high,Spain exposure already covered by CS1.L; XESP.L appears invalid on Yahoo.
+Switzerland,Switzerland,CHUSD.L,excluded,replace_candidate,CSWG.L,medium,CHUSD.L appears invalid; CSWG.L is a strong LSE candidate requiring final manual verification.

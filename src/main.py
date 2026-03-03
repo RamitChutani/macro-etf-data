@@ -30,6 +30,10 @@ def main() -> None:
     parser.add_argument("--end-year", type=int, default=2026)
     parser.add_argument("--etf-output", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-output", default="data/outputs/weo_gdp.csv")
+    parser.add_argument(
+        "--metadata-output",
+        default="data/outputs/etf_ticker_metadata.csv",
+    )
     parser.add_argument("--combined-output", default="data/outputs/etf_weo_combined_annual.csv")
     parser.add_argument("--dashboard-output", default="data/outputs/etf_gdp_dashboard_mvp.xlsx")
     parser.add_argument(
@@ -55,6 +59,8 @@ def main() -> None:
         str(script_dir / "fetch_etf_prices.py"),
         "--output",
         args.etf_output,
+        "--metadata-output",
+        args.metadata_output,
     ]
     if args.start_date:
         etf_cmd.extend(["--start", args.start_date])
@@ -79,6 +85,8 @@ def main() -> None:
         args.etf_output,
         "--weo-csv",
         args.weo_output,
+        "--metadata-csv",
+        args.metadata_output,
         "--output",
         args.combined_output,
     ]
@@ -94,6 +102,8 @@ def main() -> None:
             args.etf_output,
             "--weo-csv",
             args.weo_output,
+            "--metadata-csv",
+            args.metadata_output,
             "--output",
             args.dashboard_output,
         ]

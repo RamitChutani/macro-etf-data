@@ -121,10 +121,33 @@ def build_ticker_country_map() -> dict[str, str]:
     return ticker_to_country
 
 
-def compute_annual_etf_returns(etf_csv: str) -> pd.DataFrame:
+def load_ticker_currency_map(metadata_csv: str | None) -> dict[str, str]:
+    if not metadata_csv:
+        return {}
+    try:
+        meta = pd.read_csv(metadata_csv)
+    except FileNotFoundError:
+        return {}
+    required = {"ticker", "currency"}
+    if not required.issubset(set(meta.columns)):
+        return {}
+    meta = meta.copy()
+    meta["ticker"] = meta["ticker"].astype(str)
+    meta["currency"] = meta["currency"].fillna("").astype(str)
+    out = (
+        meta[["ticker", "currency"]]
+        .drop_duplicates(subset=["ticker"], keep="first")
+        .set_index("ticker")["currency"]
+        .to_dict()
+    )
+    return out
+
+
+def compute_annual_etf_returns(etf_csv: str, metadata_csv: str | None = None) -> pd.DataFrame:
     raw = pd.read_csv(etf_csv)
     selected = choose_etf_price_columns(raw.columns.tolist())
     ticker_country = build_ticker_country_map()
+    ticker_currency = load_ticker_currency_map(metadata_csv)
 
     keep_cols = ["Date"] + [col for col, _ in selected.values()]
     frame = raw[keep_cols].copy()
@@ -151,6 +174,7 @@ def compute_annual_etf_returns(etf_csv: str) -> pd.DataFrame:
         annual["etf_price_field"] = field_used
         annual["country_name"] = ticker_country[ticker]
         annual["country_code"] = annual["country_name"].map(COUNTRY_TO_ISO3)
+        annual["etf_currency"] = ticker_currency.get(ticker, "")
         chunks.append(annual)
 
     if not chunks:
@@ -192,8 +216,10 @@ def load_weo_gdp(weo_csv: str) -> pd.DataFrame:
     return pivot
 
 
-def build_combined_dataset(etf_csv: str, weo_csv: str) -> pd.DataFrame:
-    etf_annual = compute_annual_etf_returns(etf_csv)
+def build_combined_dataset(
+    etf_csv: str, weo_csv: str, metadata_csv: str | None = None
+) -> pd.DataFrame:
+    etf_annual = compute_annual_etf_returns(etf_csv, metadata_csv)
     gdp = load_weo_gdp(weo_csv)
 
     merged = etf_annual.merge(gdp, on=["country_code", "year"], how="left")
@@ -212,6 +238,7 @@ def build_combined_dataset(etf_csv: str, weo_csv: str) -> pd.DataFrame:
             "country_name",
             "country_code",
             "ticker",
+            "etf_currency",
             "etf_price_field",
             "year",
             "etf_price_start",
@@ -233,10 +260,15 @@ def main() -> None:
     )
     parser.add_argument("--etf-csv", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-csv", default="data/outputs/weo_gdp.csv")
+    parser.add_argument(
+        "--metadata-csv",
+        default="data/outputs/etf_ticker_metadata.csv",
+        help="Optional ticker metadata CSV containing currency by ticker.",
+    )
     parser.add_argument("--output", default="data/outputs/etf_weo_combined_annual.csv")
     args = parser.parse_args()
 
-    combined = build_combined_dataset(args.etf_csv, args.weo_csv)
+    combined = build_combined_dataset(args.etf_csv, args.weo_csv, args.metadata_csv)
     combined.to_csv(args.output, index=False)
     print(f"Wrote {len(combined)} rows to {args.output}")
     print(

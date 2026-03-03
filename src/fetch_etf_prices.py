@@ -58,7 +58,9 @@ ETF_LABEL_TO_TICKER = {
 }
 
 
-ALLOWED_CURRENCIES = {"GBP", "GBp"}
+REQUIRED_EXCHANGE = "LSE"
+REQUIRED_QUOTE_TYPE = "ETF"
+ALLOWED_CURRENCIES = {"GBP", "GBp", "USD", "EUR"}
 
 
 def build_pretty_col(label: str, ticker: str) -> str:
@@ -84,10 +86,21 @@ def fetch_ticker_history_close(
         tk = yf.Ticker(ticker)
         info = tk.info
         currency = info.get("currency")
-        info_row["exchange"] = info.get("exchange")
+        exchange = info.get("exchange")
+        quote_type = info.get("quoteType")
+        info_row["exchange"] = exchange
         info_row["currency"] = currency
-        info_row["quote_type"] = info.get("quoteType")
+        info_row["quote_type"] = quote_type
 
+        if exchange != REQUIRED_EXCHANGE:
+            info_row["reason"] = f"unsupported exchange {exchange}"
+            return None, info_row
+        if quote_type != REQUIRED_QUOTE_TYPE:
+            info_row["reason"] = f"unsupported quoteType {quote_type}"
+            return None, info_row
+        if not currency:
+            info_row["reason"] = "missing currency"
+            return None, info_row
         if currency not in ALLOWED_CURRENCIES:
             info_row["reason"] = f"unsupported currency {currency}"
             return None, info_row

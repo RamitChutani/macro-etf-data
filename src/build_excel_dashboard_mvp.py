@@ -188,14 +188,38 @@ def load_history_wide(etf_csv: str) -> pd.DataFrame:
     return raw[cols].copy()
 
 
+def load_ticker_currency_map(metadata_csv: str | None) -> dict[str, str]:
+    if not metadata_csv:
+        return {}
+    try:
+        meta = pd.read_csv(metadata_csv)
+    except FileNotFoundError:
+        return {}
+    required = {"ticker", "currency"}
+    if not required.issubset(set(meta.columns)):
+        return {}
+    meta = meta.copy()
+    meta["ticker"] = meta["ticker"].astype(str)
+    meta["currency"] = meta["currency"].fillna("").astype(str)
+    return (
+        meta[["ticker", "currency"]]
+        .drop_duplicates(subset=["ticker"], keep="first")
+        .set_index("ticker")["currency"]
+        .to_dict()
+    )
+
+
 def build_timeframe_rows(
-    etf_csv: str, weo_csv: str
+    etf_csv: str,
+    weo_csv: str,
+    metadata_csv: str | None = "data/outputs/etf_ticker_metadata.csv",
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     raw = pd.read_csv(etf_csv)
     raw["Date"] = pd.to_datetime(raw["Date"], errors="coerce")
     raw = raw.dropna(subset=["Date"]).sort_values("Date")
 
     ticker_to_country = build_ticker_country_map()
+    ticker_to_currency = load_ticker_currency_map(metadata_csv)
     price_columns = choose_price_columns(raw.columns.tolist())
     gdp_real_growth_map, gdp_nominal_growth_map = load_gdp_growth_maps(weo_csv)
 
@@ -253,6 +277,7 @@ def build_timeframe_rows(
                     "start_date": start_pt.date.date(),
                     "end_date": end_pt.date.date(),
                     "etf_return_pct": etf_return,
+                    "etf_currency": ticker_to_currency.get(ticker, ""),
                 }
             )
 
@@ -287,6 +312,7 @@ def build_timeframe_rows(
                             if (etf_return is not None and gdp_nominal_same is not None)
                             else None
                         ),
+                        "etf_currency": ticker_to_currency.get(ticker, ""),
                     }
                 )
 
@@ -323,6 +349,7 @@ def build_timeframe_rows(
                         if gdp_nominal_cagr is not None
                         else None
                     ),
+                    "etf_currency": ticker_to_currency.get(ticker, ""),
                 }
             )
 
@@ -338,6 +365,19 @@ def build_timeframe_rows(
         timeframe_df["lookup_key"] = (
             timeframe_df["country_name"] + "|" + timeframe_df["ticker"] + "|" + timeframe_df["timeframe"]
         )
+        timeframe_df = timeframe_df[
+            [
+                "country_name",
+                "country_code",
+                "ticker",
+                "timeframe",
+                "start_date",
+                "end_date",
+                "etf_return_pct",
+                "lookup_key",
+                "etf_currency",
+            ]
+        ]
 
     annual_df = pd.DataFrame(annual_rows)
     if not annual_df.empty:
@@ -350,6 +390,22 @@ def build_timeframe_rows(
         annual_df["country_year_key"] = (
             annual_df["country_name"] + "|" + annual_df["year"].astype(str)
         )
+        annual_df = annual_df[
+            [
+                "country_name",
+                "country_code",
+                "ticker",
+                "year",
+                "etf_return_pct",
+                "gdp_real_growth_pct",
+                "gdp_nominal_growth_pct",
+                "gdp_real_minus_etf_growth_pct",
+                "gdp_nominal_minus_etf_growth_pct",
+                "lookup_key",
+                "country_year_key",
+                "etf_currency",
+            ]
+        ]
 
     cagr_df = pd.DataFrame(cagr_rows)
     # Ensure GDP CAGR exists per country+horizon even when ETF CAGR is unavailable.
@@ -391,6 +447,7 @@ def build_timeframe_rows(
                     "gdp_nominal_cagr_pct": gdp_nominal_cagr,
                     "gdp_real_minus_etf_cagr_pct": None,
                     "gdp_nominal_minus_etf_cagr_pct": None,
+                    "etf_currency": "",
                 }
             )
     if gdp_only_rows:
@@ -414,6 +471,23 @@ def build_timeframe_rows(
         cagr_df["country_horizon_key"] = (
             cagr_df["country_name"] + "|" + cagr_df["horizon"]
         )
+        cagr_df = cagr_df[
+            [
+                "country_name",
+                "country_code",
+                "ticker",
+                "as_of_date",
+                "horizon",
+                "etf_cagr_pct",
+                "gdp_real_cagr_pct",
+                "gdp_nominal_cagr_pct",
+                "gdp_real_minus_etf_cagr_pct",
+                "gdp_nominal_minus_etf_cagr_pct",
+                "lookup_key",
+                "country_horizon_key",
+                "etf_currency",
+            ]
+        ]
 
     return timeframe_df, annual_df, cagr_df
 
@@ -437,7 +511,16 @@ def write_dashboard_xlsx(
             .groupby("country_name", as_index=False)
             .first()
         )
+        ticker_currency_map = (
+            timeframe_df[["ticker", "etf_currency"]]
+            .drop_duplicates(subset=["ticker"], keep="first")
+            .set_index("ticker")["etf_currency"]
+            .to_dict()
+        )
         country_summary_df = default_map.rename(columns={"ticker": "ticker_used"}).copy()
+        country_summary_df["ticker_currency"] = country_summary_df["ticker_used"].map(
+            ticker_currency_map
+        ).fillna("")
 
         timeframe_df.to_excel(writer, sheet_name="ETF_Timeframes", index=False)
         annual_df.to_excel(writer, sheet_name="Annual", index=False)
@@ -482,10 +565,11 @@ def write_dashboard_xlsx(
         ws_country["A3"] = "Metrics are CAGR (annualized), not cumulative return."
         ws_country["A5"] = "country_name"
         ws_country["B5"] = "ticker_used"
-        ws_country["C5"] = "ETF CAGR %"
-        ws_country["D5"] = "GDP Real CAGR %"
-        ws_country["E5"] = "GDP - ETF CAGR %"
-        for c in ["A2", "A5", "B5", "C5", "D5", "E5"]:
+        ws_country["C5"] = "ticker_currency"
+        ws_country["D5"] = "ETF CAGR %"
+        ws_country["E5"] = "GDP Real CAGR %"
+        ws_country["F5"] = "GDP - ETF CAGR %"
+        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5"]:
             ws_country[c].font = Font(bold=True)
 
         horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -495,17 +579,17 @@ def write_dashboard_xlsx(
         country_start_row = 6
         country_end_row = 5 + len(country_summary_df)
         for r in range(country_start_row, country_end_row + 1):
-            ws_country[f"C{r}"] = (
+            ws_country[f"D{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
             )
-            ws_country[f"D{r}"] = (
+            ws_country[f"E{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
             )
-            ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),D{r}-C{r},NA())"
-            for col in ["C", "D", "E"]:
+            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(D{r}),ISNUMBER(E{r})),E{r}-D{r},NA())"
+            for col in ["D", "E", "F"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
 
-        ws_country.auto_filter.ref = f"A5:E{country_end_row}"
+        ws_country.auto_filter.ref = f"A5:F{country_end_row}"
 
         # Dashboard header and controls
         ws_dash["A1"] = "Interactive Excel KPI Dashboard"
@@ -513,6 +597,7 @@ def write_dashboard_xlsx(
         ws_dash["A2"] = "Country"
         ws_dash["A3"] = "Ticker (auto)"
         ws_dash["A4"] = "As-of Date"
+        ws_dash["A5"] = "Ticker Currency"
         ws_dash["D2"] = "Choose country from dropdown; ticker auto-selects first mapped ETF."
         ws_dash["D3"] = "ETF timeframe panel is ETF-only; GDP comparison is annual (last 10 years)."
         ws_dash["D4"] = "Review Country_CAGR_Summary first to identify top disconnects."
@@ -528,6 +613,7 @@ def write_dashboard_xlsx(
         ws_dash["B2"] = timeframe_df["country_name"].iloc[0]
         ws_dash["B3"] = '=IFERROR(INDEX(Lists!$D:$D, MATCH($B$2, Lists!$C:$C, 0)),"")'
         ws_dash["B4"] = '=IFERROR(INDEX(ETF_Timeframes!$F:$F, MATCH($B$2&"|"&$B$3&"|MAX", ETF_Timeframes!$H:$H, 0)),"")'
+        ws_dash["B5"] = '=IFERROR(INDEX(ETF_Timeframes!$I:$I, MATCH($B$2&"|"&$B$3&"|MAX", ETF_Timeframes!$H:$H, 0)),"")'
         ws_dash["B4"].number_format = "yyyy-mm-dd"
 
         # ETF-only timeframe KPI table
@@ -638,11 +724,11 @@ def write_dashboard_xlsx(
                 rng, CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill)
             )
         ws_country.conditional_formatting.add(
-            f"C{country_start_row}:E{country_end_row}",
+            f"D{country_start_row}:F{country_end_row}",
             CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill),
         )
         ws_country.conditional_formatting.add(
-            f"C{country_start_row}:E{country_end_row}",
+            f"D{country_start_row}:F{country_end_row}",
             CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
         )
 
@@ -657,8 +743,9 @@ def write_dashboard_xlsx(
         ws_country.column_dimensions["A"].width = 20
         ws_country.column_dimensions["B"].width = 14
         ws_country.column_dimensions["C"].width = 14
-        ws_country.column_dimensions["D"].width = 16
-        ws_country.column_dimensions["E"].width = 18
+        ws_country.column_dimensions["D"].width = 14
+        ws_country.column_dimensions["E"].width = 16
+        ws_country.column_dimensions["F"].width = 18
 
         # Keep helper lists out of the way.
         ws_lists.sheet_state = "hidden"
@@ -678,10 +765,17 @@ def main() -> None:
     )
     parser.add_argument("--etf-csv", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-csv", default="data/outputs/weo_gdp.csv")
+    parser.add_argument(
+        "--metadata-csv",
+        default="data/outputs/etf_ticker_metadata.csv",
+        help="Optional ticker metadata CSV containing currency by ticker.",
+    )
     parser.add_argument("--output", default="data/outputs/etf_gdp_dashboard_mvp.xlsx")
     args = parser.parse_args()
 
-    timeframe_df, annual_df, cagr_df = build_timeframe_rows(args.etf_csv, args.weo_csv)
+    timeframe_df, annual_df, cagr_df = build_timeframe_rows(
+        args.etf_csv, args.weo_csv, args.metadata_csv
+    )
     if timeframe_df.empty:
         raise RuntimeError("No timeframe rows produced. Check ETF and WEO input data.")
     if annual_df.empty:

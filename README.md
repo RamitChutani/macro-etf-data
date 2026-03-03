@@ -12,11 +12,14 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 ## Current Capabilities
 
 - Fetch ETF daily price data for configured country-focused tickers.
+- Include valid LSE ETFs across `GBP`/`GBp`/`USD`/`EUR` (no GBP-only exclusion).
 - Fetch IMF WEO indicators `NGDPD` and `NGDP_RPCH` for mapped countries.
 - Build annual ETF return output merged with GDP metrics.
+  - combined annual output now includes `etf_currency`
 - Run full pipeline from one command via `main.py`.
 - Build an interactive Excel KPI dashboard (MVP) for stakeholder review with:
   - country-level CAGR disconnect screener sheet with selectable horizon (1Y/3Y/5Y/10Y, default 5Y)
+  - screener includes ticker currency column and dashboard control row shows selected ticker currency
   - compares ETF CAGR vs real GDP CAGR and `GDP - ETF` spread for quick triage
   - ETF-only timeframe returns (YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX)
   - annual ETF vs GDP comparison (last 10 years)
