@@ -38,6 +38,43 @@ TIMEFRAME_SPECS: list[tuple[str, object]] = [
 
 ANNUAL_WINDOW_YEARS = 10
 CAGR_HORIZONS = [1, 3, 5, 10]
+COUNTRY_TO_REGION = {
+    "Australia": "Oceania",
+    "Austria": "Europe",
+    "Belgium": "Europe",
+    "Brazil": "Latin America",
+    "Bulgaria": "Europe",
+    "Canada": "North America",
+    "China": "Asia",
+    "France": "Europe",
+    "Germany": "Europe",
+    "Greece": "Europe",
+    "Hong Kong": "Asia",
+    "India": "Asia",
+    "Indonesia": "Asia",
+    "Italy": "Europe",
+    "Japan": "Asia",
+    "Kuwait": "Middle East",
+    "Malaysia": "Asia",
+    "Mexico": "Latin America",
+    "Netherlands": "Europe",
+    "Pakistan": "Asia",
+    "Philippines": "Asia",
+    "Poland": "Europe",
+    "Saudi Arabia": "Middle East",
+    "Singapore": "Asia",
+    "South Africa": "Africa",
+    "South Korea": "Asia",
+    "Spain": "Europe",
+    "Sweden": "Europe",
+    "Switzerland": "Europe",
+    "Taiwan": "Asia",
+    "Thailand": "Asia",
+    "Turkey": "Europe",
+    "United Kingdom": "Europe",
+    "United States": "North America",
+    "Vietnam": "Asia",
+}
 
 
 @dataclass
@@ -521,6 +558,12 @@ def write_dashboard_xlsx(
         country_summary_df["ticker_currency"] = country_summary_df["ticker_used"].map(
             ticker_currency_map
         ).fillna("")
+        country_summary_df["region"] = country_summary_df["country_name"].map(
+            COUNTRY_TO_REGION
+        ).fillna("Other")
+        country_summary_df = country_summary_df[
+            ["country_name", "region", "ticker_used", "ticker_currency"]
+        ].sort_values(["region", "country_name"], ascending=[True, True]).reset_index(drop=True)
 
         timeframe_df.to_excel(writer, sheet_name="ETF_Timeframes", index=False)
         annual_df.to_excel(writer, sheet_name="Annual", index=False)
@@ -564,12 +607,13 @@ def write_dashboard_xlsx(
         ws_country["D2"] = "Start here: choose horizon, then sort by GDP - ETF CAGR."
         ws_country["A3"] = "Metrics are CAGR (annualized), not cumulative return."
         ws_country["A5"] = "country_name"
-        ws_country["B5"] = "ticker_used"
-        ws_country["C5"] = "ticker_currency"
-        ws_country["D5"] = "ETF CAGR %"
-        ws_country["E5"] = "GDP Real CAGR %"
-        ws_country["F5"] = "GDP - ETF CAGR %"
-        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5"]:
+        ws_country["B5"] = "region"
+        ws_country["C5"] = "ticker_used"
+        ws_country["D5"] = "ticker_currency"
+        ws_country["E5"] = "ETF CAGR %"
+        ws_country["F5"] = "GDP Real CAGR %"
+        ws_country["G5"] = "GDP - ETF CAGR %"
+        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5"]:
             ws_country[c].font = Font(bold=True)
 
         horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -579,17 +623,17 @@ def write_dashboard_xlsx(
         country_start_row = 6
         country_end_row = 5 + len(country_summary_df)
         for r in range(country_start_row, country_end_row + 1):
-            ws_country[f"D{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
-            )
             ws_country[f"E{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$C{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
+            )
+            ws_country[f"F{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
             )
-            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(D{r}),ISNUMBER(E{r})),E{r}-D{r},NA())"
-            for col in ["D", "E", "F"]:
+            ws_country[f"G{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(F{r})),F{r}-E{r},NA())"
+            for col in ["E", "F", "G"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
 
-        ws_country.auto_filter.ref = f"A5:F{country_end_row}"
+        ws_country.auto_filter.ref = f"A5:G{country_end_row}"
 
         # Dashboard header and controls
         ws_dash["A1"] = "Interactive Excel KPI Dashboard"
@@ -724,11 +768,11 @@ def write_dashboard_xlsx(
                 rng, CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill)
             )
         ws_country.conditional_formatting.add(
-            f"D{country_start_row}:F{country_end_row}",
+            f"E{country_start_row}:G{country_end_row}",
             CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill),
         )
         ws_country.conditional_formatting.add(
-            f"D{country_start_row}:F{country_end_row}",
+            f"E{country_start_row}:G{country_end_row}",
             CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
         )
 
@@ -741,11 +785,12 @@ def write_dashboard_xlsx(
         ws_dash.column_dimensions["F"].width = 22
         ws_dash.freeze_panes = None
         ws_country.column_dimensions["A"].width = 20
-        ws_country.column_dimensions["B"].width = 14
+        ws_country.column_dimensions["B"].width = 16
         ws_country.column_dimensions["C"].width = 14
         ws_country.column_dimensions["D"].width = 14
-        ws_country.column_dimensions["E"].width = 16
-        ws_country.column_dimensions["F"].width = 18
+        ws_country.column_dimensions["E"].width = 14
+        ws_country.column_dimensions["F"].width = 16
+        ws_country.column_dimensions["G"].width = 18
 
         # Keep helper lists out of the way.
         ws_lists.sheet_state = "hidden"
