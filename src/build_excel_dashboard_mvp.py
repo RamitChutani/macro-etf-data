@@ -37,6 +37,7 @@ TIMEFRAME_SPECS: list[tuple[str, object]] = [
 ]
 
 ANNUAL_WINDOW_YEARS = 10
+CAGR_HORIZONS = [1, 3, 5, 10]
 
 
 @dataclass
@@ -289,8 +290,8 @@ def build_timeframe_rows(
                     }
                 )
 
-        # CAGR rows (3Y, 5Y, 10Y)
-        for years in [3, 5, 10]:
+        # CAGR rows (1Y, 3Y, 5Y, 10Y)
+        for years in CAGR_HORIZONS:
             start_year = cagr_end_year - years + 1
             start_pt = first_in_year(series, start_year)
             end_year_pt = last_in_year(series, cagr_end_year)
@@ -369,7 +370,7 @@ def build_timeframe_rows(
         if not gdp_years:
             continue
         cagr_end_year = min(completed_year, max(gdp_years))
-        for years in [3, 5, 10]:
+        for years in CAGR_HORIZONS:
             gdp_real_cagr = gdp_cagr(
                 gdp_real_growth_map, country_code, cagr_end_year, years
             )
@@ -396,7 +397,11 @@ def build_timeframe_rows(
         cagr_df = pd.concat([cagr_df, pd.DataFrame(gdp_only_rows)], ignore_index=True)
 
     if not cagr_df.empty:
-        horizon_order = pd.Categorical(cagr_df["horizon"], categories=["3Y", "5Y", "10Y"], ordered=True)
+        horizon_order = pd.Categorical(
+            cagr_df["horizon"],
+            categories=[f"{y}Y" for y in CAGR_HORIZONS],
+            ordered=True,
+        )
         cagr_df = (
             cagr_df.assign(_h=horizon_order)
             .sort_values(["country_name", "ticker", "_h"])
@@ -425,6 +430,15 @@ def write_dashboard_xlsx(
     from openpyxl.worksheet.datavalidation import DataValidation
 
     with pd.ExcelWriter(output_xlsx, engine="openpyxl") as writer:
+        default_map = (
+            timeframe_df[["country_name", "ticker"]]
+            .drop_duplicates()
+            .sort_values(["country_name", "ticker"])
+            .groupby("country_name", as_index=False)
+            .first()
+        )
+        country_summary_df = default_map.rename(columns={"ticker": "ticker_used"}).copy()
+
         timeframe_df.to_excel(writer, sheet_name="ETF_Timeframes", index=False)
         annual_df.to_excel(writer, sheet_name="Annual", index=False)
         cagr_df.to_excel(writer, sheet_name="CAGR", index=False)
@@ -436,30 +450,18 @@ def write_dashboard_xlsx(
                 "ticker": pd.Series(
                     sorted(timeframe_df["ticker"].dropna().unique().tolist())
                 ),
-                "country_for_default": pd.Series(
-                    timeframe_df[["country_name", "ticker"]]
-                    .drop_duplicates()
-                    .sort_values(["country_name", "ticker"])
-                    .groupby("country_name", as_index=False)
-                    .first()["country_name"]
-                    .tolist()
-                ),
-                "default_ticker": pd.Series(
-                    timeframe_df[["country_name", "ticker"]]
-                    .drop_duplicates()
-                    .sort_values(["country_name", "ticker"])
-                    .groupby("country_name", as_index=False)
-                    .first()["ticker"]
-                    .tolist()
-                ),
+                "country_for_default": pd.Series(default_map["country_name"].tolist()),
+                "default_ticker": pd.Series(default_map["ticker"].tolist()),
             }
         ).to_excel(writer, sheet_name="Lists", index=False)
+        country_summary_df.to_excel(writer, sheet_name="Country_CAGR_Summary", index=False, startrow=4)
 
         wb = writer.book
         ws_tf = wb["ETF_Timeframes"]
         ws_annual = wb["Annual"]
         ws_cagr = wb["CAGR"]
         ws_lists = wb["Lists"]
+        ws_country = wb["Country_CAGR_Summary"]
         ws_dash = wb.create_sheet("Dashboard")
 
         # Source-sheet usability
@@ -469,6 +471,41 @@ def write_dashboard_xlsx(
         ws_annual.freeze_panes = "A2"
         ws_cagr.auto_filter.ref = ws_cagr.dimensions
         ws_cagr.freeze_panes = "A2"
+        ws_country.auto_filter.ref = ws_country.dimensions
+        ws_country.freeze_panes = "A6"
+
+        ws_country["A1"] = "Country CAGR Disconnect Screener"
+        ws_country["A1"].font = Font(bold=True, size=14)
+        ws_country["A2"] = "Horizon"
+        ws_country["B2"] = "5Y"
+        ws_country["D2"] = "Start here: choose horizon, then sort by GDP - ETF CAGR."
+        ws_country["A3"] = "Metrics are CAGR (annualized), not cumulative return."
+        ws_country["A5"] = "country_name"
+        ws_country["B5"] = "ticker_used"
+        ws_country["C5"] = "ETF CAGR %"
+        ws_country["D5"] = "GDP Real CAGR %"
+        ws_country["E5"] = "GDP - ETF CAGR %"
+        for c in ["A2", "A5", "B5", "C5", "D5", "E5"]:
+            ws_country[c].font = Font(bold=True)
+
+        horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
+        ws_country.add_data_validation(horizon_dv)
+        horizon_dv.add("B2")
+
+        country_start_row = 6
+        country_end_row = 5 + len(country_summary_df)
+        for r in range(country_start_row, country_end_row + 1):
+            ws_country[f"C{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
+            )
+            ws_country[f"D{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
+            )
+            ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),D{r}-C{r},NA())"
+            for col in ["C", "D", "E"]:
+                ws_country[f"{col}{r}"].number_format = "0.00"
+
+        ws_country.auto_filter.ref = f"A5:E{country_end_row}"
 
         # Dashboard header and controls
         ws_dash["A1"] = "Interactive Excel KPI Dashboard"
@@ -478,6 +515,7 @@ def write_dashboard_xlsx(
         ws_dash["A4"] = "As-of Date"
         ws_dash["D2"] = "Choose country from dropdown; ticker auto-selects first mapped ETF."
         ws_dash["D3"] = "ETF timeframe panel is ETF-only; GDP comparison is annual (last 10 years)."
+        ws_dash["D4"] = "Review Country_CAGR_Summary first to identify top disconnects."
 
         country_count = ws_lists.max_row - 1
         country_dv = DataValidation(
@@ -599,6 +637,14 @@ def write_dashboard_xlsx(
             ws_dash.conditional_formatting.add(
                 rng, CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill)
             )
+        ws_country.conditional_formatting.add(
+            f"C{country_start_row}:E{country_end_row}",
+            CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill),
+        )
+        ws_country.conditional_formatting.add(
+            f"C{country_start_row}:E{country_end_row}",
+            CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
+        )
 
         # Layout polish
         ws_dash.column_dimensions["A"].width = 14
@@ -608,9 +654,15 @@ def write_dashboard_xlsx(
         ws_dash.column_dimensions["E"].width = 20
         ws_dash.column_dimensions["F"].width = 22
         ws_dash.freeze_panes = None
+        ws_country.column_dimensions["A"].width = 20
+        ws_country.column_dimensions["B"].width = 14
+        ws_country.column_dimensions["C"].width = 14
+        ws_country.column_dimensions["D"].width = 16
+        ws_country.column_dimensions["E"].width = 18
 
         # Keep helper lists out of the way.
         ws_lists.sheet_state = "hidden"
+        wb.active = wb.sheetnames.index("Country_CAGR_Summary")
 
         # Force Excel to recalculate formulas/charts on open.
         wb.calculation.calcMode = "auto"

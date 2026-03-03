@@ -16,6 +16,8 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 - Build annual ETF return output merged with GDP metrics.
 - Run full pipeline from one command via `main.py`.
 - Build an interactive Excel KPI dashboard (MVP) for stakeholder review with:
+  - country-level CAGR disconnect screener sheet with selectable horizon (1Y/3Y/5Y/10Y, default 5Y)
+  - compares ETF CAGR vs real GDP CAGR and `GDP - ETF` spread for quick triage
   - ETF-only timeframe returns (YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX)
   - annual ETF vs GDP comparison (last 10 years)
   - GDP same-year comparison
