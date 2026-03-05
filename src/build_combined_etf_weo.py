@@ -7,6 +7,7 @@ import argparse
 import re
 
 import pandas as pd
+import yfinance as yf
 
 from etf_mapping import COUNTRY_TO_ISO3, build_ticker_country_map
 
@@ -59,6 +60,87 @@ def load_ticker_currency_map(metadata_csv: str | None) -> dict[str, str]:
     return out
 
 
+def load_ticker_hedged_map(metadata_csv: str | None) -> dict[str, str]:
+    if not metadata_csv:
+        return {}
+    try:
+        meta = pd.read_csv(metadata_csv)
+    except FileNotFoundError:
+        return {}
+    required = {"ticker", "currency_hedged"}
+    if not required.issubset(set(meta.columns)):
+        return {}
+    meta = meta.copy()
+    meta["ticker"] = meta["ticker"].astype(str)
+    meta["currency_hedged"] = meta["currency_hedged"].fillna("unknown").astype(str)
+    return (
+        meta[["ticker", "currency_hedged"]]
+        .drop_duplicates(subset=["ticker"], keep="first")
+        .set_index("ticker")["currency_hedged"]
+        .to_dict()
+    )
+
+
+def normalize_currency_code(currency: str) -> str:
+    c = str(currency or "").strip()
+    if c == "GBp":
+        return "GBP"
+    return c
+
+
+def compute_annual_fx_quote_to_usd_returns(
+    currencies: set[str],
+    min_year: int,
+    max_year: int,
+) -> dict[tuple[str, int], float]:
+    out: dict[tuple[str, int], float] = {}
+    for currency in sorted(currencies):
+        ccy = normalize_currency_code(currency)
+        if not ccy:
+            continue
+        if ccy == "USD":
+            for year in range(min_year, max_year + 1):
+                out[(ccy, year)] = 0.0
+            continue
+
+        series: pd.Series | None = None
+        for pair, invert in ((f"{ccy}USD=X", False), (f"USD{ccy}=X", True)):
+            hist = yf.Ticker(pair).history(
+                period="max",
+                interval="1d",
+                auto_adjust=False,
+                actions=False,
+            )
+            if hist.empty or "Close" not in hist.columns:
+                continue
+            s = hist["Close"].dropna()
+            if s.empty:
+                continue
+            if getattr(s.index, "tz", None) is not None:
+                s.index = s.index.tz_localize(None)
+            if invert:
+                s = 1.0 / s
+            series = s
+            break
+
+        if series is None or series.empty:
+            continue
+
+        frame = pd.DataFrame({"Date": series.index, "fx": series.values})
+        frame["year"] = frame["Date"].dt.year.astype(int)
+        annual = (
+            frame.groupby("year", as_index=False)["fx"]
+            .agg(fx_start="first", fx_end="last")
+            .sort_values("year")
+        )
+        annual["fx_quote_vs_usd_pct"] = ((annual["fx_end"] / annual["fx_start"]) - 1.0) * 100.0
+        for row in annual.itertuples(index=False):
+            year = int(row.year)
+            if min_year <= year <= max_year:
+                out[(ccy, year)] = float(row.fx_quote_vs_usd_pct)
+    return out
+
+
 def compute_annual_etf_returns(etf_csv: str, metadata_csv: str | None = None) -> pd.DataFrame:
     raw = pd.read_csv(etf_csv)
     selected = choose_etf_price_columns(raw.columns.tolist())
@@ -91,6 +173,7 @@ def compute_annual_etf_returns(etf_csv: str, metadata_csv: str | None = None) ->
         annual["country_name"] = ticker_country[ticker]
         annual["country_code"] = annual["country_name"].map(COUNTRY_TO_ISO3)
         annual["etf_currency"] = ticker_currency.get(ticker, "")
+        annual["etf_currency_normalized"] = annual["etf_currency"].map(normalize_currency_code)
         chunks.append(annual)
 
     if not chunks:
@@ -119,6 +202,7 @@ def load_weo_gdp(weo_csv: str) -> pd.DataFrame:
     pivot = pivot.rename(
         columns={
             "NGDPD": "gdp_current_usd",
+            "NGDP": "gdp_current_lcu",
             "NGDP_RPCH": "gdp_real_growth_pct",
             "NGDPD_PCH": "gdp_nominal_growth_pct",
         }
@@ -129,6 +213,14 @@ def load_weo_gdp(weo_csv: str) -> pd.DataFrame:
         pivot["gdp_nominal_growth_pct"] = (
             pivot.groupby("country_code")["gdp_current_usd"].pct_change() * 100.0
         )
+    if "gdp_current_lcu" in pivot.columns and "gdp_current_usd" in pivot.columns:
+        pivot["country_lcu_per_usd_weo"] = (
+            pivot["gdp_current_lcu"] / pivot["gdp_current_usd"]
+        )
+        pivot = pivot.sort_values(["country_code", "year"]).copy()
+        pivot["country_lcu_vs_usd_weo_pct"] = (
+            pivot.groupby("country_code")["country_lcu_per_usd_weo"].pct_change() * 100.0
+        )
     return pivot
 
 
@@ -136,9 +228,37 @@ def build_combined_dataset(
     etf_csv: str, weo_csv: str, metadata_csv: str | None = None
 ) -> pd.DataFrame:
     etf_annual = compute_annual_etf_returns(etf_csv, metadata_csv)
+    ticker_hedged = load_ticker_hedged_map(metadata_csv)
     gdp = load_weo_gdp(weo_csv)
 
+    min_year = int(etf_annual["year"].min())
+    max_year = int(etf_annual["year"].max())
+    currencies = set(etf_annual["etf_currency_normalized"].dropna().astype(str).tolist())
+    fx_map = compute_annual_fx_quote_to_usd_returns(currencies, min_year, max_year)
+    etf_annual["quote_ccy_vs_usd_pct"] = etf_annual.apply(
+        lambda r: fx_map.get((str(r.etf_currency_normalized), int(r.year))),
+        axis=1,
+    )
+    etf_annual["etf_return_quote_pct"] = etf_annual["etf_return_pct"]
+    etf_annual["etf_return_usd_pct"] = (
+        ((1.0 + (etf_annual["etf_return_quote_pct"] / 100.0))
+         * (1.0 + (etf_annual["quote_ccy_vs_usd_pct"] / 100.0)))
+        - 1.0
+    ) * 100.0
+    etf_annual["etf_return_usd_pct"] = etf_annual["etf_return_usd_pct"].replace(
+        [float("inf"), float("-inf")], pd.NA
+    )
+    etf_annual["currency_hedged"] = etf_annual["ticker"].map(ticker_hedged).fillna("unknown")
+
     merged = etf_annual.merge(gdp, on=["country_code", "year"], how="left")
+    merged["etf_usd_minus_country_fx_pct"] = (
+        ((1.0 + (merged["etf_return_usd_pct"] / 100.0))
+         / (1.0 + (merged["country_lcu_vs_usd_weo_pct"] / 100.0)))
+        - 1.0
+    ) * 100.0
+    merged["etf_usd_minus_country_fx_pct"] = merged["etf_usd_minus_country_fx_pct"].replace(
+        [float("inf"), float("-inf")], pd.NA
+    )
     merged["gdp_real_minus_etf_growth_pct"] = (
         merged["gdp_real_growth_pct"] - merged["etf_return_pct"]
     )
@@ -155,12 +275,19 @@ def build_combined_dataset(
             "country_code",
             "ticker",
             "etf_currency",
+            "currency_hedged",
             "etf_price_field",
             "year",
             "etf_price_start",
             "etf_price_end",
             "etf_return_pct",
+            "etf_return_quote_pct",
+            "quote_ccy_vs_usd_pct",
+            "etf_return_usd_pct",
+            "country_lcu_vs_usd_weo_pct",
+            "etf_usd_minus_country_fx_pct",
             "gdp_current_usd",
+            "gdp_current_lcu",
             "gdp_real_growth_pct",
             "gdp_nominal_growth_pct",
             "gdp_real_minus_etf_growth_pct",
