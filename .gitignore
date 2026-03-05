@@ -1,5 +1,7 @@
-__pycache__/
+
+*.csv#
 *.pyc
 .cache/
 .uv-cache/
-*.csv#
+.uv_cache/
+__pycache__/
