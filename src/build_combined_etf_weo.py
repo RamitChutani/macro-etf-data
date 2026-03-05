@@ -8,82 +8,7 @@ import re
 
 import pandas as pd
 
-
-ETF_COUNTRY_TO_TICKERS = {
-    "Australia": ["SAUS.L"],
-    "Austria": ["XB4A.L"],
-    "Belgium": ["BEL.L"],
-    "Brazil": ["XMBR.L"],
-    "Bulgaria": ["BGX.L"],
-    "Canada": ["CSCA.L"],
-    "China": ["IASH.L", "FRCH.L"],
-    "France": ["ISFR.L", "CACC.L"],
-    "Germany": ["XDAX.L"],
-    "Greece": ["GRE.L"],
-    "Hong Kong": ["HKDU.L"],
-    "India": ["IIND.L", "FRIN.L"],
-    "Indonesia": ["INDO.L"],
-    "Italy": ["CMIB.L"],
-    "Japan": ["LCJP.L", "IJPN.L"],
-    "Kuwait": ["MKUW.L"],
-    "Malaysia": ["XCX3.L"],
-    "Mexico": ["XMEX.L"],
-    "Netherlands": ["IAEA.L"],
-    "Pakistan": ["XBAK.L"],
-    "Philippines": ["XPHG.L"],
-    "Poland": ["SPOL.L"],
-    "Saudi Arabia": ["IKSA.L"],
-    "Singapore": ["XBAS.L"],
-    "South Africa": ["SRSA.L"],
-    "South Korea": ["CSKR.L", "FLRK.L"],
-    "Spain": ["CS1.L", "XESP.L"],
-    "Sweden": ["OMXS.L"],
-    "Switzerland": ["CHUSD.L"],
-    "Taiwan": ["XMTW.L", "FRXT.L"],
-    "Thailand": ["XCX4.L"],
-    "Turkey": ["TURL.L"],
-    "United Kingdom": ["CUKX.L", "CSUK.L"],
-    "United States": ["SPXL.L"],
-    "Vietnam": ["XFVT.L"],
-}
-
-COUNTRY_TO_ISO3 = {
-    "Australia": "AUS",
-    "Austria": "AUT",
-    "Belgium": "BEL",
-    "Brazil": "BRA",
-    "Bulgaria": "BGR",
-    "Canada": "CAN",
-    "China": "CHN",
-    "France": "FRA",
-    "Germany": "DEU",
-    "Greece": "GRC",
-    "Hong Kong": "HKG",
-    "India": "IND",
-    "Indonesia": "IDN",
-    "Italy": "ITA",
-    "Japan": "JPN",
-    "Kuwait": "KWT",
-    "Malaysia": "MYS",
-    "Mexico": "MEX",
-    "Netherlands": "NLD",
-    "Pakistan": "PAK",
-    "Philippines": "PHL",
-    "Poland": "POL",
-    "Saudi Arabia": "SAU",
-    "Singapore": "SGP",
-    "South Africa": "ZAF",
-    "South Korea": "KOR",
-    "Spain": "ESP",
-    "Sweden": "SWE",
-    "Switzerland": "CHE",
-    "Taiwan": "TWN",
-    "Thailand": "THA",
-    "Turkey": "TUR",
-    "United Kingdom": "GBR",
-    "United States": "USA",
-    "Vietnam": "VNM",
-}
+from etf_mapping import COUNTRY_TO_ISO3, build_ticker_country_map
 
 
 def choose_etf_price_columns(columns: list[str]) -> dict[str, tuple[str, str]]:
@@ -111,15 +36,6 @@ def choose_etf_price_columns(columns: list[str]) -> dict[str, tuple[str, str]]:
         elif "Close" in fields:
             selected[ticker] = (fields["Close"], "Close")
     return selected
-
-
-def build_ticker_country_map() -> dict[str, str]:
-    ticker_to_country: dict[str, str] = {}
-    for country_name, tickers in ETF_COUNTRY_TO_TICKERS.items():
-        for ticker in tickers:
-            ticker_to_country[ticker] = country_name
-    return ticker_to_country
-
 
 def load_ticker_currency_map(metadata_csv: str | None) -> dict[str, str]:
     if not metadata_csv:

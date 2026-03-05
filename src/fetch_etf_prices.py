@@ -9,53 +9,10 @@ from datetime import datetime
 import pandas as pd
 import yfinance as yf
 
+from etf_mapping import build_label_to_ticker_map
 
-# Keep label -> ticker semantics aligned with prior notebook output.
-ETF_LABEL_TO_TICKER = {
-    "Australia": "SAUS.L",
-    "Austria": "XB4A.L",
-    "Belgium": "BEL.L",
-    "Brazil": "XMBR.L",
-    "Bulgaria": "BGX.L",
-    "Canada": "CSCA.L",
-    "China_1": "IASH.L",
-    "China_2": "FRCH.L",
-    "France_1": "ISFR.L",
-    "France_2": "CACC.L",
-    "Germany": "XDAX.L",
-    "Greece": "GRE.L",
-    "Hong Kong": "HKDU.L",
-    "India_1": "IIND.L",
-    "India_2": "FRIN.L",
-    "Indonesia": "INDO.L",
-    "Italy": "CMIB.L",
-    "Japan_1": "LCJP.L",
-    "Japan_2": "IJPN.L",
-    "Kuwait": "MKUW.L",
-    "Malaysia": "XCX3.L",
-    "Mexico": "XMEX.L",
-    "Netherlands": "IAEA.L",
-    "Pakistan": "XBAK.L",
-    "Philippines": "XPHG.L",
-    "Poland": "SPOL.L",
-    "Saudi Arabia": "IKSA.L",
-    "Singapore": "XBAS.L",
-    "South Africa": "SRSA.L",
-    "South Korea_1": "CSKR.L",
-    "South Korea_2": "FLRK.L",
-    "Spain_1": "CS1.L",
-    "Spain_2": "XESP.L",
-    "Sweden": "OMXS.L",
-    "Switzerland": "CHUSD.L",
-    "Taiwan_1": "XMTW.L",
-    "Taiwan_2": "FRXT.L",
-    "Thailand": "XCX4.L",
-    "Turkey": "TURL.L",
-    "United Kingdom_1": "CUKX.L",
-    "United Kingdom_2": "CSUK.L",
-    "United States": "SPXL.L",
-    "Vietnam": "XFVT.L",
-}
+
+ETF_LABEL_TO_TICKER = build_label_to_ticker_map()
 
 
 REQUIRED_EXCHANGE = "LSE"
@@ -72,13 +29,18 @@ def fetch_ticker_history_close(
     ticker: str,
     start: str | None,
     end: str,
-) -> tuple[pd.Series | None, dict[str, str | None]]:
-    info_row: dict[str, str | None] = {
+) -> tuple[pd.Series | None, dict[str, object | None]]:
+    info_row: dict[str, object | None] = {
         "label": label,
         "ticker": ticker,
         "exchange": None,
         "currency": None,
         "quote_type": None,
+        "total_assets": None,
+        "net_assets": None,
+        "fund_size": None,
+        "fund_size_currency": None,
+        "fund_size_field": None,
         "included": "no",
         "reason": None,
     }
@@ -88,9 +50,23 @@ def fetch_ticker_history_close(
         currency = info.get("currency")
         exchange = info.get("exchange")
         quote_type = info.get("quoteType")
+        total_assets = info.get("totalAssets")
+        net_assets = info.get("netAssets")
+        fund_size = total_assets
+        if fund_size is None:
+            fund_size = net_assets
+            if fund_size is not None:
+                info_row["fund_size_field"] = "netAssets"
+        else:
+            info_row["fund_size_field"] = "totalAssets"
+
         info_row["exchange"] = exchange
         info_row["currency"] = currency
         info_row["quote_type"] = quote_type
+        info_row["total_assets"] = total_assets
+        info_row["net_assets"] = net_assets
+        info_row["fund_size"] = fund_size
+        info_row["fund_size_currency"] = currency
 
         if exchange != REQUIRED_EXCHANGE:
             info_row["reason"] = f"unsupported exchange {exchange}"
@@ -144,7 +120,7 @@ def fetch_ticker_history_close(
 
 def fetch_daily_prices(start: str | None, end: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     all_series: list[pd.Series] = []
-    metadata_rows: list[dict[str, str | None]] = []
+    metadata_rows: list[dict[str, object | None]] = []
 
     for label, ticker in ETF_LABEL_TO_TICKER.items():
         series, meta = fetch_ticker_history_close(label, ticker, start, end)

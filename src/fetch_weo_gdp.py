@@ -9,44 +9,7 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
-
-ETF_COUNTRY_TO_ISO3 = {
-    "Australia": "AUS",
-    "Austria": "AUT",
-    "Belgium": "BEL",
-    "Brazil": "BRA",
-    "Bulgaria": "BGR",
-    "Canada": "CAN",
-    "China": "CHN",
-    "France": "FRA",
-    "Germany": "DEU",
-    "Greece": "GRC",
-    "Hong Kong": "HKG",
-    "India": "IND",
-    "Indonesia": "IDN",
-    "Italy": "ITA",
-    "Japan": "JPN",
-    "Kuwait": "KWT",
-    "Malaysia": "MYS",
-    "Mexico": "MEX",
-    "Netherlands": "NLD",
-    "Pakistan": "PAK",
-    "Philippines": "PHL",
-    "Poland": "POL",
-    "Saudi Arabia": "SAU",
-    "Singapore": "SGP",
-    "South Africa": "ZAF",
-    "South Korea": "KOR",
-    "Spain": "ESP",
-    "Sweden": "SWE",
-    "Switzerland": "CHE",
-    "Taiwan": "TWN",
-    "Thailand": "THA",
-    "Turkey": "TUR",
-    "United Kingdom": "GBR",
-    "United States": "USA",
-    "Vietnam": "VNM",
-}
+from etf_mapping import COUNTRY_TO_ISO3 as ETF_COUNTRY_TO_ISO3
 
 INDICATOR_LABELS = {
     "NGDPD": "GDP, current prices (U.S. dollars)",

@@ -269,6 +269,29 @@ def load_ticker_currency_map(metadata_csv: str | None) -> dict[str, str]:
     )
 
 
+def load_ticker_fund_size_map(metadata_csv: str | None) -> dict[str, float]:
+    if not metadata_csv:
+        return {}
+    try:
+        meta = pd.read_csv(metadata_csv)
+    except FileNotFoundError:
+        return {}
+    required = {"ticker", "fund_size"}
+    if not required.issubset(set(meta.columns)):
+        return {}
+    meta = meta.copy()
+    meta["ticker"] = meta["ticker"].astype(str)
+    meta["fund_size"] = pd.to_numeric(meta["fund_size"], errors="coerce")
+    out = (
+        meta[["ticker", "fund_size"]]
+        .drop_duplicates(subset=["ticker"], keep="first")
+        .dropna(subset=["fund_size"])
+        .set_index("ticker")["fund_size"]
+        .to_dict()
+    )
+    return {k: float(v) for k, v in out.items()}
+
+
 def fit_columns_from_ranges(
     ws,
     ranges: list[tuple[int, int, int, int]],
@@ -592,6 +615,7 @@ def write_dashboard_xlsx(
     annual_df: pd.DataFrame,
     cagr_df: pd.DataFrame,
     output_xlsx: str,
+    metadata_csv: str | None = "data/outputs/etf_ticker_metadata.csv",
 ) -> None:
     from openpyxl.styles import Font
     from openpyxl.styles import PatternFill
@@ -599,12 +623,20 @@ def write_dashboard_xlsx(
     from openpyxl.worksheet.datavalidation import DataValidation
 
     with pd.ExcelWriter(output_xlsx, engine="openpyxl") as writer:
+        ticker_fund_size_map = load_ticker_fund_size_map(metadata_csv)
         default_map = (
-            timeframe_df[["country_name", "ticker"]]
-            .drop_duplicates()
-            .sort_values(["country_name", "ticker"])
+            timeframe_df[["country_name", "ticker", "etf_currency"]]
+            .drop_duplicates(subset=["country_name", "ticker"], keep="first")
+            .assign(
+                usd_rank=lambda d: (d["etf_currency"] == "USD").astype(int),
+                fund_size_rank=lambda d: d["ticker"].map(ticker_fund_size_map).fillna(-1.0),
+            )
+            .sort_values(
+                ["country_name", "usd_rank", "fund_size_rank", "ticker"],
+                ascending=[True, False, False, True],
+            )
             .groupby("country_name", as_index=False)
-            .first()
+            .first()[["country_name", "ticker"]]
         )
         ticker_currency_map = (
             timeframe_df[["ticker", "etf_currency"]]
@@ -720,7 +752,7 @@ def write_dashboard_xlsx(
         ws_country["L5"] = '=IFERROR(INDEX(ETF_Timeframes!$I:$I, MATCH($L$2&"|"&$L$3&"|MAX", ETF_Timeframes!$H:$H, 0)),"")'
         ws_country["L4"].number_format = "yyyy-mm-dd"
 
-        ws_country["K7"] = "ETF Timeframe Returns (%)"
+        ws_country["K7"] = "ETF Cumulative returns"
         ws_country["K7"].font = Font(bold=True)
         ws_country["K8"] = "Timeframe"
         ws_country["L8"] = "ETF Return %"
@@ -770,7 +802,7 @@ def write_dashboard_xlsx(
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($L$2&"|"&$K{r}, Annual!$K:$K, 0)), NA())'
             )
             ws_country[f"P{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$I:$I, MATCH($L$2&"|"&$K{r}, Annual!$K:$K, 0)), NA())'
+                f"=IF(AND(ISNUMBER(O{r}),ISNUMBER(L{r})),O{r}-L{r},NA())"
             )
 
         projection_years = sorted(
@@ -794,7 +826,7 @@ def write_dashboard_xlsx(
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($L$2&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
             )
             ws_country[f"P{projection_row}"] = (
-                f'=IFERROR(1*INDEX(Annual!$I:$I, MATCH($L$2&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
+                f"=IF(AND(ISNUMBER(O{projection_row}),ISNUMBER(L{projection_row})),O{projection_row}-L{projection_row},NA())"
             )
             annual_last_row = projection_row
             ws_country[f"K{annual_last_row + 1}"] = (
@@ -839,7 +871,7 @@ def write_dashboard_xlsx(
                 f'=IFERROR(1*INDEX(CAGR!$I:$I, MATCH($L$2&"|"&$K{r}, CAGR!$L:$L, 0)), NA())'
             )
             ws_country[f"P{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$J:$J, MATCH($L$2&"|"&$K{r}, CAGR!$L:$L, 0)), NA())'
+                f"=IF(AND(ISNUMBER(O{r}),ISNUMBER(L{r})),O{r}-L{r},NA())"
             )
 
         for row in range(timeframe_start_row, timeframe_start_row + len(TIMEFRAME_ORDER)):
@@ -921,7 +953,9 @@ def main() -> None:
         raise RuntimeError("No annual rows produced. Check ETF and WEO input data.")
     if cagr_df.empty:
         raise RuntimeError("No CAGR rows produced. Check ETF and WEO input data.")
-    write_dashboard_xlsx(timeframe_df, annual_df, cagr_df, args.output)
+    write_dashboard_xlsx(
+        timeframe_df, annual_df, cagr_df, args.output, metadata_csv=args.metadata_csv
+    )
     print(f"Wrote dashboard MVP to {args.output}")
     print(
         f"Timeframe rows: {len(timeframe_df)}, "

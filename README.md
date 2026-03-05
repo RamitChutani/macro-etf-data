@@ -5,6 +5,7 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 ## Repository Layout
 
 - `src/`: pipeline scripts
+  - `src/etf_mapping.py`: canonical country/ticker + ISO3 mappings (single source of truth)
 - `data/outputs/`: generated CSV outputs
 - `notebooks/`: interactive validation notebooks
 - `docs/`: references and worklogs
@@ -13,6 +14,10 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 
 - Fetch ETF daily price data for configured country-focused tickers.
 - Include valid LSE ETFs across `GBP`/`GBp`/`USD`/`EUR` (no GBP-only exclusion).
+- ETF metadata export includes `total_assets`, `net_assets`, and selected `fund_size`.
+- Dashboard default ticker selection for multi-ticker countries:
+  - prefer `USD` ticker first
+  - if no USD ticker exists, choose largest `fund_size`
 - Fetch IMF WEO indicators `NGDPD`, `NGDP`, and `NGDP_RPCH` for mapped countries.
 - Build annual ETF return output merged with GDP metrics.
   - combined annual output now includes `etf_currency`
@@ -24,7 +29,8 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - annual panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
   - annual panel keeps last 10 completed years and adds one projection/YTD row (for 2026 while in 2026)
   - CAGR panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
-  - ETF-only timeframe returns (YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX)
+  - ETF-only cumulative returns (YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX)
+  - final-sheet delta columns compute directly from in-row values (`Nominal USD GDP - ETF = O - L`) to avoid lookup mismatch
   - table widths auto-fit to table ranges (explainer cells do not drive column widths)
 - Build a separate Excel workbook with one full-history ETF chart sheet per ticker.
   - chart workbook sheet columns are auto-fit
@@ -74,7 +80,19 @@ uv run jupyter notebook
 ## Outputs
 
 - `data/outputs/etf_prices.csv`
+- `data/outputs/etf_ticker_metadata.csv`
 - `data/outputs/weo_gdp.csv`
 - `data/outputs/etf_weo_combined_annual.csv`
 - `data/outputs/etf_gdp_dashboard_mvp.xlsx`
 - `data/outputs/etf_price_history_charts.xlsx`
+
+## Current Eligibility Policy
+
+When screening candidate ETFs for inclusion in mapping updates, current hard checks are:
+- `exchange == LSE`
+- `quoteType == ETF`
+- earliest available Yahoo history date `<= 2020-01-01`
+- exclude only explicit distributing classes (`Dist` / `Distributing` in ETF name)
+
+Preference (not exclusion):
+- prefer `USD` where multiple eligible tickers exist for a country
