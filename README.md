@@ -13,19 +13,21 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 
 - Fetch ETF daily price data for configured country-focused tickers.
 - Include valid LSE ETFs across `GBP`/`GBp`/`USD`/`EUR` (no GBP-only exclusion).
-- Fetch IMF WEO indicators `NGDPD` and `NGDP_RPCH` for mapped countries.
+- Fetch IMF WEO indicators `NGDPD`, `NGDP`, and `NGDP_RPCH` for mapped countries.
 - Build annual ETF return output merged with GDP metrics.
   - combined annual output now includes `etf_currency`
 - Run full pipeline from one command via `main.py`.
 - Build an interactive Excel KPI dashboard (MVP) for stakeholder review with:
   - country-level CAGR disconnect screener sheet with selectable horizon (1Y/3Y/5Y/10Y, default 5Y)
-  - screener includes ticker currency column and dashboard control row shows selected ticker currency
-  - compares ETF CAGR vs real GDP CAGR and `GDP - ETF` spread for quick triage
+  - country focus panel is on the same sheet (`Country_CAGR_Summary`) to the right of the screener
+  - screener includes ticker currency column and country focus controls (country, auto ticker, as-of date, ticker currency)
+  - annual panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
+  - annual panel keeps last 10 completed years and adds one projection/YTD row (for 2026 while in 2026)
+  - CAGR panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
   - ETF-only timeframe returns (YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX)
-  - annual ETF vs GDP comparison (last 10 years)
-  - GDP same-year comparison
-  - CAGR comparison (3Y, 5Y, 10Y) for ETF vs GDP
+  - table widths auto-fit to table ranges (explainer cells do not drive column widths)
 - Build a separate Excel workbook with one full-history ETF chart sheet per ticker.
+  - chart workbook sheet columns are auto-fit
 - Validate a single ticker interactively in notebook:
   - manual ticker selection (project ticker or custom Yahoo symbol)
   - GBP/GBp checks
@@ -56,7 +58,9 @@ uv run python src/build_etf_history_charts_workbook.py --etf-csv data/outputs/et
 
 WEO output now includes:
 - `NGDPD` (GDP current USD level)
+- `NGDP` (GDP current domestic-currency level)
 - `NGDP_RPCH` (real GDP growth %)
+- `NGDP_PCH` (nominal GDP growth in domestic currency %, derived from `NGDP`)
 - `NGDPD_PCH` (nominal GDP growth %, derived from `NGDPD`)
 
 ## Validation Notebook
