@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 
 import pandas as pd
+from openpyxl.utils import get_column_letter
 
 
 def sanitize_sheet_name(name: str, used: set[str]) -> str:
@@ -20,6 +21,26 @@ def sanitize_sheet_name(name: str, used: set[str]) -> str:
         i += 1
     used.add(cleaned)
     return cleaned
+
+
+def autofit_worksheet(
+    ws,
+    *,
+    min_width: float = 10.0,
+    max_width: float = 80.0,
+    padding: float = 2.0,
+) -> None:
+    for col_idx in range(1, ws.max_column + 1):
+        max_len = 0
+        for row_idx in range(1, ws.max_row + 1):
+            value = ws.cell(row=row_idx, column=col_idx).value
+            if value is None:
+                continue
+            if isinstance(value, str) and value.startswith("="):
+                continue
+            max_len = max(max_len, len(str(value)))
+        width = max(min_width, min(max_width, max_len + padding))
+        ws.column_dimensions[get_column_letter(col_idx)].width = width
 
 
 def build_chart_workbook(etf_csv: str, output_xlsx: str) -> None:
@@ -42,6 +63,7 @@ def build_chart_workbook(etf_csv: str, output_xlsx: str) -> None:
             ticker = parts[1] if len(parts) >= 3 else ""
             index_rows.append({"label": label, "ticker": ticker, "column_name": col})
         pd.DataFrame(index_rows).to_excel(writer, sheet_name="Index", index=False)
+        autofit_worksheet(writer.book["Index"])
 
         wb = writer.book
         used_names = {"Index"}
@@ -71,8 +93,7 @@ def build_chart_workbook(etf_csv: str, output_xlsx: str) -> None:
             chart.width = 14
             ws.add_chart(chart, "D2")
 
-            ws.column_dimensions["A"].width = 14
-            ws.column_dimensions["B"].width = 12
+            autofit_worksheet(ws)
 
 
 def main() -> None:

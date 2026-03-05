@@ -8,6 +8,7 @@ import re
 from dataclasses import dataclass
 
 import pandas as pd
+from openpyxl.utils import get_column_letter
 
 from build_combined_etf_weo import COUNTRY_TO_ISO3, build_ticker_country_map
 
@@ -163,38 +164,60 @@ def choose_price_columns(columns: list[str]) -> dict[str, str]:
 
 def load_gdp_growth_maps(
     weo_csv: str,
-) -> tuple[dict[tuple[str, int], float], dict[tuple[str, int], float]]:
+) -> tuple[
+    dict[tuple[str, int], float],
+    dict[tuple[str, int], float],
+    dict[tuple[str, int], float],
+]:
     weo = pd.read_csv(weo_csv)
     weo["year"] = pd.to_numeric(weo["year"], errors="coerce").astype("Int64")
     weo["value"] = pd.to_numeric(weo["value"], errors="coerce")
     weo = weo.dropna(subset=["country_code", "year"])
     weo["year"] = weo["year"].astype(int)
     real_weo = weo[(weo["indicator"] == "NGDP_RPCH") & (weo["value"].notna())].copy()
-    nominal_weo = weo[(weo["indicator"] == "NGDPD_PCH") & (weo["value"].notna())].copy()
+    nominal_usd_weo = weo[(weo["indicator"] == "NGDPD_PCH") & (weo["value"].notna())].copy()
+    nominal_lcu_weo = weo[(weo["indicator"] == "NGDP_PCH") & (weo["value"].notna())].copy()
 
     real_map = {
         (str(r.country_code), int(r.year)): float(r.value)
         for r in real_weo.itertuples(index=False)
     }
-    nominal_map = {
+    nominal_usd_map = {
         (str(r.country_code), int(r.year)): float(r.value)
-        for r in nominal_weo.itertuples(index=False)
+        for r in nominal_usd_weo.itertuples(index=False)
+    }
+    nominal_lcu_map = {
+        (str(r.country_code), int(r.year)): float(r.value)
+        for r in nominal_lcu_weo.itertuples(index=False)
     }
 
     # Backward-compatible fallback if NGDPD_PCH not present in weo_csv.
-    if not nominal_map:
+    if not nominal_usd_map:
         gdp_levels = weo[(weo["indicator"] == "NGDPD") & (weo["value"].notna())].copy()
         gdp_levels = gdp_levels.sort_values(["country_code", "year"])
         gdp_levels["nominal_growth"] = (
             gdp_levels.groupby("country_code")["value"].pct_change() * 100.0
         )
-        nominal_map = {
+        nominal_usd_map = {
             (str(r.country_code), int(r.year)): float(r.nominal_growth)
             for r in gdp_levels.itertuples(index=False)
             if pd.notna(r.nominal_growth)
         }
 
-    return real_map, nominal_map
+    # Backward-compatible fallback if NGDP_PCH not present in weo_csv.
+    if not nominal_lcu_map:
+        gdp_levels_lcu = weo[(weo["indicator"] == "NGDP") & (weo["value"].notna())].copy()
+        gdp_levels_lcu = gdp_levels_lcu.sort_values(["country_code", "year"])
+        gdp_levels_lcu["nominal_growth"] = (
+            gdp_levels_lcu.groupby("country_code")["value"].pct_change() * 100.0
+        )
+        nominal_lcu_map = {
+            (str(r.country_code), int(r.year)): float(r.nominal_growth)
+            for r in gdp_levels_lcu.itertuples(index=False)
+            if pd.notna(r.nominal_growth)
+        }
+
+    return real_map, nominal_lcu_map, nominal_usd_map
 
 
 def gdp_cagr(
@@ -246,6 +269,33 @@ def load_ticker_currency_map(metadata_csv: str | None) -> dict[str, str]:
     )
 
 
+def fit_columns_from_ranges(
+    ws,
+    ranges: list[tuple[int, int, int, int]],
+    *,
+    min_width: float = 10.0,
+    max_width: float = 80.0,
+    padding: float = 2.0,
+) -> None:
+    """Auto-size column widths from specific table ranges only."""
+    widths: dict[int, int] = {}
+    for min_col, max_col, min_row, max_row in ranges:
+        for col_idx in range(min_col, max_col + 1):
+            max_len = widths.get(col_idx, 0)
+            for row_idx in range(min_row, max_row + 1):
+                value = ws.cell(row=row_idx, column=col_idx).value
+                if value is None:
+                    continue
+                if isinstance(value, str) and value.startswith("="):
+                    continue
+                max_len = max(max_len, len(str(value)))
+            widths[col_idx] = max_len
+
+    for col_idx, max_len in widths.items():
+        width = max(min_width, min(max_width, max_len + padding))
+        ws.column_dimensions[get_column_letter(col_idx)].width = width
+
+
 def build_timeframe_rows(
     etf_csv: str,
     weo_csv: str,
@@ -258,7 +308,11 @@ def build_timeframe_rows(
     ticker_to_country = build_ticker_country_map()
     ticker_to_currency = load_ticker_currency_map(metadata_csv)
     price_columns = choose_price_columns(raw.columns.tolist())
-    gdp_real_growth_map, gdp_nominal_growth_map = load_gdp_growth_maps(weo_csv)
+    (
+        gdp_real_growth_map,
+        gdp_nominal_lcu_growth_map,
+        gdp_nominal_usd_growth_map,
+    ) = load_gdp_growth_maps(weo_csv)
 
     timeframe_rows: list[dict[str, object]] = []
     annual_rows: list[dict[str, object]] = []
@@ -318,18 +372,18 @@ def build_timeframe_rows(
                 }
             )
 
-        # Annual ETF vs GDP table for last 10 completed years (GDP-driven window).
-        gdp_years = [y for y in gdp_years if y <= completed_year]
+        # Annual source rows include all available GDP years; dashboard view filters
+        # to last completed years and can append a separate projection/YTD row.
         if gdp_years:
-            last_10_years = gdp_years[-ANNUAL_WINDOW_YEARS:]
-            for y in last_10_years:
+            for y in gdp_years:
                 start_pt = first_in_year(series, y)
                 end_year_pt = last_in_year(series, y)
                 etf_return = None
                 if start_pt is not None and end_year_pt is not None:
                     etf_return = pct_return(start_pt.value, end_year_pt.value)
                 gdp_real_same = gdp_real_growth_map.get((country_code, y))
-                gdp_nominal_same = gdp_nominal_growth_map.get((country_code, y))
+                gdp_nominal_lcu_same = gdp_nominal_lcu_growth_map.get((country_code, y))
+                gdp_nominal_usd_same = gdp_nominal_usd_growth_map.get((country_code, y))
                 annual_rows.append(
                     {
                         "country_name": country_name,
@@ -338,15 +392,11 @@ def build_timeframe_rows(
                         "year": y,
                         "etf_return_pct": etf_return,
                         "gdp_real_growth_pct": gdp_real_same,
-                        "gdp_nominal_growth_pct": gdp_nominal_same,
-                        "gdp_real_minus_etf_growth_pct": (
-                            gdp_real_same - etf_return
-                            if (etf_return is not None and gdp_real_same is not None)
-                            else None
-                        ),
-                        "gdp_nominal_minus_etf_growth_pct": (
-                            gdp_nominal_same - etf_return
-                            if (etf_return is not None and gdp_nominal_same is not None)
+                        "gdp_nominal_lcu_growth_pct": gdp_nominal_lcu_same,
+                        "gdp_nominal_usd_growth_pct": gdp_nominal_usd_same,
+                        "gdp_nominal_usd_minus_etf_growth_pct": (
+                            gdp_nominal_usd_same - etf_return
+                            if (etf_return is not None and gdp_nominal_usd_same is not None)
                             else None
                         ),
                         "etf_currency": ticker_to_currency.get(ticker, ""),
@@ -365,8 +415,11 @@ def build_timeframe_rows(
             gdp_real_cagr = gdp_cagr(
                 gdp_real_growth_map, country_code, cagr_end_year, years
             )
-            gdp_nominal_cagr = gdp_cagr(
-                gdp_nominal_growth_map, country_code, cagr_end_year, years
+            gdp_nominal_lcu_cagr = gdp_cagr(
+                gdp_nominal_lcu_growth_map, country_code, cagr_end_year, years
+            )
+            gdp_nominal_usd_cagr = gdp_cagr(
+                gdp_nominal_usd_growth_map, country_code, cagr_end_year, years
             )
             cagr_rows.append(
                 {
@@ -377,13 +430,11 @@ def build_timeframe_rows(
                     "horizon": f"{years}Y",
                     "etf_cagr_pct": etf_cagr,
                     "gdp_real_cagr_pct": gdp_real_cagr,
-                    "gdp_nominal_cagr_pct": gdp_nominal_cagr,
-                    "gdp_real_minus_etf_cagr_pct": (
-                        gdp_real_cagr - etf_cagr if gdp_real_cagr is not None else None
-                    ),
-                    "gdp_nominal_minus_etf_cagr_pct": (
-                        gdp_nominal_cagr - etf_cagr
-                        if gdp_nominal_cagr is not None
+                    "gdp_nominal_lcu_cagr_pct": gdp_nominal_lcu_cagr,
+                    "gdp_nominal_usd_cagr_pct": gdp_nominal_usd_cagr,
+                    "gdp_nominal_usd_minus_etf_cagr_pct": (
+                        gdp_nominal_usd_cagr - etf_cagr
+                        if gdp_nominal_usd_cagr is not None
                         else None
                     ),
                     "etf_currency": ticker_to_currency.get(ticker, ""),
@@ -435,9 +486,9 @@ def build_timeframe_rows(
                 "year",
                 "etf_return_pct",
                 "gdp_real_growth_pct",
-                "gdp_nominal_growth_pct",
-                "gdp_real_minus_etf_growth_pct",
-                "gdp_nominal_minus_etf_growth_pct",
+                "gdp_nominal_lcu_growth_pct",
+                "gdp_nominal_usd_growth_pct",
+                "gdp_nominal_usd_minus_etf_growth_pct",
                 "lookup_key",
                 "country_year_key",
                 "etf_currency",
@@ -467,10 +518,17 @@ def build_timeframe_rows(
             gdp_real_cagr = gdp_cagr(
                 gdp_real_growth_map, country_code, cagr_end_year, years
             )
-            gdp_nominal_cagr = gdp_cagr(
-                gdp_nominal_growth_map, country_code, cagr_end_year, years
+            gdp_nominal_lcu_cagr = gdp_cagr(
+                gdp_nominal_lcu_growth_map, country_code, cagr_end_year, years
             )
-            if gdp_real_cagr is None and gdp_nominal_cagr is None:
+            gdp_nominal_usd_cagr = gdp_cagr(
+                gdp_nominal_usd_growth_map, country_code, cagr_end_year, years
+            )
+            if (
+                gdp_real_cagr is None
+                and gdp_nominal_lcu_cagr is None
+                and gdp_nominal_usd_cagr is None
+            ):
                 continue
             gdp_only_rows.append(
                 {
@@ -481,9 +539,9 @@ def build_timeframe_rows(
                     "horizon": f"{years}Y",
                     "etf_cagr_pct": None,
                     "gdp_real_cagr_pct": gdp_real_cagr,
-                    "gdp_nominal_cagr_pct": gdp_nominal_cagr,
-                    "gdp_real_minus_etf_cagr_pct": None,
-                    "gdp_nominal_minus_etf_cagr_pct": None,
+                    "gdp_nominal_lcu_cagr_pct": gdp_nominal_lcu_cagr,
+                    "gdp_nominal_usd_cagr_pct": gdp_nominal_usd_cagr,
+                    "gdp_nominal_usd_minus_etf_cagr_pct": None,
                     "etf_currency": "",
                 }
             )
@@ -517,9 +575,9 @@ def build_timeframe_rows(
                 "horizon",
                 "etf_cagr_pct",
                 "gdp_real_cagr_pct",
-                "gdp_nominal_cagr_pct",
-                "gdp_real_minus_etf_cagr_pct",
-                "gdp_nominal_minus_etf_cagr_pct",
+                "gdp_nominal_lcu_cagr_pct",
+                "gdp_nominal_usd_cagr_pct",
+                "gdp_nominal_usd_minus_etf_cagr_pct",
                 "lookup_key",
                 "country_horizon_key",
                 "etf_currency",
@@ -588,23 +646,20 @@ def write_dashboard_xlsx(
         ws_cagr = wb["CAGR"]
         ws_lists = wb["Lists"]
         ws_country = wb["Country_CAGR_Summary"]
-        ws_dash = wb.create_sheet("Dashboard")
 
-        # Source-sheet usability
         ws_tf.auto_filter.ref = ws_tf.dimensions
         ws_tf.freeze_panes = "A2"
         ws_annual.auto_filter.ref = ws_annual.dimensions
         ws_annual.freeze_panes = "A2"
         ws_cagr.auto_filter.ref = ws_cagr.dimensions
         ws_cagr.freeze_panes = "A2"
-        ws_country.auto_filter.ref = ws_country.dimensions
         ws_country.freeze_panes = "A6"
 
         ws_country["A1"] = "Country CAGR Disconnect Screener"
         ws_country["A1"].font = Font(bold=True, size=14)
         ws_country["A2"] = "Horizon"
         ws_country["B2"] = "5Y"
-        ws_country["D2"] = "Start here: choose horizon, then sort by GDP - ETF CAGR."
+        ws_country["D2"] = "Choose horizon, then sort by Nominal USD GDP - ETF CAGR."
         ws_country["A3"] = "Metrics are CAGR (annualized), not cumulative return."
         ws_country["A5"] = "country_name"
         ws_country["B5"] = "region"
@@ -612,8 +667,10 @@ def write_dashboard_xlsx(
         ws_country["D5"] = "ticker_currency"
         ws_country["E5"] = "ETF CAGR %"
         ws_country["F5"] = "GDP Real CAGR %"
-        ws_country["G5"] = "GDP - ETF CAGR %"
-        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5"]:
+        ws_country["G5"] = "GDP Nominal CAGR % (LCU)"
+        ws_country["H5"] = "GDP Nominal CAGR % (USD)"
+        ws_country["I5"] = "GDP Nominal USD - ETF CAGR %"
+        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "I5"]:
             ws_country[c].font = Font(bold=True)
 
         horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -629,174 +686,211 @@ def write_dashboard_xlsx(
             ws_country[f"F{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
             )
-            ws_country[f"G{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(F{r})),F{r}-E{r},NA())"
-            for col in ["E", "F", "G"]:
+            ws_country[f"G{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
+            )
+            ws_country[f"H{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$I:$I, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
+            )
+            ws_country[f"I{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(H{r})),H{r}-E{r},NA())"
+            for col in ["E", "F", "G", "H", "I"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
+        ws_country.auto_filter.ref = f"A5:I{country_end_row}"
 
-        ws_country.auto_filter.ref = f"A5:G{country_end_row}"
-
-        # Dashboard header and controls
-        ws_dash["A1"] = "Interactive Excel KPI Dashboard"
-        ws_dash["A1"].font = Font(bold=True, size=14)
-        ws_dash["A2"] = "Country"
-        ws_dash["A3"] = "Ticker (auto)"
-        ws_dash["A4"] = "As-of Date"
-        ws_dash["A5"] = "Ticker Currency"
-        ws_dash["D2"] = "Choose country from dropdown; ticker auto-selects first mapped ETF."
-        ws_dash["D3"] = "ETF timeframe panel is ETF-only; GDP comparison is annual (last 10 years)."
-        ws_dash["D4"] = "Review Country_CAGR_Summary first to identify top disconnects."
+        # Right-side country focus panel
+        ws_country["K1"] = "Country Focus Dashboard"
+        ws_country["K1"].font = Font(bold=True, size=14)
+        ws_country["K2"] = "Country"
+        ws_country["K3"] = "Ticker (auto)"
+        ws_country["K4"] = "As-of Date"
+        ws_country["K5"] = "Ticker Currency"
+        ws_country["N2"] = "Same-year GDP comparison: last 10 completed years + one projection/YTD row."
 
         country_count = ws_lists.max_row - 1
-        country_dv = DataValidation(
+        country_dv_focus = DataValidation(
             type="list",
             formula1=f"=Lists!$A$2:$A${country_count + 1}",
             allow_blank=False,
         )
-        ws_dash.add_data_validation(country_dv)
-        country_dv.add("B2")
-        ws_dash["B2"] = timeframe_df["country_name"].iloc[0]
-        ws_dash["B3"] = '=IFERROR(INDEX(Lists!$D:$D, MATCH($B$2, Lists!$C:$C, 0)),"")'
-        ws_dash["B4"] = '=IFERROR(INDEX(ETF_Timeframes!$F:$F, MATCH($B$2&"|"&$B$3&"|MAX", ETF_Timeframes!$H:$H, 0)),"")'
-        ws_dash["B5"] = '=IFERROR(INDEX(ETF_Timeframes!$I:$I, MATCH($B$2&"|"&$B$3&"|MAX", ETF_Timeframes!$H:$H, 0)),"")'
-        ws_dash["B4"].number_format = "yyyy-mm-dd"
+        ws_country.add_data_validation(country_dv_focus)
+        country_dv_focus.add("L2")
+        ws_country["L2"] = timeframe_df["country_name"].iloc[0]
+        ws_country["L3"] = '=IFERROR(INDEX(Lists!$D:$D, MATCH($L$2, Lists!$C:$C, 0)),"")'
+        ws_country["L4"] = '=IFERROR(INDEX(ETF_Timeframes!$F:$F, MATCH($L$2&"|"&$L$3&"|MAX", ETF_Timeframes!$H:$H, 0)),"")'
+        ws_country["L5"] = '=IFERROR(INDEX(ETF_Timeframes!$I:$I, MATCH($L$2&"|"&$L$3&"|MAX", ETF_Timeframes!$H:$H, 0)),"")'
+        ws_country["L4"].number_format = "yyyy-mm-dd"
 
-        # ETF-only timeframe KPI table
-        ws_dash["A6"] = "ETF Timeframe Returns (%)"
-        ws_dash["A6"].font = Font(bold=True)
-        ws_dash["A7"] = "Timeframe"
-        ws_dash["B7"] = "ETF Return %"
-        ws_dash["C7"] = "Start Date"
-        for c in ["A7", "B7", "C7"]:
-            ws_dash[c].font = Font(bold=True)
+        ws_country["K7"] = "ETF Timeframe Returns (%)"
+        ws_country["K7"].font = Font(bold=True)
+        ws_country["K8"] = "Timeframe"
+        ws_country["L8"] = "ETF Return %"
+        ws_country["M8"] = "Start Date"
+        for c in ["K8", "L8", "M8"]:
+            ws_country[c].font = Font(bold=True)
 
-        start_row = 8
+        timeframe_start_row = 9
         for i, tf in enumerate(TIMEFRAME_ORDER):
-            r = start_row + i
-            ws_dash[f"A{r}"] = tf
-            ws_dash[f"B{r}"] = (
-                f'=IFERROR(INDEX(ETF_Timeframes!$G:$G, MATCH($B$2&"|"&$B$3&"|"&$A{r}, ETF_Timeframes!$H:$H, 0)), "")'
+            r = timeframe_start_row + i
+            ws_country[f"K{r}"] = tf
+            ws_country[f"L{r}"] = (
+                f'=IFERROR(INDEX(ETF_Timeframes!$G:$G, MATCH($L$2&"|"&$L$3&"|"&$K{r}, ETF_Timeframes!$H:$H, 0)), "")'
             )
-            ws_dash[f"C{r}"] = (
-                f'=IFERROR(INDEX(ETF_Timeframes!$E:$E, MATCH($B$2&"|"&$B$3&"|"&$A{r}, ETF_Timeframes!$H:$H, 0)),"")'
+            ws_country[f"M{r}"] = (
+                f'=IFERROR(INDEX(ETF_Timeframes!$E:$E, MATCH($L$2&"|"&$L$3&"|"&$K{r}, ETF_Timeframes!$H:$H, 0)),"")'
             )
 
-        # Annual ETF vs GDP comparison table (last 10 years)
-        ws_dash["A21"] = "Annual ETF vs GDP (Last 10 Years, %)"
-        ws_dash["A21"].font = Font(bold=True)
-        ws_dash["A22"] = "Year"
-        ws_dash["B22"] = "ETF Return %"
-        ws_dash["C22"] = "Real GDP Growth %"
-        ws_dash["D22"] = "Nominal GDP Growth %"
-        ws_dash["E22"] = "Real GDP - ETF %"
-        ws_dash["F22"] = "Nominal GDP - ETF %"
-        for c in ["A22", "B22", "C22", "D22", "E22", "F22"]:
-            ws_dash[c].font = Font(bold=True)
+        ws_country["K20"] = "Annual ETF vs GDP (Last 10 Years, %)"
+        ws_country["K20"].font = Font(bold=True)
+        ws_country["K21"] = "Year"
+        ws_country["L21"] = "ETF Return %"
+        ws_country["M21"] = "Real GDP Growth %"
+        ws_country["N21"] = "Nominal GDP Growth % (LCU)"
+        ws_country["O21"] = "Nominal GDP Growth % (USD)"
+        ws_country["P21"] = "Nominal GDP USD - ETF %"
+        for c in ["K21", "L21", "M21", "N21", "O21", "P21"]:
+            ws_country[c].font = Font(bold=True)
 
-        annual_years = sorted(annual_df["year"].dropna().unique().tolist())[-ANNUAL_WINDOW_YEARS:]
+        completed_year = pd.Timestamp.today().year - 1
+        annual_years = sorted(
+            [y for y in annual_df["year"].dropna().unique().tolist() if int(y) <= completed_year]
+        )[-ANNUAL_WINDOW_YEARS:]
         for i, year in enumerate(annual_years):
-            r = 23 + i
-            ws_dash[f"A{r}"] = int(year)
-            ws_dash[f"B{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$E:$E, MATCH($B$2&"|"&$B$3&"|"&$A{r}, Annual!$J:$J, 0)), NA())'
+            r = 22 + i
+            ws_country[f"K{r}"] = int(year)
+            ws_country[f"L{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$E:$E, MATCH($L$2&"|"&$L$3&"|"&$K{r}, Annual!$J:$J, 0)), NA())'
             )
-            ws_dash[f"C{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$F:$F, MATCH($B$2&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
+            ws_country[f"M{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$F:$F, MATCH($L$2&"|"&$K{r}, Annual!$K:$K, 0)), NA())'
             )
-            ws_dash[f"D{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($B$2&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
+            ws_country[f"N{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($L$2&"|"&$K{r}, Annual!$K:$K, 0)), NA())'
             )
-            ws_dash[f"E{r}"] = f"=IF(AND(ISNUMBER(B{r}),ISNUMBER(C{r})),C{r}-B{r},NA())"
-            ws_dash[f"F{r}"] = f"=IF(AND(ISNUMBER(B{r}),ISNUMBER(D{r})),D{r}-B{r},NA())"
+            ws_country[f"O{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($L$2&"|"&$K{r}, Annual!$K:$K, 0)), NA())'
+            )
+            ws_country[f"P{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$I:$I, MATCH($L$2&"|"&$K{r}, Annual!$K:$K, 0)), NA())'
+            )
 
-        # CAGR KPI table
-        cagr_title_row = 35
-        cagr_header_row = 36
-        cagr_start_row = 37
-        ws_dash[f"A{cagr_title_row}"] = "CAGR Comparison (%)"
-        ws_dash[f"A{cagr_title_row}"].font = Font(bold=True)
-        ws_dash[f"A{cagr_header_row}"] = "Horizon"
-        ws_dash[f"B{cagr_header_row}"] = "ETF CAGR %"
-        ws_dash[f"C{cagr_header_row}"] = "Real GDP CAGR %"
-        ws_dash[f"D{cagr_header_row}"] = "Nominal GDP CAGR %"
-        ws_dash[f"E{cagr_header_row}"] = "Real GDP - ETF CAGR %"
-        ws_dash[f"F{cagr_header_row}"] = "Nominal GDP - ETF CAGR %"
+        projection_years = sorted(
+            [y for y in annual_df["year"].dropna().unique().tolist() if int(y) > completed_year]
+        )
+        annual_last_row = 21 + len(annual_years)
+        if projection_years:
+            projection_year = int(projection_years[0])
+            projection_row = 22 + len(annual_years)
+            ws_country[f"K{projection_row}"] = f"{projection_year} (Proj GDP / ETF YTD)"
+            ws_country[f"L{projection_row}"] = (
+                f'=IFERROR(1*INDEX(ETF_Timeframes!$G:$G, MATCH($L$2&"|"&$L$3&"|YTD", ETF_Timeframes!$H:$H, 0)), NA())'
+            )
+            ws_country[f"M{projection_row}"] = (
+                f'=IFERROR(1*INDEX(Annual!$F:$F, MATCH($L$2&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
+            )
+            ws_country[f"N{projection_row}"] = (
+                f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($L$2&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
+            )
+            ws_country[f"O{projection_row}"] = (
+                f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($L$2&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
+            )
+            ws_country[f"P{projection_row}"] = (
+                f'=IFERROR(1*INDEX(Annual!$I:$I, MATCH($L$2&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
+            )
+            annual_last_row = projection_row
+            ws_country[f"K{annual_last_row + 1}"] = (
+                f"* {projection_year} row: GDP is IMF projection; ETF is YTD return."
+            )
+
+        cagr_title_row = max(35, annual_last_row + 3)
+        cagr_header_row = cagr_title_row + 1
+        cagr_start_row = cagr_header_row + 1
+        cagr_end_row = cagr_start_row + 2
+        ws_country[f"K{cagr_title_row}"] = "CAGR Comparison (%)"
+        ws_country[f"K{cagr_title_row}"].font = Font(bold=True)
+        ws_country[f"K{cagr_header_row}"] = "Horizon"
+        ws_country[f"L{cagr_header_row}"] = "ETF CAGR %"
+        ws_country[f"M{cagr_header_row}"] = "Real GDP CAGR %"
+        ws_country[f"N{cagr_header_row}"] = "Nominal GDP CAGR % (LCU)"
+        ws_country[f"O{cagr_header_row}"] = "Nominal GDP CAGR % (USD)"
+        ws_country[f"P{cagr_header_row}"] = "Nominal GDP USD - ETF CAGR %"
         for c in [
-            f"A{cagr_header_row}",
-            f"B{cagr_header_row}",
-            f"C{cagr_header_row}",
-            f"D{cagr_header_row}",
-            f"E{cagr_header_row}",
-            f"F{cagr_header_row}",
+            f"K{cagr_header_row}",
+            f"L{cagr_header_row}",
+            f"M{cagr_header_row}",
+            f"N{cagr_header_row}",
+            f"O{cagr_header_row}",
+            f"P{cagr_header_row}",
         ]:
-            ws_dash[c].font = Font(bold=True)
+            ws_country[c].font = Font(bold=True)
 
         for i, hz in enumerate(["3Y", "5Y", "10Y"]):
             r = cagr_start_row + i
-            ws_dash[f"A{r}"] = hz
-            ws_dash[f"B{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($B$2&"|"&$B$3&"|"&$A{r}, CAGR!$K:$K, 0)), NA())'
+            ws_country[f"K{r}"] = hz
+            ws_country[f"L{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($L$2&"|"&$L$3&"|"&$K{r}, CAGR!$K:$K, 0)), NA())'
             )
-            ws_dash[f"C{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($B$2&"|"&$A{r}, CAGR!$L:$L, 0)), NA())'
+            ws_country[f"M{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($L$2&"|"&$K{r}, CAGR!$L:$L, 0)), NA())'
             )
-            ws_dash[f"D{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($B$2&"|"&$A{r}, CAGR!$L:$L, 0)), NA())'
+            ws_country[f"N{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($L$2&"|"&$K{r}, CAGR!$L:$L, 0)), NA())'
             )
-            ws_dash[f"E{r}"] = f"=IF(AND(ISNUMBER(B{r}),ISNUMBER(C{r})),C{r}-B{r},NA())"
-            ws_dash[f"F{r}"] = f"=IF(AND(ISNUMBER(B{r}),ISNUMBER(D{r})),D{r}-B{r},NA())"
+            ws_country[f"O{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$I:$I, MATCH($L$2&"|"&$K{r}, CAGR!$L:$L, 0)), NA())'
+            )
+            ws_country[f"P{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$J:$J, MATCH($L$2&"|"&$K{r}, CAGR!$L:$L, 0)), NA())'
+            )
 
-        # Number format
-        for row in range(8, 8 + len(TIMEFRAME_ORDER)):
-            for col in ["B"]:
-                ws_dash[f"{col}{row}"].number_format = "0.00"
-            ws_dash[f"C{row}"].number_format = "yyyy-mm-dd"
-        for row in range(23, 23 + len(annual_years)):
-            for col in ["B", "C", "D", "E", "F"]:
-                ws_dash[f"{col}{row}"].number_format = "0.00"
-        for row in range(cagr_start_row, cagr_start_row + 3):
-            for col in ["B", "C", "D", "E", "F"]:
-                ws_dash[f"{col}{row}"].number_format = "0.00"
+        for row in range(timeframe_start_row, timeframe_start_row + len(TIMEFRAME_ORDER)):
+            ws_country[f"L{row}"].number_format = "0.00"
+            ws_country[f"M{row}"].number_format = "yyyy-mm-dd"
+        for row in range(22, annual_last_row + 1):
+            for col in ["L", "M", "N", "O", "P"]:
+                ws_country[f"{col}{row}"].number_format = "0.00"
+        for row in range(cagr_start_row, cagr_end_row + 1):
+            for col in ["L", "M", "N", "O", "P"]:
+                ws_country[f"{col}{row}"].number_format = "0.00"
 
-        # Conditional formatting for KPI numeric cells.
         pos_fill = PatternFill(start_color="E2F0D9", end_color="E2F0D9", fill_type="solid")
         neg_fill = PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid")
-        for rng in ["B8:B16", "B23:F32", "B37:F39"]:
-            ws_dash.conditional_formatting.add(
+        for rng in [
+            f"L{timeframe_start_row}:L{timeframe_start_row + len(TIMEFRAME_ORDER) - 1}",
+            f"L22:P{annual_last_row}",
+            f"L{cagr_start_row}:P{cagr_end_row}",
+        ]:
+            ws_country.conditional_formatting.add(
                 rng, CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill)
             )
-            ws_dash.conditional_formatting.add(
+            ws_country.conditional_formatting.add(
                 rng, CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill)
             )
         ws_country.conditional_formatting.add(
-            f"E{country_start_row}:G{country_end_row}",
+            f"E{country_start_row}:I{country_end_row}",
             CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill),
         )
         ws_country.conditional_formatting.add(
-            f"E{country_start_row}:G{country_end_row}",
+            f"E{country_start_row}:I{country_end_row}",
             CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
         )
 
-        # Layout polish
-        ws_dash.column_dimensions["A"].width = 14
-        ws_dash.column_dimensions["B"].width = 14
-        ws_dash.column_dimensions["C"].width = 18
-        ws_dash.column_dimensions["D"].width = 18
-        ws_dash.column_dimensions["E"].width = 20
-        ws_dash.column_dimensions["F"].width = 22
-        ws_dash.freeze_panes = None
-        ws_country.column_dimensions["A"].width = 20
-        ws_country.column_dimensions["B"].width = 16
-        ws_country.column_dimensions["C"].width = 14
-        ws_country.column_dimensions["D"].width = 14
-        ws_country.column_dimensions["E"].width = 14
-        ws_country.column_dimensions["F"].width = 16
-        ws_country.column_dimensions["G"].width = 18
+        fit_columns_from_ranges(ws_tf, [(1, ws_tf.max_column, 1, ws_tf.max_row)])
+        fit_columns_from_ranges(ws_annual, [(1, ws_annual.max_column, 1, ws_annual.max_row)])
+        fit_columns_from_ranges(ws_cagr, [(1, ws_cagr.max_column, 1, ws_cagr.max_row)])
+        fit_columns_from_ranges(ws_lists, [(1, ws_lists.max_column, 1, ws_lists.max_row)])
+        fit_columns_from_ranges(
+            ws_country,
+            [
+                (1, 9, 5, country_end_row),
+                (11, 12, 2, 5),
+                (11, 13, 8, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
+                (11, 16, 21, annual_last_row),
+                (11, 16, cagr_header_row, cagr_end_row),
+            ],
+        )
 
-        # Keep helper lists out of the way.
         ws_lists.sheet_state = "hidden"
         wb.active = wb.sheetnames.index("Country_CAGR_Summary")
-
-        # Force Excel to recalculate formulas/charts on open.
         wb.calculation.calcMode = "auto"
         wb.calculation.fullCalcOnLoad = True
 

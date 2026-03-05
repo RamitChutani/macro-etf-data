@@ -50,8 +50,10 @@ ETF_COUNTRY_TO_ISO3 = {
 
 INDICATOR_LABELS = {
     "NGDPD": "GDP, current prices (U.S. dollars)",
+    "NGDP": "GDP, current prices (domestic currency)",
     "NGDP_RPCH": "Real GDP growth (percent change)",
     "NGDPD_PCH": "Nominal GDP growth (percent change, derived from NGDPD)",
+    "NGDP_PCH": "Nominal GDP growth (percent change, derived from NGDP)",
 }
 
 
@@ -152,12 +154,22 @@ def write_csv(rows: list[dict[str, str]], output_path: str) -> None:
         writer.writerows(rows)
 
 
-def append_nominal_growth_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
-    """Derive nominal GDP growth (YoY %) from NGDPD level rows."""
+def append_derived_growth_rows(
+    rows: list[dict[str, str]],
+    *,
+    level_indicator: str,
+    growth_indicator: str,
+) -> list[dict[str, str]]:
+    """Derive YoY growth from level indicator rows."""
     out = list(rows)
+    existing = {
+        (r.get("country_code", ""), r.get("year", ""))
+        for r in rows
+        if r.get("indicator") == growth_indicator
+    }
     by_country: dict[str, dict[int, float]] = {}
     for row in rows:
-        if row.get("indicator") != "NGDPD":
+        if row.get("indicator") != level_indicator:
             continue
         country = row.get("country_code", "")
         year_str = row.get("year", "")
@@ -172,6 +184,8 @@ def append_nominal_growth_rows(rows: list[dict[str, str]]) -> list[dict[str, str
     for country_code, levels in by_country.items():
         years = sorted(levels)
         for y in years:
+            if (country_code, str(y)) in existing:
+                continue
             prev = levels.get(y - 1)
             cur = levels.get(y)
             if prev in (None, 0) or cur is None:
@@ -188,8 +202,8 @@ def append_nominal_growth_rows(rows: list[dict[str, str]]) -> list[dict[str, str
                         country_code,
                     ),
                     "country_code": country_code,
-                    "indicator": "NGDPD_PCH",
-                    "indicator_label": INDICATOR_LABELS["NGDPD_PCH"],
+                    "indicator": growth_indicator,
+                    "indicator_label": INDICATOR_LABELS[growth_indicator],
                     "frequency": "A",
                     "year": str(y),
                     "value": f"{growth_pct:.6f}",
@@ -200,7 +214,7 @@ def append_nominal_growth_rows(rows: list[dict[str, str]]) -> list[dict[str, str
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fetch IMF WEO GDP data (NGDPD, NGDP_RPCH) for ETF countries."
+        description="Fetch IMF WEO GDP data (NGDPD, NGDP, NGDP_RPCH) for ETF countries."
     )
     parser.add_argument("--start-year", type=int, default=2015)
     parser.add_argument("--end-year", type=int, default=2026)
@@ -221,7 +235,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--indicators",
-        default="NGDPD,NGDP_RPCH",
+        default="NGDPD,NGDP,NGDP_RPCH",
         help="Comma-separated WEO indicator codes.",
     )
     parser.add_argument(
@@ -251,7 +265,12 @@ def main() -> None:
     for row in rows:
         row["country_name"] = code_to_country.get(row["country_code"], row["country_code"])
 
-    rows = append_nominal_growth_rows(rows)
+    rows = append_derived_growth_rows(
+        rows, level_indicator="NGDPD", growth_indicator="NGDPD_PCH"
+    )
+    rows = append_derived_growth_rows(
+        rows, level_indicator="NGDP", growth_indicator="NGDP_PCH"
+    )
     rows.sort(key=lambda r: (r["country_name"], r["indicator"], r["year"]))
     write_csv(rows, args.output)
     print(f"Wrote {len(rows)} rows to {args.output}")
