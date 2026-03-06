@@ -1006,17 +1006,14 @@ def write_dashboard_xlsx(
         ws_country[f"A{annual_title_row}"] = "Annual ETF vs GDP + FX Decomposition (Last 10 Years, %)"
         ws_country[f"A{annual_title_row}"].font = Font(bold=True)
         ws_country[f"A{annual_header_row}"] = "Year"
-        ws_country[f"B{annual_header_row}"] = "ETF Return (Local) %"
-        ws_country[f"C{annual_header_row}"] = "Real GDP Growth %"
-        ws_country[f"D{annual_header_row}"] = "Nominal GDP Growth % (LCU)"
-        ws_country[f"E{annual_header_row}"] = "Nominal GDP Growth % (USD)"
-        ws_country[f"F{annual_header_row}"] = "Disconnect (Real GDP) %"
-        ws_country[f"G{annual_header_row}"] = "Disconnect (Nom USD GDP) %"
+        ws_country[f"B{annual_header_row}"] = "ETF Return (USD) %"
+        ws_country[f"C{annual_header_row}"] = "Nominal GDP Growth (USD) %"
+        ws_country[f"D{annual_header_row}"] = "Macro Disconnect %"
+        ws_country[f"E{annual_header_row}"] = "Real GDP Growth %"
+        ws_country[f"F{annual_header_row}"] = "Nominal GDP Growth (LCU) %"
+        ws_country[f"G{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF Return (Local) %","")'
         ws_country[f"H{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","FX Change (vs USD) %","")'
-        ws_country[f"I{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF Return (USD) %","")'
-        ws_country[f"J{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","Country LCU vs USD % (WEO)","")'
-        ws_country[f"K{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF USD - Country FX %","")'
-        for c in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]:
+        for c in ["A", "B", "C", "D", "E", "F", "G", "H"]:
             ws_country[f"{c}{annual_header_row}"].font = Font(bold=True)
 
         completed_year = pd.Timestamp.today().year - 1
@@ -1026,37 +1023,33 @@ def write_dashboard_xlsx(
         for i, year in enumerate(annual_years):
             r = annual_start_row + i
             ws_country[f"A{r}"] = int(year)
+            
+            # ETF Return (USD) % - Column O in Annual
             ws_country[f"B{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$E:$E, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA())'
+                f'=IFERROR(1*INDEX(Annual!$O:$O, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA())'
             )
+            # Nominal GDP Growth (USD) % - Column H in Annual
             ws_country[f"C{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$F:$F, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
-            )
-            ws_country[f"D{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
-            )
-            ws_country[f"E{r}"] = (
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
             )
+            # Macro Disconnect % (C - B)
+            ws_country[f"D{r}"] = f"=IF(AND(ISNUMBER(B{r}),ISNUMBER(C{r})),C{r}-B{r},NA())"
             
-            # Fetch USD Return from Annual!$O (Column O = 15th column) for disconnect calc
-            usd_ret_idx = f'INDEX(Annual!$O:$O, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0))'
-            # Check if index returned a non-empty cell. ISNUMBER(1*...) works but 1*empty is 0. 
-            # We use IF(AND(ISNUMBER(C{r}), ISNUMBER({usd_ret_idx}), {usd_ret_idx}<>""), ...)
-            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER({usd_ret_idx}),{usd_ret_idx}<>\"\"),C{r}-{usd_ret_idx},NA())"
-            ws_country[f"G{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER({usd_ret_idx}),{usd_ret_idx}<>\"\"),E{r}-{usd_ret_idx},NA())"
+            # Real GDP Growth % - Column F in Annual
+            ws_country[f"E{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$F:$F, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
+            )
+            # Nominal GDP Growth (LCU) % - Column G in Annual
+            ws_country[f"F{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
+            )
             
+            # Context columns: Local Return (Col E) and FX Change (Col N)
+            ws_country[f"G{r}"] = (
+                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$E:$E, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
+            )
             ws_country[f"H{r}"] = (
                 f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$N:$N, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
-            )
-            ws_country[f"I{r}"] = (
-                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$O:$O, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
-            )
-            ws_country[f"J{r}"] = (
-                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$P:$P, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA()),"")'
-            )
-            ws_country[f"K{r}"] = (
-                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$Q:$Q, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
             )
 
         projection_years = sorted(
@@ -1067,37 +1060,40 @@ def write_dashboard_xlsx(
             projection_year = int(projection_years[0])
             projection_row = annual_start_row + len(annual_years)
             ws_country[f"A{projection_row}"] = f"{projection_year} (Proj GDP / ETF YTD)"
-            ws_country[f"B{projection_row}"] = (
-                f'=IFERROR(1*INDEX(ETF_Timeframes!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|YTD", ETF_Timeframes!$H:$H, 0)), NA())'
-            )
+            
+            # ETF YTD (USD) - From ETF_Timeframes!$G
+            proj_usd_ret_idx = f'INDEX(ETF_Timeframes!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|YTD", ETF_Timeframes!$H:$H, 0))'
+            ws_country[f"B{projection_row}"] = f"=IFERROR(1*{proj_usd_ret_idx}, NA())"
+            
+            # Nominal GDP Growth (USD) - Column H in Annual
             ws_country[f"C{projection_row}"] = (
-                f'=IFERROR(1*INDEX(Annual!$F:$F, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
-            )
-            ws_country[f"D{projection_row}"] = (
-                f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
-            )
-            ws_country[f"E{projection_row}"] = (
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
             )
-            # ETF_Timeframes!$G is USD return (or local if USD)
-            proj_usd_ret_idx = f'INDEX(ETF_Timeframes!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|YTD", ETF_Timeframes!$H:$H, 0))'
-            ws_country[f"F{projection_row}"] = (
-                f"=IF(AND(ISNUMBER(C{projection_row}),ISNUMBER({proj_usd_ret_idx}),{proj_usd_ret_idx}<>\"\"),C{projection_row}-{proj_usd_ret_idx},NA())"
+            # Macro Disconnect (C - B)
+            ws_country[f"D{projection_row}"] = f"=IF(AND(ISNUMBER(B{projection_row}),ISNUMBER(C{projection_row})),C{projection_row}-B{projection_row},NA())"
+            
+            # Real GDP Growth - Column F in Annual
+            ws_country[f"E{projection_row}"] = (
+                f'=IFERROR(1*INDEX(Annual!$F:$F, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
             )
+            # Nominal GDP Growth (LCU) - Column G in Annual
+            ws_country[f"F{projection_row}"] = (
+                f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
+            )
+            
+            # Context: Local YTD (Column G in ETF_Timeframes is USD, need Local... but we simplified to USD headline)
+            # Actually dashboard usually shows USD headline. Let's pull Local YTD if available.
+            # Local return in ETF_Timeframes is not currently explicitly separate, but ETF_Timeframes!$G is USD.
+            # For simplicity in projection row context, we'll pull from Annual!$E if it exists for projection year (rare) 
+            # or just leave it for now if we want to keep it simple.
+            # Let's try to pull Local YTD from ETF_Timeframes if we had it... 
+            # Looking at build_timeframe_rows, timeframe_df has "etf_return_pct" which is USD.
+            # I will just pull the annual ones from Annual sheet columns for consistency.
             ws_country[f"G{projection_row}"] = (
-                f"=IF(AND(ISNUMBER(E{projection_row}),ISNUMBER({proj_usd_ret_idx}),{proj_usd_ret_idx}<>\"\"),E{projection_row}-{proj_usd_ret_idx},NA())"
+                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$E:$E, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&{projection_year}, Annual!$J:$J, 0)), NA()),"")'
             )
             ws_country[f"H{projection_row}"] = (
                 f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$N:$N, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&{projection_year}, Annual!$J:$J, 0)), NA()),"")'
-            )
-            ws_country[f"I{projection_row}"] = (
-                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$O:$O, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&{projection_year}, Annual!$J:$J, 0)), NA()),"")'
-            )
-            ws_country[f"J{projection_row}"] = (
-                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$P:$P, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA()),"")'
-            )
-            ws_country[f"K{projection_row}"] = (
-                f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$Q:$Q, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&{projection_year}, Annual!$J:$J, 0)), NA()),"")'
             )
             annual_last_row = projection_row
             ws_country[f"A{annual_last_row + 1}"] = (
@@ -1144,8 +1140,9 @@ def write_dashboard_xlsx(
             ws_country[f"B{row}"].number_format = "0.00"
             ws_country[f"C{row}"].number_format = "yyyy-mm-dd"
         for row in range(annual_start_row, annual_last_row + 1):
-            for col in ["B", "C", "D", "E", "F", "G", "H", "I", "J"]:
+            for col in ["B", "C", "D", "E", "F", "G", "H"]:
                 ws_country[f"{col}{row}"].number_format = "0.00"
+
         for row in range(cagr_start_row, cagr_end_row + 1):
             for col in ["B", "C", "D", "E", "F"]:
                 ws_country[f"{col}{row}"].number_format = "0.00"
@@ -1154,7 +1151,7 @@ def write_dashboard_xlsx(
         neg_fill = PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid")
         for rng in [
             f"B{timeframe_start_row}:B{timeframe_start_row + len(TIMEFRAME_ORDER) - 1}",
-            f"B{annual_start_row}:K{annual_last_row}",
+            f"B{annual_start_row}:H{annual_last_row}",
             f"B{cagr_start_row}:G{cagr_end_row}",
         ]:
             ws_country.conditional_formatting.add(
@@ -1182,7 +1179,7 @@ def write_dashboard_xlsx(
                 (1, 10, 5, country_end_row),
                 (1, 2, focus_top_row + 1, focus_top_row + 5),
                 (1, 3, timeframe_header_row, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
-                (1, 11, annual_header_row, annual_last_row),
+                (1, 8, annual_header_row, annual_last_row),
                 (1, 7, cagr_header_row, cagr_end_row),
             ],
         )
