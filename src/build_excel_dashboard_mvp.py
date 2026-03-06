@@ -486,6 +486,11 @@ def build_timeframe_rows(
                         ((1.0 + (etf_return / 100.0)) * (1.0 + (quote_ccy_vs_usd / 100.0)))
                         - 1.0
                     ) * 100.0
+                
+                # If USD ticker, etf_return_usd should equal etf_return (local)
+                if normalize_currency_code(ticker_to_currency.get(ticker, "")) == "USD":
+                    etf_return_usd = etf_return
+
                 country_lcu_vs_usd_weo = country_lcu_vs_usd_weo_map.get((country_code, y))
                 etf_usd_minus_country_fx = None
                 if (
@@ -514,8 +519,8 @@ def build_timeframe_rows(
                         "gdp_nominal_lcu_growth_pct": gdp_nominal_lcu_same,
                         "gdp_nominal_usd_growth_pct": gdp_nominal_usd_same,
                         "gdp_nominal_usd_minus_etf_growth_pct": (
-                            gdp_nominal_usd_same - etf_return
-                            if (etf_return is not None and gdp_nominal_usd_same is not None)
+                            gdp_nominal_usd_same - etf_return_usd
+                            if (etf_return_usd is not None and gdp_nominal_usd_same is not None)
                             else None
                         ),
                         "etf_currency": ticker_to_currency.get(ticker, ""),
@@ -529,8 +534,37 @@ def build_timeframe_rows(
             end_year_pt = last_in_year(series, cagr_end_year)
             if start_pt is None or end_year_pt is None:
                 continue
-            total_ret = pct_return(start_pt.value, end_year_pt.value)
-            etf_cagr = cagr_from_total_return(total_ret, years)
+            
+            total_ret_local = pct_return(start_pt.value, end_year_pt.value)
+            
+            # Calculate total return in USD for CAGR
+            ccy_norm = normalize_currency_code(ticker_to_currency.get(ticker, ""))
+            if ccy_norm == "USD":
+                total_ret_usd = total_ret_local
+            else:
+                # We need the FX change over the exact same period.
+                # Since we have annual FX returns, we can compound them, but it's more accurate to fetch the actual price.
+                # However, for simplicity and consistency with the annual table, 
+                # we'll use the cumulative FX return from the quote_fx_map years.
+                fx_compounded = 1.0
+                valid_fx = True
+                for y in range(start_year, cagr_end_year + 1):
+                    ann_fx = quote_fx_map.get((ccy_norm, y))
+                    if ann_fx is None:
+                        valid_fx = False
+                        break
+                    fx_compounded *= (1.0 + (ann_fx / 100.0))
+                
+                if valid_fx:
+                    total_ret_usd = ((1.0 + (total_ret_local / 100.0)) * fx_compounded - 1.0) * 100.0
+                else:
+                    total_ret_usd = None
+            
+            if total_ret_usd is not None:
+                etf_cagr = cagr_from_total_return(total_ret_usd, years)
+            else:
+                etf_cagr = None
+
             gdp_real_cagr = gdp_cagr(
                 gdp_real_growth_map, country_code, cagr_end_year, years
             )
@@ -553,7 +587,7 @@ def build_timeframe_rows(
                     "gdp_nominal_usd_cagr_pct": gdp_nominal_usd_cagr,
                     "gdp_nominal_usd_minus_etf_cagr_pct": (
                         gdp_nominal_usd_cagr - etf_cagr
-                        if gdp_nominal_usd_cagr is not None
+                        if (gdp_nominal_usd_cagr is not None and etf_cagr is not None)
                         else None
                     ),
                     "etf_currency": ticker_to_currency.get(ticker, ""),
@@ -987,7 +1021,10 @@ def write_dashboard_xlsx(
             ws_country[f"E{r}"] = (
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
             )
-            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(H{r})),E{r}-H{r},NA())"
+            # Fetch USD Return from Annual!$O (Column O = 15th column) for disconnect calc
+            usd_ret_formula = f'IFERROR(1*INDEX(Annual!$O:$O, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA())'
+            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER({usd_ret_formula})),E{r}-{usd_ret_formula},NA())"
+            
             ws_country[f"G{r}"] = (
                 f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$N:$N, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
             )
@@ -1021,8 +1058,10 @@ def write_dashboard_xlsx(
             ws_country[f"E{projection_row}"] = (
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
             )
+            # ETF_Timeframes!$G is USD return (or local if USD)
+            proj_usd_ret_formula = f'IFERROR(1*INDEX(ETF_Timeframes!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|YTD", ETF_Timeframes!$H:$H, 0)), NA())'
             ws_country[f"F{projection_row}"] = (
-                f"=IF(AND(ISNUMBER(E{projection_row}),ISNUMBER(B{projection_row})),E{projection_row}-B{projection_row},NA())"
+                f"=IF(AND(ISNUMBER(E{projection_row}),ISNUMBER({proj_usd_ret_formula})),E{projection_row}-{proj_usd_ret_formula},NA())"
             )
             ws_country[f"G{projection_row}"] = (
                 f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$N:$N, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&{projection_year}, Annual!$J:$J, 0)), NA()),"")'
