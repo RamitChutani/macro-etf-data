@@ -15,15 +15,8 @@ from etf_mapping import build_label_to_ticker_map
 ETF_LABEL_TO_TICKER = build_label_to_ticker_map()
 
 
-ALLOWED_EXCHANGES = {
-    "LSE",  # London Stock Exchange
-    "PCX",  # NYSE Arca (Yahoo code)
-    "NYQ",  # NYSE (Yahoo code)
-    "ASE",  # NYSE American (Yahoo code)
-    "NMS",  # Nasdaq Global Select (Yahoo code)
-    "NGM",  # Nasdaq Global Market (Yahoo code)
-    "NCM",  # Nasdaq Capital Market (Yahoo code)
-    "NAS",  # Nasdaq (generic Yahoo code)
+DISALLOWED_EXCHANGES: set[str] = {
+    # Add any specific exchanges to exclude here in the future
 }
 REQUIRED_QUOTE_TYPE = "ETF"
 ALLOWED_CURRENCIES = {"GBP", "GBp", "USD", "EUR"}
@@ -123,8 +116,8 @@ def fetch_ticker_history_close(
         info_row["currency_hedged"] = hedged_flag
         info_row["currency_hedged_basis"] = hedged_basis
 
-        if exchange not in ALLOWED_EXCHANGES:
-            info_row["reason"] = f"unsupported exchange {exchange}"
+        if exchange in DISALLOWED_EXCHANGES:
+            info_row["reason"] = f"disallowed exchange {exchange}"
             return None, info_row
         if quote_type != REQUIRED_QUOTE_TYPE:
             info_row["reason"] = f"unsupported quoteType {quote_type}"
@@ -292,8 +285,8 @@ def inspect_tickers(
             }
 
             reasons: list[str] = []
-            if exchange not in ALLOWED_EXCHANGES:
-                reasons.append(f"unsupported exchange {exchange}")
+            if exchange in DISALLOWED_EXCHANGES:
+                reasons.append(f"disallowed exchange {exchange}")
             if quote_type != REQUIRED_QUOTE_TYPE:
                 reasons.append(f"unsupported quoteType {quote_type}")
             if not currency:

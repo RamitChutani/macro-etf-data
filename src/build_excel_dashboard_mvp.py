@@ -314,6 +314,7 @@ def load_ticker_exchange_map(metadata_csv: str | None) -> dict[str, str]:
         "NGM": "Nasdaq Global Market",
         "NCM": "Nasdaq Capital Market",
         "NAS": "Nasdaq",
+        "BTS": "Cboe BZX",
     }
 
     meta = meta.copy()
