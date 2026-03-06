@@ -789,17 +789,17 @@ def write_dashboard_xlsx(
         ticker_exchange_map = load_ticker_exchange_map(metadata_csv)
         default_map = (
             timeframe_df[timeframe_df["timeframe"] == "MAX"][
-                ["country_name", "ticker", "start_date", "etf_currency"]
+                ["country_name", "ticker", "etf_currency"]
             ]
             .assign(
-                # Earliest start_date = longest availability
-                start_date_rank=lambda d: pd.to_datetime(d["start_date"]),
+                # Priority 1: USD Preference (1 for USD, 0 otherwise)
                 usd_rank=lambda d: (d["etf_currency"] == "USD").astype(int),
+                # Priority 2: Fund Size (AUM)
                 fund_size_rank=lambda d: d["ticker"].map(ticker_fund_size_map).fillna(-1.0),
             )
             .sort_values(
-                ["country_name", "start_date_rank", "usd_rank", "fund_size_rank", "ticker"],
-                ascending=[True, True, False, False, True],
+                ["country_name", "usd_rank", "fund_size_rank", "ticker"],
+                ascending=[True, False, False, True],
             )
             .groupby("country_name", as_index=False)
             .first()[["country_name", "ticker"]]

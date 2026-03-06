@@ -16,13 +16,13 @@ ETF_LABEL_TO_TICKER = build_label_to_ticker_map()
 
 
 DISALLOWED_EXCHANGES: set[str] = {
-    # Add any specific exchanges to exclude here in the future
+    # Exchange blacklist is currently empty per requirements.
 }
 REQUIRED_QUOTE_TYPE = "ETF"
 ALLOWED_CURRENCIES = {"GBP", "GBp", "USD", "EUR"}
 DEFAULT_MIN_HISTORY_ROWS = 252
 DEFAULT_MAX_STALE_DAYS = 45
-DEFAULT_MIN_HISTORY_START = "2020-01-01"
+DEFAULT_MIN_HISTORY_START = "2016-01-01"
 
 
 def detect_currency_hedged(text: str) -> tuple[str, str]:
@@ -48,6 +48,36 @@ def detect_currency_hedged(text: str) -> tuple[str, str]:
         if marker in t:
             return "yes", f"name_marker:{marker}"
     return "unknown", "no_name_marker"
+
+
+def check_if_accumulating(tk: yf.Ticker, info: dict) -> tuple[bool, str]:
+    """
+    Proxy check for Accumulating status.
+    If it has paid dividends in the last 3 years or has a non-zero yield,
+    it is considered Distributing.
+    """
+    # 1. Check yield from info
+    dividend_yield = info.get("yield") or info.get("trailingAnnualDividendYield") or 0
+    if dividend_yield > 0:
+        return False, f"non-zero yield: {dividend_yield}"
+
+    # 2. Check dividend history (last 3 years)
+    try:
+        divs = tk.dividends
+        if not divs.empty:
+            three_years_ago = pd.Timestamp.today() - pd.DateOffset(years=3)
+            recent_divs = divs[divs.index >= three_years_ago]
+            if not recent_divs.empty:
+                return False, f"recent dividends found: {len(recent_divs)} in 3y"
+    except Exception:
+        pass
+
+    # 3. Check name for "Dist" or "Inc" (Distributing/Income) vs "Acc" (Accumulating)
+    long_name = str(info.get("longName") or "").lower()
+    if " dist" in long_name or " income" in long_name or " (dist)" in long_name:
+        return False, "name contains Dist/Income markers"
+    
+    return True, "no dividends or yield found"
 
 
 def build_pretty_col(label: str, ticker: str) -> str:
@@ -78,6 +108,8 @@ def fetch_ticker_history_close(
         "short_name": None,
         "currency_hedged": None,
         "currency_hedged_basis": None,
+        "is_accumulating": None,
+        "accumulating_basis": None,
         "history_start_date": None,
         "history_end_date": None,
         "history_rows": None,
@@ -96,6 +128,9 @@ def fetch_ticker_history_close(
         long_name = str(info.get("longName") or "")
         short_name = str(info.get("shortName") or "")
         hedged_flag, hedged_basis = detect_currency_hedged(f"{long_name} {short_name}")
+        
+        is_acc, acc_basis = check_if_accumulating(tk, info)
+        
         fund_size = total_assets
         if fund_size is None:
             fund_size = net_assets
@@ -115,12 +150,17 @@ def fetch_ticker_history_close(
         info_row["short_name"] = short_name
         info_row["currency_hedged"] = hedged_flag
         info_row["currency_hedged_basis"] = hedged_basis
+        info_row["is_accumulating"] = "yes" if is_acc else "no"
+        info_row["accumulating_basis"] = acc_basis
 
         if exchange in DISALLOWED_EXCHANGES:
             info_row["reason"] = f"disallowed exchange {exchange}"
             return None, info_row
         if quote_type != REQUIRED_QUOTE_TYPE:
             info_row["reason"] = f"unsupported quoteType {quote_type}"
+            return None, info_row
+        if not is_acc:
+            info_row["reason"] = f"not accumulating ({acc_basis})"
             return None, info_row
         if not currency:
             info_row["reason"] = "missing currency"
@@ -267,6 +307,9 @@ def inspect_tickers(
             long_name = str(info.get("longName") or "")
             short_name = str(info.get("shortName") or "")
             hedged_flag, hedged_basis = detect_currency_hedged(f"{long_name} {short_name}")
+            
+            is_acc, acc_basis = check_if_accumulating(tk, info)
+            
             row: dict[str, object | None] = {
                 "label": label,
                 "ticker": ticker,
@@ -277,6 +320,8 @@ def inspect_tickers(
                 "short_name": short_name,
                 "currency_hedged": hedged_flag,
                 "currency_hedged_basis": hedged_basis,
+                "is_accumulating": "yes" if is_acc else "no",
+                "accumulating_basis": acc_basis,
                 "start_date": (
                     datetime.utcfromtimestamp(first_trade).strftime("%Y-%m-%d")
                     if first_trade
@@ -289,6 +334,8 @@ def inspect_tickers(
                 reasons.append(f"disallowed exchange {exchange}")
             if quote_type != REQUIRED_QUOTE_TYPE:
                 reasons.append(f"unsupported quoteType {quote_type}")
+            if not is_acc:
+                reasons.append(f"not accumulating ({acc_basis})")
             if not currency:
                 reasons.append("missing currency")
             elif currency not in ALLOWED_CURRENCIES:
