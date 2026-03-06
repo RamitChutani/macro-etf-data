@@ -918,18 +918,19 @@ def write_dashboard_xlsx(
         ws_country["B2"] = "5Y"
         ws_country["D2"] = "Sorted by size of economy. Metrics are CAGR (annualized)."
         
-        # New order headers (A-J)
+        # New order headers (A-K)
         ws_country["A5"] = "country_name"
         ws_country["B5"] = "ticker_used"
         ws_country["C5"] = "GDP Nominal CAGR % (USD)"
         ws_country["D5"] = "ETF CAGR % (USD)"
         ws_country["E5"] = "Macro Disconnect %"
-        ws_country["F5"] = "region"
-        ws_country["G5"] = "ticker_exchange"
-        ws_country["H5"] = "ticker_currency"
-        ws_country["I5"] = "GDP Real CAGR %"
-        ws_country["J5"] = "GDP Nominal CAGR % (LCU)"
-        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "I5", "J5"]:
+        ws_country["F5"] = "" # GAP
+        ws_country["G5"] = "region"
+        ws_country["H5"] = "ticker_exchange"
+        ws_country["I5"] = "ticker_currency"
+        ws_country["J5"] = "GDP Real CAGR %"
+        ws_country["K5"] = "GDP Nominal CAGR % (LCU)"
+        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "G5", "H5", "I5", "J5", "K5"]:
             ws_country[c].font = Font(bold=True)
 
         horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -940,6 +941,7 @@ def write_dashboard_xlsx(
         country_end_row = 5 + len(country_summary_df)
         country_ticker_end_row = 1 + len(country_ticker_options_df)
         ticker_attrs_end_row = 1 + len(ticker_attrs_df)
+        country_count = ws_lists.max_row - 1
         for r in range(country_start_row, country_end_row + 1):
             # Ticker dropdown in Col B now
             ticker_formula_row = (
@@ -966,30 +968,30 @@ def write_dashboard_xlsx(
             ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
             
             # REFERENCE COLUMNS
-            # region
-            ws_country[f"F{r}"] = (
-                f'=IFERROR(INDEX(Lists!$I$2:$I${ticker_attrs_end_row+100}, MATCH($A{r}, Lists!$A$2:$A${ticker_attrs_end_row+100}, 0)), "")' # Need country-region mapping in Lists
+            # region (from Lists Col E)
+            ws_country[f"G{r}"] = (
+                f'=IFERROR(INDEX(Lists!$E$2:$E${country_count+1}, MATCH($A{r}, Lists!$A$2:$A${country_count+1}, 0)), "")'
             )
             # exchange (from Lists Col J)
-            ws_country[f"G{r}"] = (
+            ws_country[f"H{r}"] = (
                 f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
             )
             # currency (from Lists Col K)
-            ws_country[f"H{r}"] = (
+            ws_country[f"I{r}"] = (
                 f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
             )
             # Real GDP CAGR - CAGR!$G
-            ws_country[f"I{r}"] = (
+            ws_country[f"J{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
             )
             # Nominal GDP CAGR (LCU) - CAGR!$H
-            ws_country[f"J{r}"] = (
+            ws_country[f"K{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
             )
             
-            for col in ["C", "D", "E", "I", "J"]:
+            for col in ["C", "D", "E", "J", "K"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
-        ws_country.auto_filter.ref = f"A5:J{country_end_row}"
+        ws_country.auto_filter.ref = f"A5:K{country_end_row}"
 
         # Country focus dashboard below screener.
         focus_top_row = country_end_row + 3
@@ -1004,7 +1006,6 @@ def write_dashboard_xlsx(
             "Same-year GDP comparison: last 10 completed years + one projection/YTD row."
         )
 
-        country_count = ws_lists.max_row - 1
         country_dv_focus = DataValidation(
             type="list",
             formula1=f"=Lists!$A$2:$A${country_count + 1}",
@@ -1228,11 +1229,11 @@ def write_dashboard_xlsx(
             CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
         )
         ws_country.conditional_formatting.add(
-            f"I{country_start_row}:J{country_end_row}",
+            f"J{country_start_row}:K{country_end_row}",
             CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill),
         )
         ws_country.conditional_formatting.add(
-            f"I{country_start_row}:J{country_end_row}",
+            f"J{country_start_row}:K{country_end_row}",
             CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
         )
 
@@ -1243,7 +1244,7 @@ def write_dashboard_xlsx(
         fit_columns_from_ranges(
             ws_country,
             [
-                (1, 10, 5, country_end_row),
+                (1, 11, 5, country_end_row),
                 (1, 2, focus_top_row + 1, focus_top_row + 5),
                 (1, 3, timeframe_header_row, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
                 (1, 8, annual_header_row, annual_last_row),
