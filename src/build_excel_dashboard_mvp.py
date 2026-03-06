@@ -1061,8 +1061,8 @@ def write_dashboard_xlsx(
         ws_country[f"A{annual_title_row}"] = "Annual ETF vs GDP + FX Decomposition (Last 10 Years, %)"
         ws_country[f"A{annual_title_row}"].font = Font(bold=True)
         ws_country[f"A{annual_header_row}"] = "Year"
-        ws_country[f"B{annual_header_row}"] = "ETF Return (USD) %"
-        ws_country[f"C{annual_header_row}"] = "Nominal GDP Growth (USD) %"
+        ws_country[f"B{annual_header_row}"] = "Nominal GDP Growth (USD) %"
+        ws_country[f"C{annual_header_row}"] = "ETF Return (USD) %"
         ws_country[f"D{annual_header_row}"] = "Macro Disconnect %"
         ws_country[f"E{annual_header_row}"] = "" # GAP
         ws_country[f"F{annual_header_row}"] = "Real GDP Growth %"
@@ -1080,16 +1080,16 @@ def write_dashboard_xlsx(
             r = annual_start_row + i
             ws_country[f"A{r}"] = int(year)
             
-            # ETF Return (USD) % - Column O in Annual
-            ws_country[f"B{r}"] = (
-                f'=IFERROR(1*INDEX(Annual!$O:$O, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA())'
-            )
             # Nominal GDP Growth (USD) % - Column H in Annual
-            ws_country[f"C{r}"] = (
+            ws_country[f"B{r}"] = (
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
             )
-            # Macro Disconnect % (C - B)
-            ws_country[f"D{r}"] = f"=IF(AND(ISNUMBER(B{r}),ISNUMBER(C{r})),C{r}-B{r},NA())"
+            # ETF Return (USD) % - Column O in Annual
+            ws_country[f"C{r}"] = (
+                f'=IFERROR(1*INDEX(Annual!$O:$O, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA())'
+            )
+            # Macro Disconnect % (B - C). Return NA if ETF return (C) is 0.
+            ws_country[f"D{r}"] = f"=IF(AND(ISNUMBER(B{r}),ISNUMBER(C{r}),C{r}<>0),B{r}-C{r},NA())"
             
             # GAP
             ws_country[f"E{r}"] = ""
@@ -1120,16 +1120,16 @@ def write_dashboard_xlsx(
             projection_row = annual_start_row + len(annual_years)
             ws_country[f"A{projection_row}"] = f"{projection_year} (Proj GDP / ETF YTD)"
             
-            # ETF YTD (USD) - From ETF_Timeframes!$G
-            proj_usd_ret_idx = f'INDEX(ETF_Timeframes!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|YTD", ETF_Timeframes!$H:$H, 0))'
-            ws_country[f"B{projection_row}"] = f"=IFERROR(1*{proj_usd_ret_idx}, NA())"
-            
             # Nominal GDP Growth (USD) - Column H in Annual
-            ws_country[f"C{projection_row}"] = (
+            ws_country[f"B{projection_row}"] = (
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
             )
-            # Macro Disconnect (C - B)
-            ws_country[f"D{projection_row}"] = f"=IF(AND(ISNUMBER(B{projection_row}),ISNUMBER(C{projection_row})),C{projection_row}-B{projection_row},NA())"
+            # ETF YTD (USD) - From ETF_Timeframes!$G
+            proj_usd_ret_idx = f'INDEX(ETF_Timeframes!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|YTD", ETF_Timeframes!$H:$H, 0))'
+            ws_country[f"C{projection_row}"] = f"=IFERROR(1*{proj_usd_ret_idx}, NA())"
+            
+            # Macro Disconnect (B - C). Return NA if ETF return (C) is 0.
+            ws_country[f"D{projection_row}"] = f"=IF(AND(ISNUMBER(B{projection_row}),ISNUMBER(C{projection_row}),C{projection_row}<>0),B{projection_row}-C{projection_row},NA())"
             
             # GAP
             ws_country[f"E{projection_row}"] = ""
@@ -1161,41 +1161,44 @@ def write_dashboard_xlsx(
         ws_country[f"A{cagr_title_row}"] = "CAGR Comparison (%)"
         ws_country[f"A{cagr_title_row}"].font = Font(bold=True)
         ws_country[f"A{cagr_header_row}"] = "Horizon"
-        ws_country[f"B{cagr_header_row}"] = "ETF CAGR % (USD)"
-        ws_country[f"C{cagr_header_row}"] = "Nominal GDP CAGR % (USD)"
+        ws_country[f"B{cagr_header_row}"] = "Nominal GDP CAGR % (USD)"
+        ws_country[f"C{cagr_header_row}"] = "ETF CAGR % (USD)"
         ws_country[f"D{cagr_header_row}"] = "" # GAP
-        ws_country[f"E{cagr_header_row}"] = "Real GDP CAGR %"
-        ws_country[f"F{cagr_header_row}"] = "Nominal GDP CAGR % (LCU)"
+        ws_country[f"E{cagr_header_row}"] = "" # GAP (Alignment)
+        ws_country[f"F{cagr_header_row}"] = "Real GDP CAGR %"
+        ws_country[f"G{cagr_header_row}"] = "Nominal GDP CAGR % (LCU)"
         
-        for c in ["A", "B", "C", "D", "E", "F"]:
+        for c in ["A", "B", "C", "D", "E", "F", "G"]:
             ws_country[f"{c}{cagr_header_row}"].font = Font(bold=True)
 
         for i, hz in enumerate(["3Y", "5Y", "10Y"]):
             r = cagr_start_row + i
             ws_country[f"A{r}"] = hz
             
-            # ETF CAGR (USD) - Column F in CAGR sheet
-            ws_country[f"B{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, CAGR!$K:$K, 0)), NA())'
-            )
             # Nominal GDP CAGR (USD) - Column I in CAGR sheet
-            ws_country[f"C{r}"] = (
+            ws_country[f"B{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$I:$I, MATCH($B${focus_top_row + 1}&"|"&$A{r}, CAGR!$L:$L, 0)), NA())'
+            )
+            # ETF CAGR (USD) - Column F in CAGR sheet
+            ws_country[f"C{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, CAGR!$K:$K, 0)), NA())'
             )
             # GAP
             ws_country[f"D{r}"] = ""
+            # GAP (Alignment)
+            ws_country[f"E{r}"] = ""
             
             # Real GDP CAGR % - Column G in CAGR sheet
-            ws_country[f"E{r}"] = (
+            ws_country[f"F{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$A{r}, CAGR!$L:$L, 0)), NA())'
             )
             # Nominal GDP CAGR (LCU) % - Column H in CAGR sheet
-            ws_country[f"F{r}"] = (
+            ws_country[f"G{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($B${focus_top_row + 1}&"|"&$A{r}, CAGR!$L:$L, 0)), NA())'
             )
-            # Ensure G/H are blank for CAGR focus table if they were pre-filled or exist
-            ws_country[f"G{r}"] = ""
+            # Ensure context columns are blank for CAGR focus table if they exist
             ws_country[f"H{r}"] = ""
+            ws_country[f"I{r}"] = ""
 
         for row in range(timeframe_start_row, timeframe_start_row + len(TIMEFRAME_ORDER)):
             ws_country[f"B{row}"].number_format = "0.00"
@@ -1205,7 +1208,7 @@ def write_dashboard_xlsx(
                 ws_country[f"{col}{row}"].number_format = "0.00"
 
         for row in range(cagr_start_row, cagr_end_row + 1):
-            for col in ["B", "C", "E", "F"]:
+            for col in ["B", "C", "F", "G"]:
                 ws_country[f"{col}{row}"].number_format = "0.00"
 
         # Tiered conditional formatting for all returns on the sheet
@@ -1221,7 +1224,7 @@ def write_dashboard_xlsx(
             f"B{annual_start_row}:D{annual_last_row}",   # Annual table (USD side)
             f"F{annual_start_row}:I{annual_last_row}",   # Annual table (Macro/Context side)
             f"B{cagr_start_row}:C{cagr_end_row}",       # CAGR focus table (USD side)
-            f"E{cagr_start_row}:F{cagr_end_row}",       # CAGR focus table (Macro side)
+            f"F{cagr_start_row}:G{cagr_end_row}",       # CAGR focus table (Macro side)
         ]
 
         for rng in format_ranges:
@@ -1250,7 +1253,7 @@ def write_dashboard_xlsx(
                 (1, 2, focus_top_row + 1, focus_top_row + 5),
                 (1, 3, timeframe_header_row, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
                 (1, 9, annual_header_row, annual_last_row),
-                (1, 6, cagr_header_row, cagr_end_row),
+                (1, 7, cagr_header_row, cagr_end_row),
             ],
         )
 
