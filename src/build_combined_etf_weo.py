@@ -260,14 +260,14 @@ def build_combined_dataset(
         [float("inf"), float("-inf")], pd.NA
     )
     merged["gdp_real_minus_etf_growth_pct"] = (
-        merged["gdp_real_growth_pct"] - merged["etf_return_pct"]
+        merged["gdp_real_growth_pct"] - merged["etf_return_usd_pct"]
     )
     merged["gdp_nominal_minus_etf_growth_pct"] = (
-        merged["gdp_nominal_growth_pct"] - merged["etf_return_pct"]
+        merged["gdp_nominal_growth_pct"] - merged["etf_return_usd_pct"]
     )
-    # Keep existing column name for compatibility; this now explicitly tracks real GDP minus ETF.
+    # Keep existing column name for compatibility; this now explicitly tracks real GDP minus ETF (USD).
     merged["gdp_minus_etf_growth_pct"] = (
-        merged["gdp_real_growth_pct"] - merged["etf_return_pct"]
+        merged["gdp_real_growth_pct"] - merged["etf_return_usd_pct"]
     )
     return merged[
         [

@@ -956,13 +956,13 @@ def write_dashboard_xlsx(
         ws_country[f"A{annual_title_row}"] = "Annual ETF vs GDP + FX Decomposition (Last 10 Years, %)"
         ws_country[f"A{annual_title_row}"].font = Font(bold=True)
         ws_country[f"A{annual_header_row}"] = "Year"
-        ws_country[f"B{annual_header_row}"] = "ETF Return %"
+        ws_country[f"B{annual_header_row}"] = "ETF Return (Local) %"
         ws_country[f"C{annual_header_row}"] = "Real GDP Growth %"
         ws_country[f"D{annual_header_row}"] = "Nominal GDP Growth % (LCU)"
         ws_country[f"E{annual_header_row}"] = "Nominal GDP Growth % (USD)"
-        ws_country[f"F{annual_header_row}"] = "Nominal GDP USD - ETF %"
-        ws_country[f"G{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","Quote CCY vs USD %","")'
-        ws_country[f"H{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF Return % (USD)","")'
+        ws_country[f"F{annual_header_row}"] = "Macro Disconnect (GDP - USD Ret) %"
+        ws_country[f"G{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","FX Change (vs USD) %","")'
+        ws_country[f"H{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF Return (USD) %","")'
         ws_country[f"I{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","Country LCU vs USD % (WEO)","")'
         ws_country[f"J{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF USD - Country FX %","")'
         for c in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]:
@@ -987,7 +987,7 @@ def write_dashboard_xlsx(
             ws_country[f"E{r}"] = (
                 f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
             )
-            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(B{r})),E{r}-B{r},NA())"
+            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(H{r})),E{r}-H{r},NA())"
             ws_country[f"G{r}"] = (
                 f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$N:$N, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
             )
@@ -1071,7 +1071,7 @@ def write_dashboard_xlsx(
             ws_country[f"E{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$I:$I, MATCH($B${focus_top_row + 1}&"|"&$A{r}, CAGR!$L:$L, 0)), NA())'
             )
-            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(B{r})),E{r}-B{r},NA())"
+            ws_country[f"F{r}"] = f"=IF(AND(ISNUMBER(E{r}),ISNUMBER(H{r})),E{r}-H{r},NA())"
 
         for row in range(timeframe_start_row, timeframe_start_row + len(TIMEFRAME_ORDER)):
             ws_country[f"B{row}"].number_format = "0.00"
