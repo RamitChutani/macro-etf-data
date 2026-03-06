@@ -37,7 +37,7 @@ ETF_COUNTRY_TO_TICKERS: dict[str, list[str]] = {
     "Thailand": ["XCX4.L", "THD"],
     "Turkey": ["TURL.L", "TUR"],
     "United Kingdom": ["CUKX.L", "CSUK.L", "EWU"],
-    "United States": ["CSPX.L", "VUAA.L", "VUSA.L"],
+    "United States": ["CSPX.L", "VUAA.L", "VUSA.L", "CSUS.L"],
     "Vietnam": ["XFVT.L", "VNAM"],
 }
 
@@ -90,6 +90,7 @@ COUNTRIES_WITH_SUFFIXED_PRIMARY = {
     "Spain",
     "Taiwan",
     "United Kingdom",
+    "United States",
 }
 
 

@@ -22,9 +22,9 @@ India_1,IIND.L,LSE,GBP,ETF,5248004608.0,5248004600.0,5248004608.0,GBP,totalAsset
 India_2,FRIN.L,LSE,GBP,ETF,1759243904.0,1759243900.0,1759243904.0,GBP,totalAssets,Franklin FTSE India UCITS ETF,FRANKLIN TEMPLETON ICAV FRK FTS,unknown,no_name_marker,2019-06-28,2026-03-05,1689.0,1.0,yes,
 India_3,NDIA.L,LSE,USD,ETF,5248004608.0,5248004600.0,5248004608.0,USD,totalAssets,iShares MSCI India UCITS ETF USD Acc,ISHARES IV PLC ISH MSCI INDIA U,unknown,no_name_marker,2018-05-29,2026-03-05,1965.0,1.0,yes,
 India_4,INDA,BTS,USD,ETF,9251804160.0,9251804200.0,9251804160.0,USD,totalAssets,iShares MSCI India ETF,Ishares MSCI India ETF,unknown,no_name_marker,,,,,no,unsupported exchange BTS
-Indonesia,INDO.L,LSE,USD,ETF,,,,USD,,Lyxor MSCI Indonesia ETF C-USD,MULTI UNITS FRANCE LYXOR ETF MS,unknown,no_name_marker,2018-10-03,2018-10-03,1.0,2711.0,no,insufficient history rows (1 < 252)
+Indonesia,INDO.L,LSE,USD,ETF,,,,USD,,Lyxor MSCI Indonesia ETF C-USD,MULTI UNITS FRANCE LYXOR ETF MS,unknown,no_name_marker,,,,,no,no close history returned
 Indonesia_2,EIDO,PCX,USD,ETF,310150976.0,310150976.0,310150976.0,USD,totalAssets,iShares MSCI Indonesia ETF,iShares MSCI Indonesia ETF,unknown,no_name_marker,2010-05-07,2026-03-05,3981.0,1.0,yes,
-Italy,CMIB.L,LSE,EUR,ETF,,,,EUR,,iShares VII Public Limited Company - iShares FTSE MIB UCITS ETF EUR (Acc),ISHARES VII PLC ISHARES FTSE MI,unknown,no_name_marker,2019-09-23,2019-09-23,1.0,2356.0,no,insufficient history rows (1 < 252)
+Italy,CMIB.L,LSE,EUR,ETF,,,,EUR,,iShares VII Public Limited Company - iShares FTSE MIB UCITS ETF EUR (Acc),ISHARES VII PLC ISHARES FTSE MI,unknown,no_name_marker,,,,,no,no close history returned
 Italy_2,EWI,PCX,USD,ETF,676846912.0,676846910.0,676846912.0,USD,totalAssets,iShares MSCI Italy ETF,iShares MSCI Italy ETF,unknown,no_name_marker,1996-03-18,2026-03-05,7540.0,1.0,yes,
 Japan_1,LCJP.L,LSE,GBP,ETF,,,,GBP,,Amundi Core MSCI Japan UCITS ETF Acc,MULTI UNITS LUXEMBOURG AMUNDI C,unknown,no_name_marker,2018-02-28,2026-03-05,2023.0,1.0,yes,
 Japan_2,CJPU.L,LSE,USD,ETF,1291408256.0,1291408260.0,1291408256.0,USD,totalAssets,iShares VII PLC - iShares MSCI Japan ETF USD Acc,ISHARES VII PLC ISHRS MSCI JAPA,unknown,no_name_marker,2010-01-11,2026-03-05,4081.0,1.0,yes,
@@ -61,13 +61,14 @@ Taiwan_1,XMTW.L,LSE,GBp,ETF,217655952.0,217655952.0,217655952.0,GBp,totalAssets,
 Taiwan_2,EWT,PCX,USD,ETF,8794449920.0,8794449900.0,8794449920.0,USD,totalAssets,iShares MSCI Taiwan ETF,iShares MSCI Taiwan ETF,unknown,no_name_marker,2000-06-23,2026-03-05,6462.0,1.0,yes,
 Thailand,XCX4.L,LSE,GBp,ETF,148116096.0,148116096.0,148116096.0,GBp,totalAssets,Xtrackers MSCI Thailand UCITS ETF 1C,XTRACKERS X MSCI THAILAND 1C,unknown,no_name_marker,2010-06-24,2026-03-05,3961.0,1.0,yes,
 Thailand_2,THD,PCX,USD,ETF,347865312.0,347865312.0,347865312.0,USD,totalAssets,iShares MSCI Thailand ETF,iShares MSCI Thailand ETF,unknown,no_name_marker,2008-04-01,2026-03-05,4511.0,1.0,yes,
-Turkey,TURL.L,LSE,GBp,ETF,80517224.0,80517224.0,80517224.0,GBp,totalAssets,Amundi MSCI Turkey UCITS ETF Acc,MULTI UNITS LUXEMBOURG LYXOR MS,unknown,no_name_marker,2008-01-02,2026-03-04,4528.0,2.0,yes,
+Turkey,TURL.L,LSE,GBp,ETF,80517224.0,80517224.0,80517224.0,GBp,totalAssets,Amundi MSCI Turkey UCITS ETF Acc,MULTI UNITS LUXEMBOURG LYXOR MS,unknown,no_name_marker,2008-01-02,2026-03-05,4529.0,1.0,yes,
 Turkey_2,TUR,NGM,USD,ETF,346330432.0,346330432.0,346330432.0,USD,totalAssets,iShares MSCI Turkey ETF,iShares MSCI Turkey ETF,unknown,no_name_marker,2008-03-28,2026-03-05,4513.0,1.0,yes,
 United Kingdom_1,CUKX.L,LSE,GBp,ETF,2827106560.0,2827106560.0,2827106560.0,GBp,totalAssets,iShares VII PLC - iShares Core FTSE 100 ETF GBP Acc,ISHARES VII PLC ISHRS FTSE 100 ,unknown,no_name_marker,2010-09-16,2026-03-05,3907.0,1.0,yes,
 United Kingdom_2,CSUK.L,LSE,GBp,ETF,108510752.0,108510752.0,108510752.0,GBp,totalAssets,iShares VII PLC - iShares MSCI UK ETF GBP Acc,ISHARES VII PLC ISHRS MSCI UK U,unknown,no_name_marker,2010-09-21,2026-03-05,3903.0,1.0,yes,
 United Kingdom_3,EWU,PCX,USD,ETF,3240832512.0,3240832510.0,3240832512.0,USD,totalAssets,iShares MSCI United Kingdom ETF,iShares MSCI,unknown,no_name_marker,1996-03-18,2026-03-05,7540.0,1.0,yes,
-United States,CSPX.L,LSE,USD,ETF,,,,USD,,iShares VII PLC - iShares Core S&P 500 UCITS ETF,ISHARES VII PLC ISHRS CORE S&P ,unknown,no_name_marker,2010-09-15,2026-03-05,3908.0,1.0,yes,
+United States_1,CSPX.L,LSE,USD,ETF,,,,USD,,iShares VII PLC - iShares Core S&P 500 UCITS ETF,ISHARES VII PLC ISHRS CORE S&P ,unknown,no_name_marker,2010-09-15,2026-03-05,3908.0,1.0,yes,
 United States_2,VUAA.L,LSE,USD,ETF,80564903936.0,80564904000.0,80564903936.0,USD,totalAssets,Vanguard S&P 500 UCITS ETF USD Accumulation,VANGUARD FUNDS PLC VANGUARD S&P,unknown,no_name_marker,2019-05-14,2026-03-05,1721.0,1.0,yes,
 United States_3,VUSA.L,LSE,GBP,ETF,80564903936.0,80564904000.0,80564903936.0,GBP,totalAssets,Vanguard S&P 500 UCITS ETF,VANGUARD FUNDS PLC VANGUARD S&P,unknown,no_name_marker,2012-05-22,2026-03-05,3483.0,1.0,yes,
+United States_4,CSUS.L,LSE,USD,ETF,3436921856.0,3436921860.0,3436921856.0,USD,totalAssets,iShares VII PLC - iShares MSCI USA UCITS ETF USD (Acc),ISHARES VII PLC ISHRS MSCI USA ,unknown,no_name_marker,2010-09-15,2026-03-05,3906.0,1.0,yes,
 Vietnam,XFVT.L,LSE,GBp,ETF,374594464.0,374594464.0,374594464.0,GBp,totalAssets,Xtrackers Vietnam Swap UCITS ETF 1C,XTRACKERS X FTSE VIETNAM SWAP,unknown,no_name_marker,2009-01-02,2026-03-05,4338.0,1.0,yes,
 Vietnam_2,VNAM,PCX,USD,ETF,34452520.0,34452520.0,34452520.0,USD,totalAssets,Global X MSCI Vietnam ETF,Global X MSCI Vietnam ETF,unknown,no_name_marker,2021-12-10,2026-03-05,1061.0,1.0,no,history starts too late (2021-12-10 > 2020-01-01)
