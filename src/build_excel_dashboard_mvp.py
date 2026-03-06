@@ -174,6 +174,7 @@ def load_gdp_growth_maps(
     dict[tuple[str, int], float],
     dict[tuple[str, int], float],
     dict[tuple[str, int], float],
+    dict[tuple[str, int], float],
 ]:
     weo = pd.read_csv(weo_csv)
     weo["year"] = pd.to_numeric(weo["year"], errors="coerce").astype("Int64")
@@ -183,6 +184,7 @@ def load_gdp_growth_maps(
     real_weo = weo[(weo["indicator"] == "NGDP_RPCH") & (weo["value"].notna())].copy()
     nominal_usd_weo = weo[(weo["indicator"] == "NGDPD_PCH") & (weo["value"].notna())].copy()
     nominal_lcu_weo = weo[(weo["indicator"] == "NGDP_PCH") & (weo["value"].notna())].copy()
+    current_usd_weo = weo[(weo["indicator"] == "NGDPD") & (weo["value"].notna())].copy()
 
     real_map = {
         (str(r.country_code), int(r.year)): float(r.value)
@@ -195,6 +197,10 @@ def load_gdp_growth_maps(
     nominal_lcu_map = {
         (str(r.country_code), int(r.year)): float(r.value)
         for r in nominal_lcu_weo.itertuples(index=False)
+    }
+    current_usd_map = {
+        (str(r.country_code), int(r.year)): float(r.value)
+        for r in current_usd_weo.itertuples(index=False)
     }
 
     # Backward-compatible fallback if NGDPD_PCH not present in weo_csv.
@@ -243,7 +249,7 @@ def load_gdp_growth_maps(
             if pd.notna(r.country_lcu_vs_usd_weo_pct)
         }
 
-    return real_map, nominal_lcu_map, nominal_usd_map, country_fx_map
+    return real_map, nominal_lcu_map, nominal_usd_map, country_fx_map, current_usd_map
 
 
 def gdp_cagr(
@@ -396,6 +402,7 @@ def build_timeframe_rows(
         gdp_nominal_lcu_growth_map,
         gdp_nominal_usd_growth_map,
         country_lcu_vs_usd_weo_map,
+        gdp_current_usd_map,
     ) = load_gdp_growth_maps(weo_csv)
     if raw.empty:
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
@@ -491,6 +498,7 @@ def build_timeframe_rows(
                 gdp_real_same = gdp_real_growth_map.get((country_code, y))
                 gdp_nominal_lcu_same = gdp_nominal_lcu_growth_map.get((country_code, y))
                 gdp_nominal_usd_same = gdp_nominal_usd_growth_map.get((country_code, y))
+                gdp_current_usd_val = gdp_current_usd_map.get((country_code, y))
                 quote_ccy_vs_usd = quote_fx_map.get(
                     (normalize_currency_code(ticker_to_currency.get(ticker, "")), y)
                 )
@@ -532,6 +540,7 @@ def build_timeframe_rows(
                         "gdp_real_growth_pct": gdp_real_same,
                         "gdp_nominal_lcu_growth_pct": gdp_nominal_lcu_same,
                         "gdp_nominal_usd_growth_pct": gdp_nominal_usd_same,
+                        "gdp_current_usd": gdp_current_usd_val,
                         "gdp_nominal_usd_minus_etf_growth_pct": (
                             gdp_nominal_usd_same - etf_return_usd
                             if (etf_return_usd is not None and gdp_nominal_usd_same is not None)
@@ -667,6 +676,7 @@ def build_timeframe_rows(
                 "etf_return_usd_pct",
                 "country_lcu_vs_usd_weo_pct",
                 "etf_usd_minus_country_fx_pct",
+                "gdp_current_usd",
             ]
         ]
 
@@ -801,6 +811,18 @@ def write_dashboard_xlsx(
             .to_dict()
         )
         country_summary_df = default_map.rename(columns={"ticker": "ticker_used"}).copy()
+        
+        # Get latest GDP for sorting by size of economy
+        latest_gdp = (
+            annual_df.dropna(subset=["gdp_current_usd"])
+            .sort_values("year")
+            .groupby("country_name")
+            .last()[["gdp_current_usd"]]
+        )
+        country_summary_df = country_summary_df.merge(
+            latest_gdp, on="country_name", how="left"
+        )
+        
         country_summary_df["ticker_exchange"] = country_summary_df["ticker_used"].map(
             ticker_exchange_map
         ).fillna("")
@@ -810,9 +832,23 @@ def write_dashboard_xlsx(
         country_summary_df["region"] = country_summary_df["country_name"].map(
             COUNTRY_TO_REGION
         ).fillna("Other")
+        
+        # Sort by economy size (GDP current USD) descending
+        country_summary_df = country_summary_df.sort_values(
+            "gdp_current_usd", ascending=False
+        ).reset_index(drop=True)
+        
+        # Define column order: core first, reference later
         country_summary_df = country_summary_df[
-            ["country_name", "region", "ticker_used", "ticker_exchange", "ticker_currency"]
-        ].sort_values(["region", "country_name"], ascending=[True, True]).reset_index(drop=True)
+            [
+                "country_name", 
+                "ticker_used", 
+                "gdp_current_usd", # temp column for sorting if needed, but we can drop or keep
+                "region", 
+                "ticker_exchange", 
+                "ticker_currency"
+            ]
+        ]
         country_ticker_options_df = (
             timeframe_df[["country_name", "ticker"]]
             .drop_duplicates(subset=["country_name", "ticker"], keep="first")
@@ -845,6 +881,8 @@ def write_dashboard_xlsx(
                 "default_ticker": pd.Series(default_map["ticker"].tolist()),
             }
         )
+        lists_df["region"] = lists_df["country_name"].map(COUNTRY_TO_REGION).fillna("Other")
+        
         lists_df.to_excel(writer, sheet_name="Lists", index=False)
         country_ticker_options_df.to_excel(
             writer,
@@ -873,24 +911,24 @@ def write_dashboard_xlsx(
         ws_annual.freeze_panes = "A2"
         ws_cagr.auto_filter.ref = ws_cagr.dimensions
         ws_cagr.freeze_panes = "A2"
-        ws_country.freeze_panes = "A6"
 
         ws_country["A1"] = "Country CAGR Disconnect Screener"
         ws_country["A1"].font = Font(bold=True, size=14)
         ws_country["A2"] = "Horizon"
         ws_country["B2"] = "5Y"
-        ws_country["D2"] = "Choose horizon, then sort by Nominal USD GDP - ETF CAGR."
-        ws_country["A3"] = "Metrics are CAGR (annualized), not cumulative return."
+        ws_country["D2"] = "Sorted by size of economy. Metrics are CAGR (annualized)."
+        
+        # New order headers (A-J)
         ws_country["A5"] = "country_name"
-        ws_country["B5"] = "region"
-        ws_country["C5"] = "ticker_used"
-        ws_country["D5"] = "ticker_exchange"
-        ws_country["E5"] = "ticker_currency"
-        ws_country["F5"] = "ETF CAGR %"
-        ws_country["G5"] = "GDP Real CAGR %"
-        ws_country["H5"] = "GDP Nominal CAGR % (LCU)"
-        ws_country["I5"] = "GDP Nominal CAGR % (USD)"
-        ws_country["J5"] = "GDP Nominal USD - ETF CAGR %"
+        ws_country["B5"] = "ticker_used"
+        ws_country["C5"] = "GDP Nominal CAGR % (USD)"
+        ws_country["D5"] = "ETF CAGR % (USD)"
+        ws_country["E5"] = "Macro Disconnect %"
+        ws_country["F5"] = "region"
+        ws_country["G5"] = "ticker_exchange"
+        ws_country["H5"] = "ticker_currency"
+        ws_country["I5"] = "GDP Real CAGR %"
+        ws_country["J5"] = "GDP Nominal CAGR % (LCU)"
         for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "I5", "J5"]:
             ws_country[c].font = Font(bold=True)
 
@@ -903,6 +941,7 @@ def write_dashboard_xlsx(
         country_ticker_end_row = 1 + len(country_ticker_options_df)
         ticker_attrs_end_row = 1 + len(ticker_attrs_df)
         for r in range(country_start_row, country_end_row + 1):
+            # Ticker dropdown in Col B now
             ticker_formula_row = (
                 '=OFFSET(Lists!$G$2,'
                 f'IFERROR(MATCH($A{r},Lists!$F$2:$F${country_ticker_end_row},0)-1,0),'
@@ -912,27 +951,43 @@ def write_dashboard_xlsx(
             )
             ticker_dv_row = DataValidation(type="list", formula1=ticker_formula_row, allow_blank=False)
             ws_country.add_data_validation(ticker_dv_row)
-            ticker_dv_row.add(f"C{r}")
-            ws_country[f"D{r}"] = (
-                f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($C{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
-            )
-            ws_country[f"E{r}"] = (
-                f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($C{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
-            )
-            ws_country[f"F{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$C{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
-            )
-            ws_country[f"G{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
-            )
-            ws_country[f"H{r}"] = (
-                f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
-            )
-            ws_country[f"I{r}"] = (
+            ticker_dv_row.add(f"B{r}")
+            
+            # CORE METRICS pull from CAGR sheet
+            # GDP Nominal CAGR (USD) - CAGR!$I
+            ws_country[f"C{r}"] = (
                 f'=IFERROR(1*INDEX(CAGR!$I:$I, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
             )
-            ws_country[f"J{r}"] = f"=IF(AND(ISNUMBER(F{r}),ISNUMBER(I{r})),I{r}-F{r},NA())"
-            for col in ["F", "G", "H", "I", "J"]:
+            # ETF CAGR (USD) - CAGR!$F
+            ws_country[f"D{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
+            )
+            # Macro Disconnect (Simple formula: C - D)
+            ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
+            
+            # REFERENCE COLUMNS
+            # region
+            ws_country[f"F{r}"] = (
+                f'=IFERROR(INDEX(Lists!$I$2:$I${ticker_attrs_end_row+100}, MATCH($A{r}, Lists!$A$2:$A${ticker_attrs_end_row+100}, 0)), "")' # Need country-region mapping in Lists
+            )
+            # exchange (from Lists Col J)
+            ws_country[f"G{r}"] = (
+                f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
+            )
+            # currency (from Lists Col K)
+            ws_country[f"H{r}"] = (
+                f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
+            )
+            # Real GDP CAGR - CAGR!$G
+            ws_country[f"I{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
+            )
+            # Nominal GDP CAGR (LCU) - CAGR!$H
+            ws_country[f"J{r}"] = (
+                f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
+            )
+            
+            for col in ["C", "D", "E", "I", "J"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
         ws_country.auto_filter.ref = f"A5:J{country_end_row}"
 
@@ -1165,11 +1220,19 @@ def write_dashboard_xlsx(
                 rng, CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill)
             )
         ws_country.conditional_formatting.add(
-            f"F{country_start_row}:J{country_end_row}",
+            f"C{country_start_row}:E{country_end_row}",
             CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill),
         )
         ws_country.conditional_formatting.add(
-            f"F{country_start_row}:J{country_end_row}",
+            f"C{country_start_row}:E{country_end_row}",
+            CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
+        )
+        ws_country.conditional_formatting.add(
+            f"I{country_start_row}:J{country_end_row}",
+            CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=pos_fill),
+        )
+        ws_country.conditional_formatting.add(
+            f"I{country_start_row}:J{country_end_row}",
             CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill),
         )
 
