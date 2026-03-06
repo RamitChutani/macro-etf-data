@@ -160,14 +160,27 @@ def compute_annual_etf_returns(etf_csv: str, metadata_csv: str | None = None) ->
         series = frame[["year", price_col]].rename(columns={price_col: "price"}).dropna()
         if series.empty:
             continue
+        
+        # Identify the first year with a non-zero price
+        valid_series = series[series["price"] > 0]
+        if valid_series.empty:
+            continue
+        inception_year = int(valid_series["year"].min())
+
         annual = (
             series.groupby("year", as_index=False)["price"]
             .agg(etf_price_start="first", etf_price_end="last")
             .sort_values("year")
         )
-        annual["etf_return_pct"] = (
-            (annual["etf_price_end"] / annual["etf_price_start"]) - 1.0
-        ) * 100.0
+        # Calculate return only if year >= inception and start price > 0
+        annual["etf_return_pct"] = annual.apply(
+            lambda r: (
+                ((r["etf_price_end"] / r["etf_price_start"]) - 1.0) * 100.0
+                if (int(r["year"]) >= inception_year and r["etf_price_start"] > 0)
+                else pd.NA
+            ),
+            axis=1
+        )
         annual["ticker"] = ticker
         annual["etf_price_field"] = field_used
         annual["country_name"] = ticker_country[ticker]

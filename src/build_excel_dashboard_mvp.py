@@ -422,6 +422,13 @@ def build_timeframe_rows(
         series = raw.set_index("Date")[price_col].dropna()
         if series.empty:
             continue
+        
+        # Identify the first date with a non-zero price (inception)
+        valid_series = series[series > 0]
+        if valid_series.empty:
+            continue
+        inception_date = valid_series.index.min()
+        inception_year = int(inception_date.year)
 
         end_pt = PricePoint(series.index[-1], float(series.iloc[-1]))
         end_date = end_pt.date
@@ -469,18 +476,24 @@ def build_timeframe_rows(
         # to last completed years and can append a separate projection/YTD row.
         if gdp_years:
             for y in gdp_years:
-                start_pt = first_in_year(series, y)
-                end_year_pt = last_in_year(series, y)
+                start_pt = None
+                end_year_pt = None
                 etf_return = None
-                if start_pt is not None and end_year_pt is not None:
-                    etf_return = pct_return(start_pt.value, end_year_pt.value)
+                etf_return_usd = None
+                
+                if y >= inception_year:
+                    start_pt = first_in_year(series, y)
+                    end_year_pt = last_in_year(series, y)
+                    if start_pt is not None and end_year_pt is not None and start_pt.value > 0:
+                        etf_return = pct_return(start_pt.value, end_year_pt.value)
+                
                 gdp_real_same = gdp_real_growth_map.get((country_code, y))
                 gdp_nominal_lcu_same = gdp_nominal_lcu_growth_map.get((country_code, y))
                 gdp_nominal_usd_same = gdp_nominal_usd_growth_map.get((country_code, y))
                 quote_ccy_vs_usd = quote_fx_map.get(
                     (normalize_currency_code(ticker_to_currency.get(ticker, "")), y)
                 )
-                etf_return_usd = None
+                
                 if etf_return is not None and quote_ccy_vs_usd is not None:
                     etf_return_usd = (
                         ((1.0 + (etf_return / 100.0)) * (1.0 + (quote_ccy_vs_usd / 100.0)))
@@ -530,9 +543,12 @@ def build_timeframe_rows(
         # CAGR rows (1Y, 3Y, 5Y, 10Y)
         for years in CAGR_HORIZONS:
             start_year = cagr_end_year - years + 1
+            if start_year < inception_year:
+                continue
+            
             start_pt = first_in_year(series, start_year)
             end_year_pt = last_in_year(series, cagr_end_year)
-            if start_pt is None or end_year_pt is None:
+            if start_pt is None or end_year_pt is None or start_pt.value <= 0:
                 continue
             
             total_ret_local = pct_return(start_pt.value, end_year_pt.value)
