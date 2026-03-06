@@ -177,7 +177,7 @@ def compute_annual_etf_returns(etf_csv: str, metadata_csv: str | None = None) ->
             lambda r: (
                 ((r["etf_price_end"] / r["etf_price_start"]) - 1.0) * 100.0
                 if (int(r["year"]) >= inception_year and r["etf_price_start"] > 0)
-                else pd.NA
+                else None
             ),
             axis=1
         )
@@ -253,35 +253,54 @@ def build_combined_dataset(
         axis=1,
     )
     etf_annual["etf_return_quote_pct"] = etf_annual["etf_return_pct"]
-    etf_annual["etf_return_usd_pct"] = (
-        ((1.0 + (etf_annual["etf_return_quote_pct"] / 100.0))
-         * (1.0 + (etf_annual["quote_ccy_vs_usd_pct"] / 100.0)))
-        - 1.0
-    ) * 100.0
-    etf_annual["etf_return_usd_pct"] = etf_annual["etf_return_usd_pct"].replace(
-        [float("inf"), float("-inf")], pd.NA
+    
+    # Calculate USD return
+    etf_annual["etf_return_usd_pct"] = etf_annual.apply(
+        lambda r: (
+            ((1.0 + (r["etf_return_quote_pct"] / 100.0))
+             * (1.0 + (r["quote_ccy_vs_usd_pct"] / 100.0)))
+            - 1.0
+        ) * 100.0 if (pd.notna(r["etf_return_quote_pct"]) and pd.notna(r["quote_ccy_vs_usd_pct"]))
+        else None,
+        axis=1
     )
-    etf_annual["currency_hedged"] = etf_annual["ticker"].map(ticker_hedged).fillna("unknown")
+    # Special case: If ticker currency is USD, return is already USD
+    usd_mask = etf_annual["etf_currency_normalized"] == "USD"
+    etf_annual.loc[usd_mask, "etf_return_usd_pct"] = etf_annual.loc[usd_mask, "etf_return_quote_pct"]
+
+    etf_annual["etf_return_usd_pct"] = etf_annual["etf_return_usd_pct"].replace(
+        [float("inf"), float("-inf")], None
+    )
 
     merged = etf_annual.merge(gdp, on=["country_code", "year"], how="left")
-    merged["etf_usd_minus_country_fx_pct"] = (
-        ((1.0 + (merged["etf_return_usd_pct"] / 100.0))
-         / (1.0 + (merged["country_lcu_vs_usd_weo_pct"] / 100.0)))
-        - 1.0
-    ) * 100.0
-    merged["etf_usd_minus_country_fx_pct"] = merged["etf_usd_minus_country_fx_pct"].replace(
-        [float("inf"), float("-inf")], pd.NA
+    merged["currency_hedged"] = merged["ticker"].map(ticker_hedged).fillna("unknown")
+
+    merged["etf_usd_minus_country_fx_pct"] = merged.apply(
+        lambda r: (
+            ((1.0 + (r["etf_return_usd_pct"] / 100.0))
+             / (1.0 + (r["country_lcu_vs_usd_weo_pct"] / 100.0)))
+            - 1.0
+        ) * 100.0 if (pd.notna(r["etf_return_usd_pct"]) and pd.notna(r["country_lcu_vs_usd_weo_pct"]) and (1.0 + (r["country_lcu_vs_usd_weo_pct"] / 100.0)) != 0)
+        else None,
+        axis=1
     )
-    merged["gdp_real_minus_etf_growth_pct"] = (
-        merged["gdp_real_growth_pct"] - merged["etf_return_usd_pct"]
+
+    # Real GDP Disconnect
+    merged["gdp_real_minus_etf_growth_pct"] = merged.apply(
+        lambda r: r["gdp_real_growth_pct"] - r["etf_return_usd_pct"]
+        if (pd.notna(r["gdp_real_growth_pct"]) and pd.notna(r["etf_return_usd_pct"]))
+        else None,
+        axis=1
     )
-    merged["gdp_nominal_minus_etf_growth_pct"] = (
-        merged["gdp_nominal_growth_pct"] - merged["etf_return_usd_pct"]
+    # Nominal USD GDP Disconnect
+    merged["gdp_nominal_minus_etf_growth_pct"] = merged.apply(
+        lambda r: r["gdp_nominal_growth_pct"] - r["etf_return_usd_pct"]
+        if (pd.notna(r["gdp_nominal_growth_pct"]) and pd.notna(r["etf_return_usd_pct"]))
+        else None,
+        axis=1
     )
-    # Keep existing column name for compatibility; this now explicitly tracks real GDP minus ETF (USD).
-    merged["gdp_minus_etf_growth_pct"] = (
-        merged["gdp_real_growth_pct"] - merged["etf_return_usd_pct"]
-    )
+    # Backward-compatible column
+    merged["gdp_minus_etf_growth_pct"] = merged["gdp_real_minus_etf_growth_pct"]
     return merged[
         [
             "country_name",
