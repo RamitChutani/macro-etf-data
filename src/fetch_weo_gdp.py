@@ -180,7 +180,7 @@ def main() -> None:
         description="Fetch IMF WEO GDP data (NGDPD, NGDP, NGDP_RPCH) for ETF countries."
     )
     parser.add_argument("--start-year", type=int, default=2015)
-    parser.add_argument("--end-year", type=int, default=2026)
+    parser.add_argument("--end-year", type=int, default=2029)
     parser.add_argument(
         "--base-url",
         default="https://api.imf.org/external/sdmx/2.1",

@@ -27,7 +27,7 @@ def main() -> None:
     )
     parser.add_argument("--end-date")
     parser.add_argument("--start-year", type=int, default=2015)
-    parser.add_argument("--end-year", type=int, default=2026)
+    parser.add_argument("--end-year", type=int, default=2029)
     parser.add_argument("--etf-output", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-output", default="data/outputs/weo_gdp.csv")
     parser.add_argument(
