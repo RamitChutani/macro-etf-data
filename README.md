@@ -17,7 +17,7 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 - Apply automatic inclusion filters before downstream outputs:
   - minimum non-null close rows (default `252`)
   - maximum staleness in days from latest close (default `45`)
-  - minimum acceptable first close date (default `2020-01-01`)
+  - **minimum acceptable first close date (default `2016-01-01`)**
   - only `included=yes` tickers flow into combined outputs and dashboard sheets
 - ETF metadata export includes `total_assets`, `net_assets`, and selected `fund_size`.
   - metadata also records `history_start_date`, `history_end_date`, `history_rows`, `history_stale_days`, `included`, `reason`
@@ -47,7 +47,9 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - annual panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
   - annual panel keeps last 10 completed years and adds one projection/YTD row (for 2026 while in 2026)
   - CAGR panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
-  - ETF-only cumulative returns (YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX)
+  - **ETF cumulative returns table now shows both USD Return % and Quote Currency Return %**
+  - **Redundant currency columns (FX Decomposition) now automatically blank out if the ticker is already denominated in USD**
+  - **Column headers are dynamic and show the specific quote currency (e.g., "ETF Return (GBP) %")**
   - final-sheet delta columns compute directly from in-row values (`Nominal USD GDP - ETF`) to avoid lookup mismatch
   - table widths auto-fit to table ranges (explainer cells do not drive column widths)
 - Build a separate Excel workbook with one full-history ETF chart sheet per ticker.
@@ -91,7 +93,7 @@ Optional filter overrides:
 
 ```bash
 uv run python src/fetch_etf_prices.py \
-  --min-history-start 2020-01-01 \
+  --min-history-start 2016-01-01 \
   --min-history-rows 252 \
   --max-stale-days 45
 ```
@@ -125,10 +127,10 @@ uv run jupyter notebook
 When screening candidate ETFs for inclusion in mapping updates, current hard checks are:
 - `exchange` in `{LSE, PCX, NYQ, ASE, NMS, NGM, NCM, NAS}` (Yahoo exchange codes for LSE + NYSE/Nasdaq families)
 - `quoteType == ETF`
-- earliest available Yahoo history date `<= 2020-01-01` (default, configurable)
+- earliest available Yahoo history date `<= 2016-01-01` (default, configurable)
 - history has at least `252` non-null close rows (default, configurable)
 - latest close is no more than `45` days stale (default, configurable)
-- exclude only explicit distributing classes (`Dist` / `Distributing` in ETF name)
+- **Primary standard is Accumulating (Acc) policy only** (verified against factsheets or 3yr dividend history).
 
 Currency-hedged metadata:
 - metadata file includes `currency_hedged` and `currency_hedged_basis`
@@ -137,3 +139,4 @@ Currency-hedged metadata:
 
 Preference (not exclusion):
 - prefer `USD` where multiple eligible tickers exist for a country
+- prefer LSE-listed UCITS (Ireland-domiciled) for tax efficiency and accumulation policy
