@@ -209,7 +209,9 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--fo
 
 <script>
 (function() {
+  console.log("Dashboard script starting...");
   const dashboardData = REPLACE_DATA_JSON;
+  console.log("Data loaded:", dashboardData);
   let currentPeriod = 'ytd';
 
   window.fp = function(v) {
@@ -225,6 +227,7 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--fo
   };
 
   window.render = function() {
+    console.log("Rendering dashboard for period:", currentPeriod);
     try {
       const asOfEl = document.getElementById('asOfDate');
       if (asOfEl) asOfEl.innerText = dashboardData.as_of;
@@ -265,6 +268,7 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--fo
         tableHtml += '</tbody></table>';
         tableContainer.innerHTML = tableHtml;
       }
+      console.log("Render complete.");
     } catch (err) {
       console.error("Render error:", err);
     }
@@ -287,7 +291,7 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--fo
         <div><div style="font-size:10px;color:var(--text-muted)">YTD Return</div><div style="font-weight:700">${fp(d['ytd'])}</div></div>
         <div><div style="font-size:10px;color:var(--text-muted)">1Y Return</div><div style="font-weight:700">${fp(d['y1'])}</div></div>
         <div><div style="font-size:10px;color:var(--text-muted)">GDP Real (2025)</div><div style="font-weight:700">${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1) + '%' : '—'}</div></div>
-        <div><div style="font-size:10px;color:var(--text-muted)">LCU Return (2025)</div><div style="font-weight:700">${fp(dashboardData.macro ? d.macro.lcu_return / 100 : null)}</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted)">LCU Return (2025)</div><div style="font-weight:700">${fp(d.macro ? d.macro.lcu_return / 100 : null)}</div></div>
       </div>
     `;
     tip.classList.add('show');
@@ -298,10 +302,10 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--fo
   window.hideTip = function() { if (tip) tip.classList.remove('show'); };
 
   // Initial render
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', render);
-  } else {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
     render();
+  } else {
+    window.onload = render;
   }
 })();
 </script>
