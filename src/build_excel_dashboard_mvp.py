@@ -242,9 +242,11 @@ def load_gdp_growth_maps(
     if not fx_levels.empty:
         fx_levels["lcu_per_usd"] = fx_levels["ngdp_lcu"] / fx_levels["ngdp_usd"]
         fx_levels = fx_levels.sort_values(["country_code", "year"]).copy()
+        # Invert to Local Currency return vs USD: (prev_rate / current_rate) - 1
         fx_levels["country_lcu_vs_usd_weo_pct"] = (
-            fx_levels.groupby("country_code")["lcu_per_usd"].pct_change() * 100.0
-        )
+            fx_levels.groupby("country_code")["lcu_per_usd"].shift(1) 
+            / fx_levels["lcu_per_usd"] - 1.0
+        ) * 100.0
         country_fx_map = {
             (str(r.country_code), int(r.year)): float(r.country_lcu_vs_usd_weo_pct)
             for r in fx_levels.itertuples(index=False)
@@ -1000,7 +1002,7 @@ def write_dashboard_xlsx(
         ws_country[f"G{annual_header_row}"] = "Nominal GDP Growth (LCU) %"
         ws_country[f"H{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF Return (" & {focus_currency_ref} & ") %","")'
         ws_country[f"I{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","FX Change (vs USD) %","")'
-        ws_country[f"J{annual_header_row}"] = "WEO LCU vs USD %"
+        ws_country[f"J{annual_header_row}"] = "WEO LCU Return vs USD %"
         for c in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]:
             ws_country[f"{c}{annual_header_row}"].font = Font(bold=True)
 

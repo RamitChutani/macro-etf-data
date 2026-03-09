@@ -227,13 +227,18 @@ def load_weo_gdp(weo_csv: str) -> pd.DataFrame:
             pivot.groupby("country_code")["gdp_current_usd"].pct_change() * 100.0
         )
     if "gdp_current_lcu" in pivot.columns and "gdp_current_usd" in pivot.columns:
+        # Implied exchange rate (LCU per USD)
         pivot["country_lcu_per_usd_weo"] = (
             pivot["gdp_current_lcu"] / pivot["gdp_current_usd"]
         )
-        pivot = pivot.sort_values(["country_code", "year"]).copy()
+        pivot = pivot.sort_index().copy()
+        # Calculate Local Currency return vs USD (Inverted: USD per LCU)
+        # return = (1 / current_rate) / (1 / prev_rate) - 1 
+        # which simplifies to: (prev_rate / current_rate) - 1
         pivot["country_lcu_vs_usd_weo_pct"] = (
-            pivot.groupby("country_code")["country_lcu_per_usd_weo"].pct_change() * 100.0
-        )
+            pivot.groupby("country_code")["country_lcu_per_usd_weo"].shift(1) 
+            / pivot["country_lcu_per_usd_weo"] - 1.0
+        ) * 100.0
     return pivot
 
 
