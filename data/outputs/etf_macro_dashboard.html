@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETF vs Macro Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg-primary:#0a0e17;--bg-secondary:#111827;--bg-card:#151d2e;--bg-card-hover:#1a2540;--border:#1e293b;--border-light:#2a3a52;--text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;--accent-green:#22c55e;--accent-red:#ef4444;--accent-blue:#3b82f6;--accent-cyan:#06b6d4;--region-americas:#f59e0b;--region-europe:#3b82f6;--region-asia:#10b981;--region-mea:#f43f5e;--region-oceania:#8b5cf6;--font-body:'DM Sans',sans-serif;--font-mono:'JetBrains Mono',monospace;--radius:10px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-body);line-height:1.5;overflow-x:hidden}
+.header{position:sticky;top:0;z-index:100;background:rgba(10,14,23,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{font-family:var(--font-mono);font-size:20px;font-weight:700;background:linear-gradient(135deg,#3b82f6,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px}
+.date-badge{font-family:var(--font-mono);font-size:11px;color:var(--accent-cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);padding:5px 12px;border-radius:20px}
+.main{padding:24px 32px 60px;max-width:1600px;margin:0 auto}
+.controls{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+.period-toggle{display:flex;background:var(--bg-card);border-radius:8px;border:1px solid var(--border);overflow:hidden}
+.period-btn{font-family:var(--font-mono);font-size:12px;font-weight:500;padding:7px 16px;border:none;cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.2s}
+.period-btn.active{background:var(--accent-blue);color:#fff}
+.heatmap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px}
+.heat-cell{position:relative;border-radius:var(--radius);padding:16px;cursor:pointer;border:1px solid transparent;transition:all 0.25s ease;background:var(--bg-card)}
+.heat-cell:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.4);border-color:rgba(255,255,255,0.1)}
+.cell-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.cell-ticker{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:8px}
+.cell-return{font-family:var(--font-mono);font-size:22px;font-weight:700}
+.cell-sub{font-size:10px;color:var(--text-muted);margin-top:4px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px}
+.ranking-table{width:100%;border-collapse:collapse;background:var(--bg-card);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+.ranking-table th{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;color:var(--text-muted);padding:12px 16px;text-align:left;background:var(--bg-secondary)}
+.ranking-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border)}
+.tooltip{display:none;position:fixed;z-index:200;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:16px;box-shadow:0 12px 40px rgba(0,0,0,0.5);min-width:280px;pointer-events:none}
+.tooltip.show{display:block}
+.footer{text-align:center;padding:24px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);font-family:var(--font-mono)}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">MACRO ETF LAB</div>
+  <div class="date-badge">DATA AS OF: <span id="asOfDate"></span></div>
+</div>
+<div class="main">
+  <div class="controls">
+    <div class="period-toggle">
+      <button class="period-btn" onclick="setPeriod('1d')">1D</button>
+      <button class="period-btn" onclick="setPeriod('1w')">1W</button>
+      <button class="period-btn active" onclick="setPeriod('ytd')">YTD</button>
+      <button class="period-btn" onclick="setPeriod('1y')">1Y</button>
+      <button class="period-btn" onclick="setPeriod('3y')">3Y</button>
+      <button class="period-btn" onclick="setPeriod('5y')">5Y</button>
+    </div>
+  </div>
+  
+  <h3 style="font-size:14px;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;">Core Tickers</h3>
+  <div id="benchmarksGrid" class="heatmap-grid"></div>
+  
+  <h3 style="font-size:14px;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;">Country Performance</h3>
+  <div id="countriesGrid" class="heatmap-grid"></div>
+  
+  <h3 style="font-size:14px;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;">Full Rankings</h3>
+  <div id="rankingTableContainer"></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="footer">ETF returns vs WEO Macro Metrics — Created by Macro ETF Pipeline</div>
+
+<script>
+const data = {"as_of": "MAR 06, 2026", "benchmarks": [{"ticker": "SAUS.L", "country": "Australia", "etf": "iShares MSCI Australia UCITS ETF USD (Acc)", "region": "Oceania", "currency": "GBp", "1d": -0.0175, "1w": -0.0337, "1m": 0.0388, "3m": 0.1063, "6m": 0.0985, "ytd": 0.0962, "1y": 0.1844, "3y": 0.009, "5y": 0.081, "10y": 0.093, "macro": {"gdp_real": 1.809, "gdp_nominal_usd": 1.894523, "lcu_return": -2.7758913765679516}}, {"ticker": "XDAX.L", "country": "Germany", "etf": "Xtrackers DAX UCITS ETF 1C", "region": "Europe", "currency": "GBp", "1d": -0.0179, "1w": -0.0621, "1m": -0.0284, "3m": -0.015, "6m": 0.0093, "ytd": -0.0346, "1y": 0.0648, "3y": 0.139, "5y": 0.1095, "10y": 0.0722, "macro": {"gdp_real": 0.191, "gdp_nominal_usd": 7.032007, "lcu_return": 4.389151360533838}}, {"ticker": "CSPX.L", "country": "United States", "etf": "iShares VII PLC - iShares Core S&P 500 UCITS ETF", "region": "North America", "currency": "USD", "1d": -0.0077, "1w": -0.0119, "1m": -0.0003, "3m": -0.0049, "6m": 0.0585, "ytd": -0.0093, "1y": 0.1981, "3y": 0.2065, "5y": 0.1411, "10y": 0.1463, "macro": {"gdp_real": 2.017, "gdp_nominal_usd": 4.497634, "lcu_return": 0.0}}], "countries": [{"ticker": "XMBR.L", "country": "Brazil", "etf": "Xtrackers MSCI Brazil UCITS ETF 1C", "region": "Latin America", "currency": "GBp", "1d": -0.0235, "1w": -0.0543, "1m": -0.0022, "3m": 0.1249, "6m": 0.2976, "ytd": 0.1517, "1y": 0.5239, "3y": 0.1333, "5y": 0.1164, "10y": 0.1012, "macro": {"gdp_real": 2.4, "gdp_nominal_usd": 3.555866, "lcu_return": -4.008811479073304}}, {"ticker": "CSCA.L", "country": "Canada", "etf": "iShares VII PLC - iShares MSCI Canada ETF USD Acc", "region": "North America", "currency": "GBp", "1d": -0.0099, "1w": -0.0065, "1m": 0.0592, "3m": 0.0744, "6m": 0.1811, "ytd": 0.0557, "1y": 0.3833, "3y": 0.1593, "5y": 0.1473, "10y": 0.1236, "macro": {"gdp_real": 1.153, "gdp_nominal_usd": 1.781126, "lcu_return": -1.7339833117305359}}, {"ticker": "IASH.L", "country": "China", "etf": "iShares MSCI China A UCITS ETF", "region": "Asia", "currency": "GBp", "1d": 0.0016, "1w": -0.011, "1m": 0.0173, "3m": 0.0481, "6m": 0.1019, "ytd": 0.0306, "1y": 0.2335, "3y": 0.0135, "5y": -0.004, "10y": 0.058, "macro": {"gdp_real": 4.796, "gdp_nominal_usd": 3.460407, "lcu_return": -0.17778426014487536}}, {"ticker": "ISFR.L", "country": "France", "etf": "iShares MSCI France UCITS ETF", "region": "Europe", "currency": "GBp", "1d": -0.0177, "1w": -0.0698, "1m": -0.0199, "3m": -0.0045, "6m": 0.0575, "ytd": -0.0083, "1y": 0.0575, "3y": 0.0547, "5y": 0.0951, "10y": 0.1029, "macro": {"gdp_real": 0.671, "gdp_nominal_usd": 6.34803, "lcu_return": 4.389145762039726}}, {"ticker": "EXS1.DE", "country": "Germany", "etf": "iShares Core DAX UCITS ETF (DE) EUR (Acc)", "region": "Europe", "currency": "EUR", "1d": -0.009, "1w": -0.0667, "1m": -0.0464, "3m": -0.0189, "6m": -0.0018, "ytd": -0.0387, "1y": 0.0049, "3y": 0.14, "5y": 0.1049, "10y": 0.0845, "macro": {"gdp_real": 0.191, "gdp_nominal_usd": 7.032007, "lcu_return": 4.389151360533838}}, {"ticker": "LYINR.SW", "country": "India", "etf": "Amundi MSCI India Swap UCITS ETF USD Acc", "region": "Asia", "currency": "USD", "1d": 0.0034, "1w": -0.0424, "1m": -0.0619, "3m": -0.0786, "6m": -0.0557, "ytd": -0.0735, "1y": 0.0236, "3y": 0.0831, "5y": 0.0507, "10y": 0.0781, "macro": {"gdp_real": 6.646, "gdp_nominal_usd": 5.507083, "lcu_return": -2.7725456984090457}}, {"ticker": "INDO.PA", "country": "Indonesia", "etf": "Amundi MSCI Indonesia UCITS ETF Acc", "region": "Asia", "currency": "EUR", "1d": -0.0232, "1w": -0.0798, "1m": -0.0887, "3m": -0.1616, "6m": -0.1329, "ytd": -0.1494, "1y": -0.1605, "3y": -0.1144, "5y": -0.0346, "10y": -0.0137, "macro": {"gdp_real": 4.861, "gdp_nominal_usd": 3.362888, "lcu_return": -3.419710718214619}}, {"ticker": "CJPU.L", "country": "Japan", "etf": "iShares VII PLC - iShares MSCI Japan ETF USD Acc", "region": "Asia", "currency": "USD", "1d": -0.0071, "1w": -0.083, "1m": -0.0444, "3m": 0.0575, "6m": 0.1159, "ytd": 0.0528, "1y": 0.27, "3y": 0.1763, "5y": 0.0751, "10y": 0.0847, "macro": {"gdp_real": 1.076, "gdp_nominal_usd": 6.479752, "lcu_return": 2.4947854641344414}}, {"ticker": "XCX3.L", "country": "Malaysia", "etf": "Xtrackers MSCI Malaysia UCITS ETF 1C", "region": "Asia", "currency": "GBp", "1d": 0.0039, "1w": -0.0194, "1m": 0.0018, "3m": 0.0913, "6m": 0.1825, "ytd": 0.0562, "1y": 0.221, "3y": 0.0935, "5y": 0.0577, "10y": 0.0306, "macro": {"gdp_real": 4.5, "gdp_nominal_usd": 11.450002, "lcu_return": 5.531928703126043}}, {"ticker": "XMEX.L", "country": "Mexico", "etf": "Xtrackers MSCI Mexico UCITS ETF 1C", "region": "Latin America", "currency": "GBp", "1d": -0.0187, "1w": -0.0494, "1m": -0.0026, "3m": 0.1159, "6m": 0.2476, "ytd": 0.0967, "1y": 0.5083, "3y": 0.0801, "5y": 0.1664, "10y": 0.0722, "macro": {"gdp_real": 0.99, "gdp_nominal_usd": 0.343359, "lcu_return": -5.5095419944523165}}, {"ticker": "XBAK.L", "country": "Pakistan", "etf": "Xtrackers - MSCI Pakistan Swap UCITS ETF", "region": "Asia", "currency": "USD", "1d": 0.0294, "1w": -0.0386, "1m": -0.1263, "3m": -0.0535, "6m": 0.0211, "ytd": -0.0883, "1y": 0.292, "3y": 0.4158, "5y": 0.0707, "10y": -0.0072, "macro": {"gdp_real": 2.676, "gdp_nominal_usd": 10.524006, "lcu_return": 1.3219298060247242}}, {"ticker": "XPHG.L", "country": "Philippines", "etf": "Xtrackers MSCI Philippines UCITS ETF 1C", "region": "Asia", "currency": "GBp", "1d": -0.0084, "1w": -0.0581, "1m": -0.0042, "3m": 0.0614, "6m": 0.0141, "ytd": 0.0497, "1y": 0.04, "3y": -0.0307, "5y": -0.0116, "10y": -0.0115, "macro": {"gdp_real": 5.435, "gdp_nominal_usd": 7.04935, "lcu_return": 0.00014209606133963604}}, {"ticker": "SPOL.L", "country": "Poland", "etf": "iShares MSCI Poland UCITS ETF USD (Acc)", "region": "Europe", "currency": "GBp", "1d": -0.0062, "1w": -0.0592, "1m": -0.0383, "3m": 0.1061, "6m": 0.1818, "ytd": 0.018, "1y": 0.336, "3y": 0.2948, "5y": 0.163, "10y": 0.0846, "macro": {"gdp_real": 3.243, "gdp_nominal_usd": 13.675096, "lcu_return": 6.274701424363371}}, {"ticker": "IPOL.L", "country": "Poland", "etf": "iShares MSCI Poland UCITS ETF USD (Acc)", "region": "Europe", "currency": "USD", "1d": -0.0076, "1w": -0.0824, "1m": -0.0741, "3m": 0.0891, "6m": 0.1479, "ytd": -0.0043, "1y": 0.3337, "3y": 0.3231, "5y": 0.1517, "10y": 0.0761, "macro": {"gdp_real": 3.243, "gdp_nominal_usd": 13.675096, "lcu_return": 6.274701424363371}}, {"ticker": "IKSA.L", "country": "Saudi Arabia", "etf": "iShares MSCI Saudi Arabia Capped UCITS ETF USD (Acc)", "region": "Middle East", "currency": "USD", "1d": -0.0049, "1w": -0.0043, "1m": -0.0646, "3m": 0.0236, "6m": 0.034, "ytd": 0.0285, "1y": -0.0178, "3y": 0.028, "5y": 0.052, "10y": null, "macro": {"gdp_real": 4.021, "gdp_nominal_usd": 2.3173, "lcu_return": -1.0876163469841771e-05}}, {"ticker": "SRSA.L", "country": "South Africa", "etf": "iShares MSCI South Africa UCITS ETF USD (Acc)", "region": "Africa", "currency": "GBp", "1d": -0.0657, "1w": -0.1121, "1m": -0.012, "3m": 0.0885, "6m": 0.3052, "ytd": 0.0274, "1y": 0.5962, "3y": 0.2162, "5y": 0.1345, "10y": 0.0954, "macro": {"gdp_real": 1.149, "gdp_nominal_usd": 6.309777, "lcu_return": 1.5322265908830124}}, {"ticker": "IRSA.L", "country": "South Africa", "etf": "iShares MSCI South Africa UCITS ETF USD (Acc)", "region": "Africa", "currency": "USD", "1d": -0.0059, "1w": -0.14, "1m": -0.0564, "3m": 0.0898, "6m": 0.2892, "ytd": 0.0206, "1y": 0.6169, "3y": 0.2595, "5y": 0.1275, "10y": 0.0886, "macro": {"gdp_real": 1.149, "gdp_nominal_usd": 6.309777, "lcu_return": 1.5322265908830124}}, {"ticker": "CSKR.L", "country": "South Korea", "etf": "iShares VII PLC - iShares MSCI Korea UCITS ETF USD (Acc)", "region": "Asia", "currency": "USD", "1d": -0.0568, "1w": -0.1613, "1m": 0.049, "3m": 0.397, "6m": 0.8041, "ytd": 0.2989, "1y": 1.3998, "3y": 0.3144, "5y": 0.0936, "10y": 0.1234, "macro": {"gdp_real": 0.896, "gdp_nominal_usd": -0.896668, "lcu_return": -2.951916938055843}}, {"ticker": "CSWG.L", "country": "Switzerland", "etf": "Amundi Index Solutions - Amundi MSCI Switzerland UCITS ETF-C CHF", "region": "Europe", "currency": "GBp", "1d": -0.0141, "1w": -0.0403, "1m": -0.0046, "3m": 0.0583, "6m": 0.1097, "ytd": 0.0294, "1y": 0.1412, "3y": 0.0995, "5y": -0.4725, "10y": 0.0643, "macro": {"gdp_real": 0.946, "gdp_nominal_usd": 6.876597, "lcu_return": 5.785428671851567}}, {"ticker": "CSW.PA", "country": "Switzerland", "etf": "Amundi Index Solutions - Amundi MSCI Switzerland UCITS ETF-C EUR", "region": "Europe", "currency": "EUR", "1d": -0.0098, "1w": -0.0542, "1m": -0.0147, "3m": 0.0512, "6m": 0.0963, "ytd": 0.0236, "1y": 0.0969, "3y": 0.1045, "5y": 0.0996, "10y": -0.2476, "macro": {"gdp_real": 0.946, "gdp_nominal_usd": 6.876597, "lcu_return": 5.785428671851567}}, {"ticker": "XMTW.L", "country": "Taiwan", "etf": "Xtrackers MSCI Taiwan UCITS ETF 1C", "region": "Asia", "currency": "GBp", "1d": -0.0165, "1w": -0.067, "1m": 0.0518, "3m": 0.1402, "6m": 0.2872, "ytd": 0.1223, "1y": 0.4533, "3y": 0.2398, "5y": 0.1515, "10y": 0.184, "macro": {"gdp_real": 3.674, "gdp_nominal_usd": 10.963935, "lcu_return": 5.210706253215691}}, {"ticker": "XCX4.L", "country": "Thailand", "etf": "Xtrackers MSCI Thailand UCITS ETF 1C", "region": "Asia", "currency": "GBp", "1d": -0.0004, "1w": -0.0756, "1m": 0.0775, "3m": 0.1544, "6m": 0.226, "ytd": 0.1611, "1y": 0.3329, "3y": 0.0112, "5y": 0.0245, "10y": 0.0466, "macro": {"gdp_real": 2.0, "gdp_nominal_usd": 6.088111, "lcu_return": 3.804374281499756}}, {"ticker": "TURL.L", "country": "Turkey", "etf": "Amundi MSCI Turkey UCITS ETF Acc", "region": "Europe", "currency": "GBp", "1d": 0.0, "1w": 0.0, "1m": 0.0, "3m": 0.0, "6m": 0.0, "ytd": 0.0, "1y": 0.0, "3y": -0.0539, "5y": 0.0638, "10y": -0.0359, "macro": {"gdp_real": 3.494, "gdp_nominal_usd": 15.256385, "lcu_return": -17.351286071905182}}, {"ticker": "CUKX.L", "country": "United Kingdom", "etf": "iShares VII PLC - iShares Core FTSE 100 ETF GBP Acc", "region": "Europe", "currency": "GBp", "1d": -0.0134, "1w": -0.0408, "1m": 0.0118, "3m": 0.0806, "6m": 0.1448, "ytd": 0.0533, "1y": 0.2302, "3y": 0.1337, "5y": 0.133, "10y": 0.0926, "macro": {"gdp_real": 1.308, "gdp_nominal_usd": 8.619352, "lcu_return": 3.558548457791244}}, {"ticker": "CSUK.L", "country": "United Kingdom", "etf": "iShares VII PLC - iShares MSCI UK ETF GBP Acc", "region": "Europe", "currency": "GBp", "1d": -0.0131, "1w": -0.0384, "1m": 0.0172, "3m": 0.0852, "6m": 0.1453, "ytd": 0.0583, "1y": 0.2269, "3y": 0.1302, "5y": 0.1359, "10y": 0.0894, "macro": {"gdp_real": 1.308, "gdp_nominal_usd": 8.619352, "lcu_return": 3.558548457791244}}, {"ticker": "CSUS.L", "country": "United States", "etf": "iShares VII PLC - iShares MSCI USA UCITS ETF USD (Acc)", "region": "North America", "currency": "USD", "1d": -0.0072, "1w": -0.0121, "1m": -0.0004, "3m": -0.0087, "6m": 0.054, "ytd": -0.0115, "1y": 0.1942, "3y": 0.2064, "5y": 0.1357, "10y": 0.1443, "macro": {"gdp_real": 2.017, "gdp_nominal_usd": 4.497634, "lcu_return": 0.0}}, {"ticker": "XFVT.L", "country": "Vietnam", "etf": "Xtrackers Vietnam Swap UCITS ETF 1C", "region": "Asia", "currency": "GBp", "1d": 0.0272, "1w": -0.0207, "1m": 0.0534, "3m": 0.0077, "6m": 0.0934, "ytd": -0.0202, "1y": 0.5445, "3y": 0.1304, "5y": 0.025, "10y": 0.0673, "macro": {"gdp_real": 6.457, "gdp_nominal_usd": 5.496309, "lcu_return": -4.086844476972007}}]};
+let currentPeriod = 'ytd';
+
+function fp(v){if(v==null)return'—';return(v>=0?'+':'')+(v*100).toFixed(1)+'%'}
+function hc(v){if(v==null)return 'var(--bg-card)'; let n=Math.min(Math.abs(v)/0.15,1); let i=0.15+n*0.55; return v>=0?`rgba(34,197,94,${i})`:`rgba(239,68,68,${i})`}
+
+function render(){
+  document.getElementById('asOfDate').innerText = data.as_of;
+  
+  const renderGrid = (id, items) => {
+    document.getElementById(id).innerHTML = items.sort((a,b) => (b[currentPeriod]||-99) - (a[currentPeriod]||-99)).map(d => `
+      <div class="heat-cell" style="background:${hc(d[currentPeriod])}" onmouseenter="showTip(event, ${JSON.stringify(d).replace(/"/g,'&quot;')})" onmouseleave="hideTip()">
+        <div class="cell-name">${d.country}</div>
+        <div class="cell-ticker">${d.ticker} · ${d.region}</div>
+        <div class="cell-return">${fp(d[currentPeriod])}</div>
+        <div class="cell-sub">${d.region}</div>
+      </div>
+    `).join('');
+  };
+  
+  renderGrid('benchmarksGrid', data.benchmarks);
+  renderGrid('countriesGrid', data.countries);
+  
+  let tableHtml = `<table class="ranking-table"><thead><tr><th>Rank</th><th>Country</th><th>Ticker</th><th>Region</th><th>YTD</th><th>1Y</th><th>3Y (Ann)</th><th>GDP Real (2025)</th></tr></thead><tbody>`;
+  [...data.benchmarks, ...data.countries].sort((a,b) => (b[currentPeriod]||-99) - (a[currentPeriod]||-99)).forEach((d, i) => {
+    tableHtml += `<tr>
+      <td>${i+1}</td>
+      <td><b>${d.country}</b></td>
+      <td><code>${d.ticker}</code></td>
+      <td>${d.region}</td>
+      <td style="color:${d.ytd >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d.ytd)}</td>
+      <td style="color:${d.y1 >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d.y1)}</td>
+      <td style="color:${d.3y >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d.3y)}</td>
+      <td>${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1) + '%' : '—'}</td>
+    </tr>`;
+  });
+  tableHtml += '</tbody></table>';
+  document.getElementById('rankingTableContainer').innerHTML = tableHtml;
+}
+
+function setPeriod(p){
+  currentPeriod = p;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  render();
+}
+
+const tip = document.getElementById('tooltip');
+function showTip(e, d){
+  tip.innerHTML = `
+    <div style="font-size:16px;font-weight:700">${d.country}</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${d.etf}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--border);padding-top:10px">
+      <div><div style="font-size:10px;color:var(--text-muted)">YTD Return</div><div style="font-weight:700">${fp(d.ytd)}</div></div>
+      <div><div style="font-size:10px;color:var(--text-muted)">1Y Return</div><div style="font-weight:700">${fp(d.y1)}</div></div>
+      <div><div style="font-size:10px;color:var(--text-muted)">GDP Real (2025)</div><div style="font-weight:700">${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1)+'%' : '—'}</div></div>
+      <div><div style="font-size:10px;color:var(--text-muted)">LCU Return (2025)</div><div style="font-weight:700">${fp(d.macro.lcu_return/100)}</div></div>
+    </div>
+  `;
+  tip.classList.add('show');
+  tip.style.left = (e.clientX + 15) + 'px';
+  tip.style.top = (e.clientY + 15) + 'px';
+}
+function hideTip(){ tip.classList.remove('show'); }
+
+render();
+</script>
+</body>
+</html>

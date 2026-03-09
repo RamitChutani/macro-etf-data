@@ -36,6 +36,7 @@ def main() -> None:
     )
     parser.add_argument("--combined-output", default="data/outputs/etf_weo_combined_annual.csv")
     parser.add_argument("--dashboard-output", default="data/outputs/etf_gdp_dashboard_mvp.xlsx")
+    parser.add_argument("--html-output", default="data/outputs/etf_macro_dashboard.html")
     parser.add_argument(
         "--history-charts-output",
         default="data/outputs/etf_price_history_charts.xlsx",
@@ -44,6 +45,11 @@ def main() -> None:
         "--skip-dashboard",
         action="store_true",
         help="Skip Excel MVP dashboard generation step.",
+    )
+    parser.add_argument(
+        "--skip-html",
+        action="store_true",
+        help="Skip interactive HTML dashboard generation step.",
     )
     parser.add_argument(
         "--skip-history-charts",
@@ -108,6 +114,20 @@ def main() -> None:
             args.dashboard_output,
         ]
         run_step(dashboard_cmd)
+    if not args.skip_html:
+        html_cmd = [
+            py,
+            str(script_dir / "build_html_dashboard.py"),
+            "--etf-csv",
+            args.etf_output,
+            "--weo-csv",
+            args.weo_output,
+            "--metadata-csv",
+            args.metadata_output,
+            "--output",
+            args.html_output,
+        ]
+        run_step(html_cmd)
     if not args.skip_history_charts:
         history_cmd = [
             py,
