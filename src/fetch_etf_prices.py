@@ -225,7 +225,8 @@ def fetch_ticker_history_close(
         if min_history_start:
             min_start_ts = pd.to_datetime(min_history_start)
             actual_start_ts = pd.to_datetime(history_start_date)
-            if actual_start_ts > min_start_ts:
+            # Special case for Saudi Arabia (IKSA.L) as requested to allow 5Y comparisons.
+            if actual_start_ts > min_start_ts and ticker != "IKSA.L":
                 info_row["reason"] = (
                     f"history starts too late ({history_start_date} > {min_history_start})"
                 )
