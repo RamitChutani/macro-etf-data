@@ -57,7 +57,7 @@ def check_if_accumulating(tk: yf.Ticker, info: dict) -> tuple[bool, str]:
     it is considered Distributing.
     """
     # 1. Check yield from info
-    dividend_yield = info.get("yield") or info.get("trailingAnnualDividendYield") or 0
+    dividend_yield = info.get("dividendYield") or info.get("trailingAnnualDividendYield") or 0
     if dividend_yield > 0:
         return False, f"non-zero yield: {dividend_yield}"
 
@@ -65,19 +65,30 @@ def check_if_accumulating(tk: yf.Ticker, info: dict) -> tuple[bool, str]:
     try:
         divs = tk.dividends
         if not divs.empty:
-            three_years_ago = pd.Timestamp.today() - pd.DateOffset(years=3)
+            # yfinance returns timezone-aware Timestamps, but pd.Timestamp.today() is naive by default.
+            # Localize today to UTC and then compare.
+            three_years_ago = pd.Timestamp.today(tz="UTC") - pd.DateOffset(years=3)
+            # Ensure divs.index is tz-aware for comparison (usually is from yfinance)
+            if divs.index.tz is None:
+                divs.index = divs.index.tz_localize("UTC")
             recent_divs = divs[divs.index >= three_years_ago]
             if not recent_divs.empty:
                 return False, f"recent dividends found: {len(recent_divs)} in 3y"
-    except Exception:
+    except Exception as e:
+        # If we can't fetch dividends, we fall back to name-based or info-based
         pass
 
     # 3. Check name for "Dist" or "Inc" (Distributing/Income) vs "Acc" (Accumulating)
     long_name = str(info.get("longName") or "").lower()
-    if " dist" in long_name or " income" in long_name or " (dist)" in long_name:
-        return False, "name contains Dist/Income markers"
+    short_name = str(info.get("shortName") or "").lower()
+    combined_name = f"{long_name} {short_name}"
     
-    return True, "no dividends or yield found"
+    dist_markers = [" dist", " income", " (dist)", " dis", " inc"]
+    for marker in dist_markers:
+        if marker in combined_name:
+            return False, f"name contains Dist/Income marker: {marker}"
+    
+    return True, "no dividends or yield found and no Dist/Income markers in name"
 
 
 def build_pretty_col(label: str, ticker: str) -> str:
