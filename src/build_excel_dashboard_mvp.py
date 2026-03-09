@@ -1000,7 +1000,8 @@ def write_dashboard_xlsx(
         ws_country[f"G{annual_header_row}"] = "Nominal GDP Growth (LCU) %"
         ws_country[f"H{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","ETF Return (" & {focus_currency_ref} & ") %","")'
         ws_country[f"I{annual_header_row}"] = f'=IF({focus_currency_ref}<>"USD","FX Change (vs USD) %","")'
-        for c in ["A", "B", "C", "D", "E", "F", "G", "H", "I"]:
+        ws_country[f"J{annual_header_row}"] = "WEO LCU vs USD %"
+        for c in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]:
             ws_country[f"{c}{annual_header_row}"].font = Font(bold=True)
 
         completed_year = pd.Timestamp.today().year - 1
@@ -1016,6 +1017,7 @@ def write_dashboard_xlsx(
             ws_country[f"G{r}"] = f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
             ws_country[f"H{r}"] = f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$E:$E, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
             ws_country[f"I{r}"] = f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$N:$N, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&$A{r}, Annual!$J:$J, 0)), NA()),"")'
+            ws_country[f"J{r}"] = f'=IFERROR(1*INDEX(Annual!$P:$P, MATCH($B${focus_top_row + 1}&"|"&$A{r}, Annual!$K:$K, 0)), NA())'
 
         projection_years = sorted([y for y in annual_df["year"].dropna().unique().tolist() if int(y) > completed_year])
         annual_last_row = annual_header_row + len(annual_years)
@@ -1032,6 +1034,7 @@ def write_dashboard_xlsx(
             ws_country[f"G{projection_row}"] = f'=IFERROR(1*INDEX(Annual!$G:$G, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
             ws_country[f"H{projection_row}"] = f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$E:$E, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&{projection_year}, Annual!$J:$J, 0)), NA()),"")'
             ws_country[f"I{projection_row}"] = f'=IF({focus_currency_ref}<>"USD",IFERROR(1*INDEX(Annual!$N:$N, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|"&{projection_year}, Annual!$J:$J, 0)), NA()),"")'
+            ws_country[f"J{projection_row}"] = f'=IFERROR(1*INDEX(Annual!$P:$P, MATCH($B${focus_top_row + 1}&"|"&{projection_year}, Annual!$K:$K, 0)), NA())'
             annual_last_row = projection_row
             ws_country[f"A{annual_last_row + 1}"] = f"* {projection_year} row: GDP is IMF projection; ETF is YTD return (USD)."
 
@@ -1062,7 +1065,7 @@ def write_dashboard_xlsx(
             ws_country[f"G{r}"] = f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($B${focus_top_row + 1}&"|"&$A{r}, CAGR!$L:$L, 0)), NA())'
 
         for row in range(annual_start_row, annual_last_row + 1):
-            for col in ["B", "C", "D", "F", "G", "H", "I"]:
+            for col in ["B", "C", "D", "F", "G", "H", "I", "J"]:
                 ws_country[f"{col}{row}"].number_format = "0.00"
         for row in range(cagr_start_row, cagr_end_row + 1):
             for col in ["B", "C", "F", "G"]:
@@ -1078,7 +1081,7 @@ def write_dashboard_xlsx(
             f"J{country_start_row}:K{country_end_row}",
             f"B{timeframe_start_row}:C{timeframe_start_row + len(TIMEFRAME_ORDER) - 1}",
             f"B{annual_start_row}:D{annual_last_row}",
-            f"F{annual_start_row}:I{annual_last_row}",
+            f"F{annual_start_row}:J{annual_last_row}",
             f"B{cagr_start_row}:C{cagr_end_row}",
             f"F{cagr_start_row}:G{cagr_end_row}",
         ]
@@ -1096,7 +1099,7 @@ def write_dashboard_xlsx(
             (1, 11, 5, country_end_row),
             (1, 2, focus_top_row + 1, focus_top_row + 5),
             (1, 4, timeframe_header_row, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
-            (1, 9, annual_header_row, annual_last_row),
+            (1, 10, annual_header_row, annual_last_row),
             (1, 7, cagr_header_row, cagr_end_row),
         ])
 
