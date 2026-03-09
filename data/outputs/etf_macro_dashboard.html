@@ -39,17 +39,24 @@ td{padding:16px;border-bottom:1px solid var(--border);font-size:14px}
 <div class="main">
   <div id="mainView">
     <div class="controls">
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase">Time Horizon</div>
-        <div class="btn-group">
-          <button class="btn period-btn" onclick="setPeriod('1y', this)">1Y</button>
-          <button class="btn period-btn active" onclick="setPeriod('3y', this)">3Y</button>
-          <button class="btn period-btn" onclick="setPeriod('5y', this)">5Y</button>
-          <button class="btn period-btn" onclick="setPeriod('10y', this)">10Y</button>
+      <div style="display:flex;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase">Annual</div>
+          <div class="btn-group">
+            <button class="btn period-btn" onclick="setPeriod('1y', this)">1Y</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase">CAGR Horizons</div>
+          <div class="btn-group">
+            <button class="btn period-btn active" onclick="setPeriod('3y', this)">3Y</button>
+            <button class="btn period-btn" onclick="setPeriod('5y', this)">5Y</button>
+            <button class="btn period-btn" onclick="setPeriod('10y', this)">10Y</button>
+          </div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase">Region</div>
+        <div style="font-size:10px;font-weight:800;color:var(--text-dim);text-transform:uppercase">Region Filter</div>
         <div id="regionFilters" style="display:flex;gap:8px"></div>
       </div>
     </div>
@@ -69,11 +76,19 @@ td{padding:16px;border-bottom:1px solid var(--border);font-size:14px}
   let currentRegion = 'All';
 
   function fp(v){if(v==null)return'—';return(v>=0?'+':'')+(v*100).toFixed(1)+'%'}
-  function hc(v){if(v==null)return'var(--bg-card)';let n=Math.min(Math.abs(v)/0.15,1);let i=0.2+n*0.6;return v>=0?`rgba(251,113,133,${i})`:`rgba(74,222,128,${i})`}
+  
+  window.hc = function(v) {
+    if(v == null) return 'var(--bg-card)';
+    // Invert: Positive Disconnect (Lag) = Green (Value), Negative (Outperformance) = Red (Expensive)
+    let n = Math.min(Math.abs(v) / 0.15, 1);
+    let i = 0.2 + n * 0.6;
+    return v >= 0 ? `rgba(74, 222, 128, ${i})` : `rgba(251, 113, 133, ${i})`;
+  };
 
   window.render = function() {
     document.getElementById('asOf').innerText = 'AS OF: ' + data.as_of;
     const discKey = 'disc_' + currentPeriod;
+    const label = currentPeriod.toUpperCase();
     const filtered = data.countries.filter(d => currentRegion === 'All' || d.region === currentRegion);
     
     document.getElementById('grid').innerHTML = filtered.sort((a,b) => (b[discKey]||-99) - (a[discKey]||-99)).map(d => `
@@ -84,7 +99,7 @@ td{padding:16px;border-bottom:1px solid var(--border);font-size:14px}
         </div>
         <div>
           <div class="c-val">${fp(d[discKey])}</div>
-          <div class="c-sub">Disconnect (vs GDP USD)</div>
+          <div class="c-sub">${label} Disconnect (vs GDP USD)</div>
         </div>
       </div>
     `).join('');
