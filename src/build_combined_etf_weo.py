@@ -108,7 +108,7 @@ def compute_annual_fx_quote_to_usd_returns(
             hist = yf.Ticker(pair).history(
                 period="max",
                 interval="1d",
-                auto_adjust=False,
+                auto_adjust=True,
                 actions=False,
             )
             if hist.empty or "Close" not in hist.columns:

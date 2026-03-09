@@ -399,7 +399,7 @@ def fetch_daily_fx_series(currencies: set[str]) -> dict[str, pd.Series]:
         for pair, invert in ((f"{ccy}USD=X", False), (f"USD{ccy}=X", True)):
             try:
                 tk = yf.Ticker(pair)
-                hist = tk.history(period="max", interval="1d", auto_adjust=False, actions=False)
+                hist = tk.history(period="max", interval="1d", auto_adjust=True, actions=False)
                 if not hist.empty and "Close" in hist.columns:
                     s = hist["Close"].dropna()
                     if not s.empty:

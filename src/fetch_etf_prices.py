@@ -183,7 +183,7 @@ def fetch_ticker_history_close(
         history_kwargs: dict[str, object] = {
             "end": end,
             "interval": "1d",
-            "auto_adjust": False,
+            "auto_adjust": True,
             "actions": True,
         }
         if start:
@@ -353,7 +353,7 @@ def inspect_tickers(
             elif currency not in ALLOWED_CURRENCIES:
                 reasons.append(f"unsupported currency {currency}")
 
-            hist = tk.history(period="max", interval="1d", auto_adjust=False, actions=False)
+            hist = tk.history(period="max", interval="1d", auto_adjust=True, actions=False)
             if hist.empty or "Close" not in hist.columns:
                 row["history_start_date"] = None
                 row["history_end_date"] = None
