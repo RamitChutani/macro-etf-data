@@ -185,12 +185,12 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--fo
 <div class="main">
   <div class="controls">
     <div class="period-toggle">
-      <button class="period-btn" onclick="setPeriod('1d')">1D</button>
-      <button class="period-btn" onclick="setPeriod('1w')">1W</button>
-      <button class="period-btn active" onclick="setPeriod('ytd')">YTD</button>
-      <button class="period-btn" onclick="setPeriod('1y')">1Y</button>
-      <button class="period-btn" onclick="setPeriod('3y')">3Y</button>
-      <button class="period-btn" onclick="setPeriod('5y')">5Y</button>
+      <button class="period-btn" onclick="setPeriod('1d', this)">1D</button>
+      <button class="period-btn" onclick="setPeriod('1w', this)">1W</button>
+      <button class="period-btn active" onclick="setPeriod('ytd', this)">YTD</button>
+      <button class="period-btn" onclick="setPeriod('1y', this)">1Y</button>
+      <button class="period-btn" onclick="setPeriod('3y', this)">3Y</button>
+      <button class="period-btn" onclick="setPeriod('5y', this)">5Y</button>
     </div>
   </div>
   
@@ -208,74 +208,102 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--fo
 <div class="footer">ETF returns vs WEO Macro Metrics — Created by Macro ETF Pipeline</div>
 
 <script>
-const data = REPLACE_DATA_JSON;
-let currentPeriod = 'ytd';
+(function() {
+  const dashboardData = REPLACE_DATA_JSON;
+  let currentPeriod = 'ytd';
 
-function fp(v){if(v==null)return'—';return(v>=0?'+':'')+(v*100).toFixed(1)+'%'}
-function hc(v){if(v==null)return 'var(--bg-card)'; let n=Math.min(Math.abs(v)/0.15,1); let i=0.15+n*0.55; return v>=0?`rgba(34,197,94,${i})`:`rgba(239,68,68,${i})`}
+  window.fp = function(v) {
+    if(v == null) return '—';
+    return (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
+  };
 
-function render(){
-  document.getElementById('asOfDate').innerText = data.as_of;
-  
-  const renderGrid = (id, items) => {
-    document.getElementById(id).innerHTML = items.sort((a,b) => (b[currentPeriod]||-99) - (a[currentPeriod]||-99)).map(d => `
-      <div class="heat-cell" style="background:${hc(d[currentPeriod])}" onmouseenter="showTip(event, ${JSON.stringify(d).replace(/"/g,'&quot;')})" onmouseleave="hideTip()">
-        <div class="cell-name">${d.country}</div>
-        <div class="cell-ticker">${d.ticker} · ${d.region}</div>
-        <div class="cell-return">${fp(d[currentPeriod])}</div>
-        <div class="cell-sub">${d.region}</div>
+  window.hc = function(v) {
+    if(v == null) return 'var(--bg-card)';
+    let n = Math.min(Math.abs(v) / 0.15, 1);
+    let i = 0.15 + n * 0.55;
+    return v >= 0 ? `rgba(34,197,94,${i})` : `rgba(239,68,68,${i})`;
+  };
+
+  window.render = function() {
+    try {
+      const asOfEl = document.getElementById('asOfDate');
+      if (asOfEl) asOfEl.innerText = dashboardData.as_of;
+      
+      const renderGrid = (id, items) => {
+        const gridEl = document.getElementById(id);
+        if (!gridEl) return;
+        const sorted = [...items].sort((a, b) => (b[currentPeriod] || -99) - (a[currentPeriod] || -99));
+        gridEl.innerHTML = sorted.map(d => `
+          <div class="heat-cell" style="background:${hc(d[currentPeriod])}" onmouseenter="showTip(event, ${JSON.stringify(d).replace(/"/g, '&quot;')})" onmouseleave="hideTip()">
+            <div class="cell-name">${d.country}</div>
+            <div class="cell-ticker">${d.ticker} · ${d.region}</div>
+            <div class="cell-return">${fp(d[currentPeriod])}</div>
+            <div class="cell-sub">${d.region}</div>
+          </div>
+        `).join('');
+      };
+      
+      renderGrid('benchmarksGrid', dashboardData.benchmarks);
+      renderGrid('countriesGrid', dashboardData.countries);
+      
+      const tableContainer = document.getElementById('rankingTableContainer');
+      if (tableContainer) {
+        let tableHtml = `<table class="ranking-table"><thead><tr><th>Rank</th><th>Country</th><th>Ticker</th><th>Region</th><th>YTD</th><th>1Y</th><th>3Y (Ann)</th><th>GDP Real (2025)</th></tr></thead><tbody>`;
+        const allItems = [...dashboardData.benchmarks, ...dashboardData.countries];
+        allItems.sort((a, b) => (b[currentPeriod] || -99) - (a[currentPeriod] || -99)).forEach((d, i) => {
+          tableHtml += `<tr>
+            <td>${i + 1}</td>
+            <td><b>${d.country}</b></td>
+            <td><code>${d.ticker}</code></td>
+            <td>${d.region}</td>
+            <td style="color:${d['ytd'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['ytd'])}</td>
+            <td style="color:${d['y1'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['y1'])}</td>
+            <td style="color:${d['3y'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['3y'])}</td>
+            <td>${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1) + '%' : '—'}</td>
+          </tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        tableContainer.innerHTML = tableHtml;
+      }
+    } catch (err) {
+      console.error("Render error:", err);
+    }
+  };
+
+  window.setPeriod = function(p, btn) {
+    currentPeriod = p;
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    render();
+  };
+
+  const tip = document.getElementById('tooltip');
+  window.showTip = function(e, d) {
+    if (!tip) return;
+    tip.innerHTML = `
+      <div style="font-size:16px;font-weight:700">${d.country}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${d.etf}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--border);padding-top:10px">
+        <div><div style="font-size:10px;color:var(--text-muted)">YTD Return</div><div style="font-weight:700">${fp(d['ytd'])}</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted)">1Y Return</div><div style="font-weight:700">${fp(d['y1'])}</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted)">GDP Real (2025)</div><div style="font-weight:700">${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1) + '%' : '—'}</div></div>
+        <div><div style="font-size:10px;color:var(--text-muted)">LCU Return (2025)</div><div style="font-weight:700">${fp(dashboardData.macro ? d.macro.lcu_return / 100 : null)}</div></div>
       </div>
-    `).join('');
+    `;
+    tip.classList.add('show');
+    tip.style.left = (e.clientX + 15) + 'px';
+    tip.style.top = (e.clientY + 15) + 'px';
   };
   
-  renderGrid('benchmarksGrid', data.benchmarks);
-  renderGrid('countriesGrid', data.countries);
-  
-  let tableHtml = `<table class="ranking-table"><thead><tr><th>Rank</th><th>Country</th><th>Ticker</th><th>Region</th><th>YTD</th><th>1Y</th><th>3Y (Ann)</th><th>GDP Real (2025)</th></tr></thead><tbody>`;
-  [...data.benchmarks, ...data.countries].sort((a,b) => (b[currentPeriod]||-99) - (a[currentPeriod]||-99)).forEach((d, i) => {
-    tableHtml += `<tr>
-      <td>${i+1}</td>
-      <td><b>${d.country}</b></td>
-      <td><code>${d.ticker}</code></td>
-      <td>${d.region}</td>
-      <td style="color:${d['ytd'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['ytd'])}</td>
-      <td style="color:${d['y1'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['y1'])}</td>
-      <td style="color:${d['3y'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['3y'])}</td>
-      <td>${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1) + '%' : '—'}</td>
-    </tr>`;
-  });
-  tableHtml += '</tbody></table>';
-  document.getElementById('rankingTableContainer').innerHTML = tableHtml;
-}
+  window.hideTip = function() { if (tip) tip.classList.remove('show'); };
 
-function setPeriod(p){
-  currentPeriod = p;
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-  if (event) {
-    event.target.classList.add('active');
+  // Initial render
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', render);
+  } else {
+    render();
   }
-  render();
-}
-
-const tip = document.getElementById('tooltip');
-function showTip(e, d){
-  tip.innerHTML = `
-    <div style="font-size:16px;font-weight:700">${d.country}</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${d.etf}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--border);padding-top:10px">
-      <div><div style="font-size:10px;color:var(--text-muted)">YTD Return</div><div style="font-weight:700">${fp(d['ytd'])}</div></div>
-      <div><div style="font-size:10px;color:var(--text-muted)">1Y Return</div><div style="font-weight:700">${fp(d['y1'])}</div></div>
-      <div><div style="font-size:10px;color:var(--text-muted)">GDP Real (2025)</div><div style="font-weight:700">${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1)+'%' : '—'}</div></div>
-      <div><div style="font-size:10px;color:var(--text-muted)">LCU Return (2025)</div><div style="font-weight:700">${fp(d.macro.lcu_return/100)}</div></div>
-    </div>
-  `;
-  tip.classList.add('show');
-  tip.style.left = (e.clientX + 15) + 'px';
-  tip.style.top = (e.clientY + 15) + 'px';
-}
-function hideTip(){ tip.classList.remove('show'); }
-
-render();
+})();
 </script>
 </body>
 </html>"""
