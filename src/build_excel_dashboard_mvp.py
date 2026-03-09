@@ -805,7 +805,7 @@ def write_dashboard_xlsx(
     output_xlsx: str,
     metadata_csv: str | None = "data/outputs/etf_ticker_metadata.csv",
 ) -> None:
-    from openpyxl.styles import Font, PatternFill
+    from openpyxl.styles import Font, PatternFill, Alignment
     from openpyxl.formatting.rule import CellIsRule
     from openpyxl.worksheet.datavalidation import DataValidation
 
@@ -901,15 +901,21 @@ def write_dashboard_xlsx(
         ws_country["B2"] = "5Y"
         ws_country["D2"] = "Sorted by size of economy. Metrics are CAGR (annualized)."
         
+        # Projection Super-Header
+        ws_country.merge_cells("F4:I4")
+        ws_country["F4"] = "Projected Nominal GDP Growth (USD) %"
+        ws_country["F4"].font = Font(bold=True)
+        ws_country["F4"].alignment = Alignment(horizontal="center")
+
         ws_country["A5"] = "country_name"
         ws_country["B5"] = "ticker_used"
         ws_country["C5"] = "GDP Nominal CAGR % (USD)"
         ws_country["D5"] = "ETF CAGR % (USD)"
         ws_country["E5"] = "Macro Disconnect %"
-        ws_country["F5"] = "2026 Proj GDP %"
-        ws_country["G5"] = "2027 Proj GDP %"
-        ws_country["H5"] = "2028 Proj GDP %"
-        ws_country["I5"] = "2029 Proj GDP %"
+        ws_country["F5"] = "2026"
+        ws_country["G5"] = "2027"
+        ws_country["H5"] = "2028"
+        ws_country["I5"] = "2029"
         ws_country["J5"] = "" # GAP
         ws_country["K5"] = "region"
         ws_country["L5"] = "ticker_exchange"
@@ -937,11 +943,12 @@ def write_dashboard_xlsx(
             ws_country[f"D{r}"] = f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
             ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
             
-            # Forecasts (Nominal USD Growth)
-            ws_country[f"F{r}"] = f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2026", Annual!$K:$K, 0)), NA())'
-            ws_country[f"G{r}"] = f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2027", Annual!$K:$K, 0)), NA())'
-            ws_country[f"H{r}"] = f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2028", Annual!$K:$K, 0)), NA())'
-            ws_country[f"I{r}"] = f'=IFERROR(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2029", Annual!$K:$K, 0)), NA())'
+            # Forecasts (Nominal USD Growth). Return NA() if value is missing or 0.
+            # (In WEO projections, actual 0.00 is rare, so 0 often implies missing derived data).
+            ws_country[f"F{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2026", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2026", Annual!$K:$K, 0))), NA())'
+            ws_country[f"G{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2027", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2027", Annual!$K:$K, 0))), NA())'
+            ws_country[f"H{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2028", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2028", Annual!$K:$K, 0))), NA())'
+            ws_country[f"I{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2029", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2029", Annual!$K:$K, 0))), NA())'
             
             ws_country[f"J{r}"] = ""
             ws_country[f"K{r}"] = f'=IFERROR(INDEX(Lists!$E$2:$E${country_count+1}, MATCH($A{r}, Lists!$A$2:$A${country_count+1}, 0)), "")'
