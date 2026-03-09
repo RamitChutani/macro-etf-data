@@ -94,9 +94,9 @@ function render(){
       <td><b>${d.country}</b></td>
       <td><code>${d.ticker}</code></td>
       <td>${d.region}</td>
-      <td style="color:${d.ytd >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d.ytd)}</td>
-      <td style="color:${d.y1 >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d.y1)}</td>
-      <td style="color:${d.3y >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d.3y)}</td>
+      <td style="color:${d['ytd'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['ytd'])}</td>
+      <td style="color:${d['y1'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['y1'])}</td>
+      <td style="color:${d['3y'] >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${fp(d['3y'])}</td>
       <td>${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1) + '%' : '—'}</td>
     </tr>`;
   });
@@ -107,7 +107,9 @@ function render(){
 function setPeriod(p){
   currentPeriod = p;
   document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event) {
+    event.target.classList.add('active');
+  }
   render();
 }
 
@@ -117,8 +119,8 @@ function showTip(e, d){
     <div style="font-size:16px;font-weight:700">${d.country}</div>
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">${d.etf}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--border);padding-top:10px">
-      <div><div style="font-size:10px;color:var(--text-muted)">YTD Return</div><div style="font-weight:700">${fp(d.ytd)}</div></div>
-      <div><div style="font-size:10px;color:var(--text-muted)">1Y Return</div><div style="font-weight:700">${fp(d.y1)}</div></div>
+      <div><div style="font-size:10px;color:var(--text-muted)">YTD Return</div><div style="font-weight:700">${fp(d['ytd'])}</div></div>
+      <div><div style="font-size:10px;color:var(--text-muted)">1Y Return</div><div style="font-weight:700">${fp(d['y1'])}</div></div>
       <div><div style="font-size:10px;color:var(--text-muted)">GDP Real (2025)</div><div style="font-weight:700">${d.macro.gdp_real ? d.macro.gdp_real.toFixed(1)+'%' : '—'}</div></div>
       <div><div style="font-size:10px;color:var(--text-muted)">LCU Return (2025)</div><div style="font-weight:700">${fp(d.macro.lcu_return/100)}</div></div>
     </div>
