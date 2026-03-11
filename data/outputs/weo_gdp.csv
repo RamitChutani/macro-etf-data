@@ -72,6 +72,21 @@ Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.149
 Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.153
 Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.225
 Australia,AUS,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.248
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2015,1.453
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2016,1.451
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2017,1.478
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2018,1.47
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2019,1.459
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2020,1.431
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2021,1.417
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2022,1.432
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2023,1.428
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2024,1.431
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2025,1.439
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2026,1.456
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2027,1.464
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2028,1.472
+Australia,AUS,PPPEX,Implied PPP conversion rate,A,2029,1.477
 Austria,AUT,NGDP,"GDP, current prices (domestic currency)",A,2015,342084000000
 Austria,AUT,NGDP,"GDP, current prices (domestic currency)",A,2016,355666000000
 Austria,AUT,NGDP,"GDP, current prices (domestic currency)",A,2017,367295000000
@@ -145,6 +160,21 @@ Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.764
 Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.56
 Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.305
 Austria,AUT,NGDP_RPCH,Real GDP growth (percent change),A,2029,0.991
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2015,0.775
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2016,0.781
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2017,0.775
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2018,0.765
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2019,0.738
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2020,0.729
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2021,0.713
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2022,0.698
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2023,0.718
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2024,0.724
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2025,0.73
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2026,0.734
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2027,0.738
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2028,0.742
+Austria,AUT,PPPEX,Implied PPP conversion rate,A,2029,0.745
 Belgium,BEL,NGDP,"GDP, current prices (domestic currency)",A,2015,415538000000
 Belgium,BEL,NGDP,"GDP, current prices (domestic currency)",A,2016,428467000000
 Belgium,BEL,NGDP,"GDP, current prices (domestic currency)",A,2017,443408000000
@@ -218,6 +248,21 @@ Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.98
 Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.261
 Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.196
 Belgium,BEL,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.264
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2015,0.767
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2016,0.774
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2017,0.776
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2018,0.766
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2019,0.736
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2020,0.716
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2021,0.706
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2022,0.704
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2023,0.71
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2024,0.706
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2025,0.705
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2026,0.705
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2027,0.703
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2028,0.704
+Belgium,BEL,PPPEX,Implied PPP conversion rate,A,2029,0.703
 Brazil,BRA,NGDP,"GDP, current prices (domestic currency)",A,2015,5995787000000
 Brazil,BRA,NGDP,"GDP, current prices (domestic currency)",A,2016,6269327000000
 Brazil,BRA,NGDP,"GDP, current prices (domestic currency)",A,2017,6585479000000
@@ -291,6 +336,21 @@ Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.942
 Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.238
 Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.305
 Brazil,BRA,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.432
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2015,2.026
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2016,2.17
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2017,2.21
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2018,2.198
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2019,2.216
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2020,2.265
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2021,2.379
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2022,2.412
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2023,2.446
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2024,2.477
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2025,2.548
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2026,2.619
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2027,2.668
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2028,2.716
+Brazil,BRA,PPPEX,Implied PPP conversion rate,A,2029,2.762
 Bulgaria,BGR,NGDP,"GDP, current prices (domestic currency)",A,2015,89571000000
 Bulgaria,BGR,NGDP,"GDP, current prices (domestic currency)",A,2016,95349000000
 Bulgaria,BGR,NGDP,"GDP, current prices (domestic currency)",A,2017,102683000000
@@ -364,6 +424,21 @@ Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.089
 Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.812
 Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.745
 Bulgaria,BGR,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.639
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2015,0.642
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2016,0.657
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2017,0.676
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2018,0.68
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2019,0.676
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2020,0.675
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2021,0.687
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2022,0.744
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2023,0.774
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2024,0.805
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2025,0.833
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2026,0.854
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2027,0.87
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2028,0.882
+Bulgaria,BGR,PPPEX,Implied PPP conversion rate,A,2029,0.891
 Canada,CAN,NGDP,"GDP, current prices (domestic currency)",A,2015,1990441000000
 Canada,CAN,NGDP,"GDP, current prices (domestic currency)",A,2016,2025535000000
 Canada,CAN,NGDP,"GDP, current prices (domestic currency)",A,2017,2140641000000
@@ -437,6 +512,21 @@ Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.541
 Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.88
 Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.685
 Canada,CAN,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.731
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2015,1.206
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2016,1.203
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2017,1.212
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2018,1.207
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2019,1.218
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2020,1.202
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2021,1.18
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2022,1.189
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2023,1.162
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2024,1.169
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2025,1.169
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2026,1.176
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2027,1.183
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2028,1.188
+Canada,CAN,PPPEX,Implied PPP conversion rate,A,2029,1.192
 China,CHN,NGDP,"GDP, current prices (domestic currency)",A,2015,70415750000000
 China,CHN,NGDP,"GDP, current prices (domestic currency)",A,2016,76067210000000
 China,CHN,NGDP,"GDP, current prices (domestic currency)",A,2017,84506670000000
@@ -510,6 +600,21 @@ China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2026,4.163
 China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2027,4.186
 China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2028,3.965
 China,CHN,NGDP_RPCH,Real GDP growth (percent change),A,2029,3.7
+China,CHN,PPPEX,Implied PPP conversion rate,A,2015,3.948
+China,CHN,PPPEX,Implied PPP conversion rate,A,2016,3.957
+China,CHN,PPPEX,Implied PPP conversion rate,A,2017,4.04
+China,CHN,PPPEX,Implied PPP conversion rate,A,2018,4.094
+China,CHN,PPPEX,Implied PPP conversion rate,A,2019,4.06
+China,CHN,PPPEX,Implied PPP conversion rate,A,2020,4.015
+China,CHN,PPPEX,Implied PPP conversion rate,A,2021,3.987
+China,CHN,PPPEX,Implied PPP conversion rate,A,2022,3.796
+China,CHN,PPPEX,Implied PPP conversion rate,A,2023,3.645
+China,CHN,PPPEX,Implied PPP conversion rate,A,2024,3.531
+China,CHN,PPPEX,Implied PPP conversion rate,A,2025,3.409
+China,CHN,PPPEX,Implied PPP conversion rate,A,2026,3.365
+China,CHN,PPPEX,Implied PPP conversion rate,A,2027,3.358
+China,CHN,PPPEX,Implied PPP conversion rate,A,2028,3.367
+China,CHN,PPPEX,Implied PPP conversion rate,A,2029,3.373
 France,FRA,NGDP,"GDP, current prices (domestic currency)",A,2015,2201402000000
 France,FRA,NGDP,"GDP, current prices (domestic currency)",A,2016,2231819000000
 France,FRA,NGDP,"GDP, current prices (domestic currency)",A,2017,2291681000000
@@ -583,6 +688,21 @@ France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.911
 France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.185
 France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.271
 France,FRA,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.243
+France,FRA,PPPEX,Implied PPP conversion rate,A,2015,0.783
+France,FRA,PPPEX,Implied PPP conversion rate,A,2016,0.781
+France,FRA,PPPEX,Implied PPP conversion rate,A,2017,0.77
+France,FRA,PPPEX,Implied PPP conversion rate,A,2018,0.756
+France,FRA,PPPEX,Implied PPP conversion rate,A,2019,0.706
+France,FRA,PPPEX,Implied PPP conversion rate,A,2020,0.693
+France,FRA,PPPEX,Implied PPP conversion rate,A,2021,0.686
+France,FRA,PPPEX,Implied PPP conversion rate,A,2022,0.659
+France,FRA,PPPEX,Implied PPP conversion rate,A,2023,0.667
+France,FRA,PPPEX,Implied PPP conversion rate,A,2024,0.664
+France,FRA,PPPEX,Implied PPP conversion rate,A,2025,0.656
+France,FRA,PPPEX,Implied PPP conversion rate,A,2026,0.655
+France,FRA,PPPEX,Implied PPP conversion rate,A,2027,0.656
+France,FRA,PPPEX,Implied PPP conversion rate,A,2028,0.658
+France,FRA,PPPEX,Implied PPP conversion rate,A,2029,0.66
 Germany,DEU,NGDP,"GDP, current prices (domestic currency)",A,2015,3087030000000
 Germany,DEU,NGDP,"GDP, current prices (domestic currency)",A,2016,3195210000000
 Germany,DEU,NGDP,"GDP, current prices (domestic currency)",A,2017,3333110000000
@@ -656,6 +776,21 @@ Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.944
 Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.473
 Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.203
 Germany,DEU,NGDP_RPCH,Real GDP growth (percent change),A,2029,0.98
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2015,0.745
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2016,0.747
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2017,0.745
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2018,0.735
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2019,0.718
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2020,0.707
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2021,0.702
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2022,0.697
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2023,0.718
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2024,0.722
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2025,0.721
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2026,0.722
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2027,0.724
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2028,0.728
+Germany,DEU,PPPEX,Implied PPP conversion rate,A,2029,0.731
 Greece,GRC,NGDP,"GDP, current prices (domestic currency)",A,2015,175363000000
 Greece,GRC,NGDP,"GDP, current prices (domestic currency)",A,2016,174448000000
 Greece,GRC,NGDP,"GDP, current prices (domestic currency)",A,2017,177379000000
@@ -729,6 +864,21 @@ Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.043
 Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.474
 Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.59
 Greece,GRC,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.566
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2015,0.593
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2016,0.584
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2017,0.575
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2018,0.565
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2019,0.541
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2020,0.53
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2021,0.52
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2022,0.517
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2023,0.528
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2024,0.531
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2025,0.535
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2026,0.538
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2027,0.544
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2028,0.546
+Greece,GRC,PPPEX,Implied PPP conversion rate,A,2029,0.548
 Hong Kong,HKG,NGDP,"GDP, current prices (domestic currency)",A,2015,2398280000000
 Hong Kong,HKG,NGDP,"GDP, current prices (domestic currency)",A,2016,2490598000000
 Hong Kong,HKG,NGDP,"GDP, current prices (domestic currency)",A,2017,2659611000000
@@ -802,6 +952,21 @@ Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.122
 Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.028
 Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.159
 Hong Kong,HKG,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.348
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2015,5.965
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2016,6.006
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2017,6.07
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2018,6.247
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2019,6.19
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2020,6.147
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2021,5.872
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2022,5.575
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2023,5.531
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2024,5.604
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2025,5.592
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2026,5.611
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2027,5.647
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2028,5.688
+Hong Kong,HKG,PPPEX,Implied PPP conversion rate,A,2029,5.732
 India,IND,NGDP,"GDP, current prices (domestic currency)",A,2015,137718700000000
 India,IND,NGDP,"GDP, current prices (domestic currency)",A,2016,153916700000000
 India,IND,NGDP,"GDP, current prices (domestic currency)",A,2017,170900400000000
@@ -875,6 +1040,21 @@ India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2026,6.159
 India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2027,6.409
 India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2028,6.481
 India,IND,NGDP_RPCH,Real GDP growth (percent change),A,2029,6.495
+India,IND,PPPEX,Implied PPP conversion rate,A,2015,19.583
+India,IND,PPPEX,Implied PPP conversion rate,A,2016,20.027
+India,IND,PPPEX,Implied PPP conversion rate,A,2017,20.456
+India,IND,PPPEX,Implied PPP conversion rate,A,2018,20.475
+India,IND,PPPEX,Implied PPP conversion rate,A,2019,20.24
+India,IND,PPPEX,Implied PPP conversion rate,A,2020,20.319
+India,IND,PPPEX,Implied PPP conversion rate,A,2021,20.728
+India,IND,PPPEX,Implied PPP conversion rate,A,2022,20.493
+India,IND,PPPEX,Implied PPP conversion rate,A,2023,20.274
+India,IND,PPPEX,Implied PPP conversion rate,A,2024,20.392
+India,IND,PPPEX,Implied PPP conversion rate,A,2025,20.257
+India,IND,PPPEX,Implied PPP conversion rate,A,2026,20.642
+India,IND,PPPEX,Implied PPP conversion rate,A,2027,21.114
+India,IND,PPPEX,Implied PPP conversion rate,A,2028,21.607
+India,IND,PPPEX,Implied PPP conversion rate,A,2029,22.085
 Indonesia,IDN,NGDP,"GDP, current prices (domestic currency)",A,2015,11526332800000000
 Indonesia,IDN,NGDP,"GDP, current prices (domestic currency)",A,2016,12401728500000000
 Indonesia,IDN,NGDP,"GDP, current prices (domestic currency)",A,2017,13589825700000000
@@ -948,6 +1128,21 @@ Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2026,4.942
 Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2027,4.961
 Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2028,4.956
 Indonesia,IDN,NGDP_RPCH,Real GDP growth (percent change),A,2029,5.111
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2015,4574.616
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2016,4642.077
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2017,4756.169
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2018,4833.599
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2019,4847.445
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2020,4791.007
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2021,4808.429
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2022,4918.708
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2023,4815.785
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2024,4741.027
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2025,4723.855
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2026,4772.649
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2027,4811.936
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2028,4854.144
+Indonesia,IDN,PPPEX,Implied PPP conversion rate,A,2029,4890.607
 Italy,ITA,NGDP,"GDP, current prices (domestic currency)",A,2015,1663278000000
 Italy,ITA,NGDP,"GDP, current prices (domestic currency)",A,2016,1704856000000
 Italy,ITA,NGDP,"GDP, current prices (domestic currency)",A,2017,1744494000000
@@ -1021,6 +1216,21 @@ Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.759
 Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2027,0.568
 Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2028,0.684
 Italy,ITA,NGDP_RPCH,Real GDP growth (percent change),A,2029,0.719
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2015,0.695
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2016,0.697
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2017,0.69
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2018,0.681
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2019,0.647
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2020,0.632
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2021,0.617
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2022,0.596
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2023,0.609
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2024,0.607
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2025,0.605
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2026,0.607
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2027,0.609
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2028,0.611
+Italy,ITA,PPPEX,Implied PPP conversion rate,A,2029,0.612
 Japan,JPN,NGDP,"GDP, current prices (domestic currency)",A,2015,538032400000000
 Japan,JPN,NGDP,"GDP, current prices (domestic currency)",A,2016,544364600000000
 Japan,JPN,NGDP,"GDP, current prices (domestic currency)",A,2017,553073000000000
@@ -1094,6 +1304,21 @@ Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2026,0.633
 Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2027,0.634
 Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2028,0.551
 Japan,JPN,NGDP_RPCH,Real GDP growth (percent change),A,2029,0.524
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2015,107.629
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2016,107.064
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2017,105.102
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2018,104.159
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2019,103.232
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2020,100.742
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2021,98.691
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2022,92.505
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2023,92.838
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2024,93.205
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2025,93.523
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2026,93.67
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2027,93.987
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2028,94.334
+Japan,JPN,PPPEX,Implied PPP conversion rate,A,2029,94.543
 Kuwait,KWT,NGDP,"GDP, current prices (domestic currency)",A,2015,34473000000
 Kuwait,KWT,NGDP,"GDP, current prices (domestic currency)",A,2016,33056000000
 Kuwait,KWT,NGDP,"GDP, current prices (domestic currency)",A,2017,36611000000
@@ -1167,6 +1392,21 @@ Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.927
 Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.306
 Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.266
 Kuwait,KWT,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.238
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2015,0.18
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2016,0.166
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2017,0.189
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2018,0.188
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2019,0.19
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2020,0.186
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2021,0.203
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2022,0.222
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2023,0.197
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2024,0.191
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2025,0.179
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2026,0.175
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2027,0.174
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2028,0.175
+Kuwait,KWT,PPPEX,Implied PPP conversion rate,A,2029,0.175
 Malaysia,MYS,NGDP,"GDP, current prices (domestic currency)",A,2015,1176941000000
 Malaysia,MYS,NGDP,"GDP, current prices (domestic currency)",A,2016,1249698000000
 Malaysia,MYS,NGDP,"GDP, current prices (domestic currency)",A,2017,1372310000000
@@ -1240,6 +1480,21 @@ Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2026,4
 Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2027,4
 Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2028,4
 Malaysia,MYS,NGDP_RPCH,Real GDP growth (percent change),A,2029,4
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2015,1.564
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2016,1.575
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2017,1.606
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2018,1.583
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2019,1.563
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2020,1.523
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2021,1.515
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2022,1.503
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2023,1.423
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2024,1.399
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2025,1.381
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2026,1.382
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2027,1.385
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2028,1.391
+Malaysia,MYS,PPPEX,Implied PPP conversion rate,A,2029,1.396
 Mexico,MEX,NGDP,"GDP, current prices (domestic currency)",A,2015,19228615000000
 Mexico,MEX,NGDP,"GDP, current prices (domestic currency)",A,2016,20758791000000
 Mexico,MEX,NGDP,"GDP, current prices (domestic currency)",A,2017,22536210000000
@@ -1313,6 +1568,21 @@ Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.544
 Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.044
 Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.139
 Mexico,MEX,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.084
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2015,8.102
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2016,8.514
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2017,8.914
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2018,9.276
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2019,9.528
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2020,9.815
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2021,9.942
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2022,9.9
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2023,9.991
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2024,10.228
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2025,10.499
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2026,10.78
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2027,10.966
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2028,11.156
+Mexico,MEX,PPPEX,Implied PPP conversion rate,A,2029,11.337
 Netherlands,NLD,NGDP,"GDP, current prices (domestic currency)",A,2015,699175000000
 Netherlands,NLD,NGDP,"GDP, current prices (domestic currency)",A,2016,720175000000
 Netherlands,NLD,NGDP,"GDP, current prices (domestic currency)",A,2017,750861000000
@@ -1386,6 +1656,21 @@ Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.222
 Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.382
 Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.369
 Netherlands,NLD,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.3
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2015,0.788
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2016,0.785
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2017,0.782
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2018,0.777
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2019,0.767
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2020,0.748
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2021,0.734
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2022,0.727
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2023,0.745
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2024,0.769
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2025,0.771
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2026,0.775
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2027,0.779
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2028,0.782
+Netherlands,NLD,PPPEX,Implied PPP conversion rate,A,2029,0.785
 Pakistan,PAK,NGDP,"GDP, current prices (domestic currency)",A,2015,30425880000000
 Pakistan,PAK,NGDP,"GDP, current prices (domestic currency)",A,2016,32725049000000
 Pakistan,PAK,NGDP,"GDP, current prices (domestic currency)",A,2017,35552819000000
@@ -1451,6 +1736,21 @@ Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.578
 Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2027,4.099
 Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2028,4.5
 Pakistan,PAK,NGDP_RPCH,Real GDP growth (percent change),A,2029,4.5
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2015,31.829
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2016,32.586
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2017,33.246
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2018,34.682
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2019,37.671
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2020,40.075
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2021,43.441
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2022,45.598
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2023,55.298
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2024,66.162
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2025,68.621
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2026,72.316
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2027,75.939
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2028,79.535
+Pakistan,PAK,PPPEX,Implied PPP conversion rate,A,2029,83.244
 Philippines,PHL,NGDP,"GDP, current prices (domestic currency)",A,2015,13944159000000
 Philippines,PHL,NGDP,"GDP, current prices (domestic currency)",A,2016,15132382000000
 Philippines,PHL,NGDP,"GDP, current prices (domestic currency)",A,2017,16556651000000
@@ -1524,6 +1824,21 @@ Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2026,5.731
 Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2027,5.993
 Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2028,6.003
 Philippines,PHL,NGDP_RPCH,Real GDP growth (percent change),A,2029,6.013
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2015,19.533
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2016,19.597
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2017,19.699
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2018,19.965
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2019,19.738
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2020,19.441
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2021,19.375
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2022,19.082
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2023,19.247
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2024,19.328
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2025,19.158
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2026,19.232
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2027,19.365
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2028,19.535
+Philippines,PHL,PPPEX,Implied PPP conversion rate,A,2029,19.724
 Poland,POL,NGDP,"GDP, current prices (domestic currency)",A,2015,1809564000000
 Poland,POL,NGDP,"GDP, current prices (domestic currency)",A,2016,1865960000000
 Poland,POL,NGDP,"GDP, current prices (domestic currency)",A,2017,1996836000000
@@ -1597,6 +1912,21 @@ Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.136
 Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.861
 Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.802
 Poland,POL,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.666
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2015,1.758
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2016,1.743
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2017,1.743
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2018,1.748
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2019,1.699
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2020,1.698
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2021,1.723
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2022,1.78
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2023,1.886
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2024,1.907
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2025,1.928
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2026,1.954
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2027,1.975
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2028,1.996
+Poland,POL,PPPEX,Implied PPP conversion rate,A,2029,2.01
 Saudi Arabia,SAU,NGDP,"GDP, current prices (domestic currency)",A,2015,2600306000000
 Saudi Arabia,SAU,NGDP,"GDP, current prices (domestic currency)",A,2016,2584798000000
 Saudi Arabia,SAU,NGDP,"GDP, current prices (domestic currency)",A,2017,2779747000000
@@ -1670,6 +2000,21 @@ Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.978
 Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2027,3.25
 Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2028,3.334
 Saudi Arabia,SAU,NGDP_RPCH,Real GDP growth (percent change),A,2029,3.3
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2015,1.671
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2016,1.618
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2017,1.689
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2018,1.854
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2019,1.862
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2020,1.921
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2021,1.909
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2022,2.007
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2023,1.893
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2024,1.843
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2025,1.769
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2026,1.735
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2027,1.731
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2028,1.731
+Saudi Arabia,SAU,PPPEX,Implied PPP conversion rate,A,2029,1.731
 Singapore,SGP,NGDP,"GDP, current prices (domestic currency)",A,2015,423444000000
 Singapore,SGP,NGDP,"GDP, current prices (domestic currency)",A,2016,441606000000
 Singapore,SGP,NGDP,"GDP, current prices (domestic currency)",A,2017,474587000000
@@ -1743,6 +2088,21 @@ Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.823
 Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.488
 Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.526
 Singapore,SGP,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.485
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2015,0.878
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2016,0.874
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2017,0.883
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2018,0.868
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2019,0.854
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2020,0.835
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2021,0.811
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2022,0.87
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2023,0.797
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2024,0.803
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2025,0.784
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2026,0.78
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2027,0.782
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2028,0.784
+Singapore,SGP,PPPEX,Implied PPP conversion rate,A,2029,0.785
 South Africa,ZAF,NGDP,"GDP, current prices (domestic currency)",A,2015,4420793000000
 South Africa,ZAF,NGDP,"GDP, current prices (domestic currency)",A,2016,4759555000000
 South Africa,ZAF,NGDP,"GDP, current prices (domestic currency)",A,2017,5078191000000
@@ -1816,6 +2176,21 @@ South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.151
 South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.512
 South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.702
 South Africa,ZAF,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.835
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2015,5.842
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2016,6.189
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2017,6.413
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2018,6.855
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2019,7.065
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2020,7.249
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2021,7.376
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2022,7.247
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2023,7.319
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2024,7.421
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2025,7.5
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2026,7.637
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2027,7.752
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2028,7.869
+South Africa,ZAF,PPPEX,Implied PPP conversion rate,A,2029,7.964
 South Korea,KOR,NGDP,"GDP, current prices (domestic currency)",A,2015,1740776000000000
 South Korea,KOR,NGDP,"GDP, current prices (domestic currency)",A,2016,1833026500000000
 South Korea,KOR,NGDP,"GDP, current prices (domestic currency)",A,2017,1934233900000000
@@ -1889,6 +2264,21 @@ South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.83
 South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.152
 South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.19
 South Korea,KOR,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.967
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2015,861.187
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2016,870.675
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2017,872.625
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2018,854.871
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2019,847.548
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2020,829.359
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2021,827.274
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2022,786.305
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2023,773.706
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2024,785.664
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2025,776.295
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2026,764.757
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2027,766.704
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2028,768.664
+South Korea,KOR,PPPEX,Implied PPP conversion rate,A,2029,770.959
 Spain,ESP,NGDP,"GDP, current prices (domestic currency)",A,2015,1087112000000
 Spain,ESP,NGDP,"GDP, current prices (domestic currency)",A,2016,1122967000000
 Spain,ESP,NGDP,"GDP, current prices (domestic currency)",A,2017,1170024000000
@@ -1962,6 +2352,21 @@ Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.958
 Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.731
 Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.6
 Spain,ESP,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.598
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2015,0.638
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2016,0.634
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2017,0.631
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2018,0.632
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2019,0.604
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2020,0.606
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2021,0.591
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2022,0.578
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2023,0.592
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2024,0.594
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2025,0.592
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2026,0.596
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2027,0.602
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2028,0.606
+Spain,ESP,PPPEX,Implied PPP conversion rate,A,2029,0.609
 Sweden,SWE,NGDP,"GDP, current prices (domestic currency)",A,2015,4230936000000
 Sweden,SWE,NGDP,"GDP, current prices (domestic currency)",A,2016,4392801000000
 Sweden,SWE,NGDP,"GDP, current prices (domestic currency)",A,2017,4575114000000
@@ -2035,6 +2440,21 @@ Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.932
 Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.784
 Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.696
 Sweden,SWE,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.671
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2015,8.753
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2016,8.815
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2017,8.852
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2018,8.866
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2019,8.584
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2020,8.436
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2021,8.312
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2022,8.227
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2023,8.397
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2024,8.44
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2025,8.377
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2026,8.361
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2027,8.379
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2028,8.41
+Sweden,SWE,PPPEX,Implied PPP conversion rate,A,2029,8.431
 Switzerland,CHE,NGDP,"GDP, current prices (domestic currency)",A,2015,667714000000
 Switzerland,CHE,NGDP,"GDP, current prices (domestic currency)",A,2016,677721000000
 Switzerland,CHE,NGDP,"GDP, current prices (domestic currency)",A,2017,684860000000
@@ -2108,6 +2528,21 @@ Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.275
 Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.1
 Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.8
 Switzerland,CHE,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.2
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2015,1.232
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2016,1.213
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2017,1.188
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2018,1.179
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2019,1.134
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2020,1.105
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2021,1.046
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2022,1.007
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2023,0.979
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2024,0.969
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2025,0.946
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2026,0.935
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2027,0.926
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2028,0.918
+Switzerland,CHE,PPPEX,Implied PPP conversion rate,A,2029,0.908
 Taiwan,TWN,NGDP,"GDP, current prices (domestic currency)",A,2015,17055080000000
 Taiwan,TWN,NGDP,"GDP, current prices (domestic currency)",A,2016,17555268000000
 Taiwan,TWN,NGDP,"GDP, current prices (domestic currency)",A,2017,18012387000000
@@ -2181,6 +2616,21 @@ Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.113
 Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.521
 Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.413
 Taiwan,TWN,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.38
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2015,16.049
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2016,16.017
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2017,15.575
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2018,15.57
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2019,15.274
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2020,14.654
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2021,14.396
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2022,13.719
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2023,13.527
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2024,13.656
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2025,13.562
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2026,13.531
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2027,13.513
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2028,13.497
+Taiwan,TWN,PPPEX,Implied PPP conversion rate,A,2029,13.476
 Thailand,THA,NGDP,"GDP, current prices (domestic currency)",A,2015,13743480000000
 Thailand,THA,NGDP,"GDP, current prices (domestic currency)",A,2016,14590337000000
 Thailand,THA,NGDP,"GDP, current prices (domestic currency)",A,2017,15488664000000
@@ -2254,6 +2704,21 @@ Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.6
 Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.19
 Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.307
 Thailand,THA,NGDP_RPCH,Real GDP growth (percent change),A,2029,2.454
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2015,12.169
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2016,12.373
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2017,12.386
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2018,12.153
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2019,11.829
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2020,11.407
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2021,11.148
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2022,10.888
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2023,10.634
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2024,10.473
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2025,10.245
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2026,10.133
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2027,10.084
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2028,10.073
+Thailand,THA,PPPEX,Implied PPP conversion rate,A,2029,10.059
 Turkey,TUR,NGDP,"GDP, current prices (domestic currency)",A,2015,2354059000000
 Turkey,TUR,NGDP,"GDP, current prices (domestic currency)",A,2016,2629988000000
 Turkey,TUR,NGDP,"GDP, current prices (domestic currency)",A,2017,3151529000000
@@ -2327,6 +2792,21 @@ Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2026,3.693
 Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2027,3.725
 Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2028,3.82
 Turkey,TUR,NGDP_RPCH,Real GDP growth (percent change),A,2029,3.792
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2015,1.183
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2016,1.268
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2017,1.384
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2018,1.633
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2019,1.837
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2020,2.111
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2021,2.726
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2022,4.975
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2023,8.074
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2024,12.548
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2025,16.507
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2026,20.101
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2027,23.419
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2028,27.125
+Turkey,TUR,PPPEX,Implied PPP conversion rate,A,2029,30.675
 United Kingdom,GBR,NGDP,"GDP, current prices (domestic currency)",A,2015,1916451000000
 United Kingdom,GBR,NGDP,"GDP, current prices (domestic currency)",A,2016,1991645000000
 United Kingdom,GBR,NGDP,"GDP, current prices (domestic currency)",A,2017,2082482000000
@@ -2400,6 +2880,21 @@ United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2026,1.264
 United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2027,1.54
 United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2028,1.439
 United Kingdom,GBR,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.432
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2015,0.677
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2016,0.684
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2017,0.685
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2018,0.688
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2019,0.67
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2020,0.653
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2021,0.645
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2022,0.635
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2023,0.654
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2024,0.664
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2025,0.671
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2026,0.675
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2027,0.678
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2028,0.681
+United Kingdom,GBR,PPPEX,Implied PPP conversion rate,A,2029,0.684
 United States,USA,NGDP,"GDP, current prices (domestic currency)",A,2015,18295000000000
 United States,USA,NGDP,"GDP, current prices (domestic currency)",A,2016,18804900000000
 United States,USA,NGDP,"GDP, current prices (domestic currency)",A,2017,19612100000000
@@ -2473,6 +2968,21 @@ United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2026,2.102
 United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2027,2.055
 United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2028,2.093
 United States,USA,NGDP_RPCH,Real GDP growth (percent change),A,2029,1.881
+United States,USA,PPPEX,Implied PPP conversion rate,A,2015,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2016,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2017,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2018,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2019,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2020,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2021,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2022,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2023,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2024,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2025,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2026,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2027,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2028,1
+United States,USA,PPPEX,Implied PPP conversion rate,A,2029,1
 Vietnam,VNM,NGDP,"GDP, current prices (domestic currency)",A,2015,5191323730000000
 Vietnam,VNM,NGDP,"GDP, current prices (domestic currency)",A,2016,5639401000000000
 Vietnam,VNM,NGDP,"GDP, current prices (domestic currency)",A,2017,6293904550000000
@@ -2546,3 +3056,18 @@ Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2026,5.595
 Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2027,5.76
 Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2028,5.6
 Vietnam,VNM,NGDP_RPCH,Real GDP growth (percent change),A,2029,5.3
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2015,6973.816
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2016,7033.869
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2017,7211.6
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2018,7275.826
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2019,7191.188
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2020,7064.954
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2021,7120.011
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2022,6942.558
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2023,6834.996
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2024,6946.845
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2025,7007.041
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2026,7128.368
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2027,7220.119
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2028,7304.556
+Vietnam,VNM,PPPEX,Implied PPP conversion rate,A,2029,7370.204

@@ -17,6 +17,7 @@ INDICATOR_LABELS = {
     "NGDP_RPCH": "Real GDP growth (percent change)",
     "NGDPD_PCH": "Nominal GDP growth (percent change, derived from NGDPD)",
     "NGDP_PCH": "Nominal GDP growth (percent change, derived from NGDP)",
+    "PPPEX": "Implied PPP conversion rate",
 }
 
 
@@ -123,7 +124,7 @@ def append_derived_growth_rows(
     level_indicator: str,
     growth_indicator: str,
 ) -> list[dict[str, str]]:
-    """Derive YoY growth from level indicator rows."""
+    """YoY growth from level indicator."""
     out = list(rows)
     existing = {
         (r.get("country_code", ""), r.get("year", ""))
@@ -177,7 +178,7 @@ def append_derived_growth_rows(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fetch IMF WEO GDP data (NGDPD, NGDP, NGDP_RPCH) for ETF countries."
+        description="Fetch IMF WEO GDP data (NGDPD, NGDP, NGDP_RPCH, PPPEX) for ETF countries."
     )
     parser.add_argument("--start-year", type=int, default=2015)
     parser.add_argument("--end-year", type=int, default=2029)
@@ -187,46 +188,41 @@ def main() -> None:
         help="IMF SDMX base URL.",
     )
     parser.add_argument(
-        "--output",
-        default="data/outputs/weo_gdp.csv",
-        help="Output CSV path.",
-    )
-    parser.add_argument(
         "--countries",
         default=",".join(ETF_COUNTRY_TO_ISO3.values()),
         help="Comma-separated ISO3 country codes.",
     )
     parser.add_argument(
         "--indicators",
-        default="NGDPD,NGDP,NGDP_RPCH",
+        default="NGDPD,NGDP,NGDP_RPCH,PPPEX",
         help="Comma-separated WEO indicator codes.",
     )
     parser.add_argument(
         "--no-fetch",
         action="store_true",
-        help="Only print the URL; do not call the API.",
+        help="Skip fetch, only run derived logic on existing file.",
     )
+    parser.add_argument("--output", default="data/outputs/weo_gdp.csv")
     args = parser.parse_args()
 
-    countries = [c.strip().upper() for c in args.countries.split(",") if c.strip()]
-    indicators = [i.strip().upper() for i in args.indicators.split(",") if i.strip()]
-    url = build_weo_url(countries, indicators, args.start_year, args.end_year, args.base_url)
-    print(f"Request URL:\n{url}\n")
+    iso_to_name = {v: k for k, v in ETF_COUNTRY_TO_ISO3.items()}
 
-    if args.no_fetch:
-        return
-
-    req = urllib.request.Request(url, headers={"Accept": "application/xml"})
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        xml_payload = resp.read()
-
-    rows = parse_sdmx_generic_xml(xml_payload)
-    if not rows:
-        raise RuntimeError("No observations parsed from IMF response.")
-
-    code_to_country = {v: k for k, v in ETF_COUNTRY_TO_ISO3.items()}
-    for row in rows:
-        row["country_name"] = code_to_country.get(row["country_code"], row["country_code"])
+    if not args.no_fetch:
+        countries = args.countries.split(",")
+        indicators = args.indicators.split(",")
+        url = build_weo_url(
+            countries, indicators, args.start_year, args.end_year, args.base_url
+        )
+        print(f"Request URL:\n{url}\n")
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req) as response:
+            payload = response.read()
+            rows = parse_sdmx_generic_xml(payload)
+            for r in rows:
+                r["country_name"] = iso_to_name.get(r["country_code"], r["country_code"])
+    else:
+        with open(args.output, "r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
 
     rows = append_derived_growth_rows(
         rows, level_indicator="NGDPD", growth_indicator="NGDPD_PCH"
