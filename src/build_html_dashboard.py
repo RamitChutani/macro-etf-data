@@ -27,8 +27,7 @@ MAIN_TIMEFRAMES = ["1Y", "3Y", "5Y", "10Y"]
 SHORT_TIMEFRAMES = ["1D", "1W", "1M", "YTD"]
 
 def get_gdp_cagr(cc, years, maps, end_year=2025):
-    # Unpack from the 4 returned maps
-    _, _, _, current_usd_map = maps
+    _, _, _, _, current_usd_map = maps
     try:
         v_start = current_usd_map.get((cc, end_year - years))
         v_end = current_usd_map.get((cc, end_year))
@@ -49,7 +48,7 @@ def build_dashboard_data(etf_csv: str, weo_csv: str, metadata_csv: str) -> dict:
     metadata = pd.read_csv(metadata_csv)
     ticker_info = metadata.set_index("ticker").to_dict(orient="index")
     gdp_maps = load_gdp_growth_maps(weo_csv)
-    (gdp_real_map, gdp_lcu_map, gdp_usd_map, cur_usd_map) = gdp_maps
+    (gdp_real_map, gdp_lcu_map, gdp_usd_map, fx_map, _) = gdp_maps
     
     latest_date = prices_raw["Date"].max()
     as_of_str = latest_date.strftime("%b %d, %Y").upper()
@@ -106,7 +105,8 @@ def build_dashboard_data(etf_csv: str, weo_csv: str, metadata_csv: str) -> dict:
                 "year": y,
                 "gdp_usd": gdp_usd_map.get((cc, y)),
                 "gdp_real": gdp_real_map.get((cc, y)),
-                "gdp_lcu": gdp_lcu_map.get((cc, y))
+                "gdp_lcu": gdp_lcu_map.get((cc, y)),
+                "weo_fx": fx_map.get((cc, y))
             })
 
         countries_data.append({
@@ -204,7 +204,7 @@ td{padding:16px;border-bottom:1px solid var(--border);font-size:14px}
   
   window.hc = function(v) {
     if(v == null) return 'var(--bg-card)';
-    // Green = Positive Disconnect (GDP > ETF), Red = Negative (ETF > GDP)
+    // Invert: Positive Disconnect (Lag) = Green (Value), Negative (Outperformance) = Red (Expensive)
     let n = Math.min(Math.abs(v) / 0.15, 1);
     let i = 0.2 + n * 0.6;
     return v >= 0 ? `rgba(74, 222, 128, ${i})` : `rgba(251, 113, 133, ${i})`;
@@ -248,13 +248,14 @@ td{padding:16px;border-bottom:1px solid var(--border);font-size:14px}
 
       <h3 style="font-size:14px;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">Annual Macro Decomposition</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Year</th><th>Nominal GDP (USD) %</th><th>Real GDP %</th></tr></thead>
+        <thead><tr><th>Year</th><th>Nominal GDP (USD) %</th><th>Real GDP %</th><th>LCU Return vs USD %</th></tr></thead>
         <tbody>
           ${d.history.filter(h => h.gdp_usd !== null).reverse().map(h => `
             <tr>
               <td>${h.year}</td>
               <td style="font-family:var(--font-mono)">${fp(h.gdp_usd/100)}</td>
               <td style="font-family:var(--font-mono)">${fp(h.gdp_real/100)}</td>
+              <td style="font-family:var(--font-mono)">${fp(h.weo_fx/100)}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -301,6 +302,6 @@ def main():
     parser.add_argument("--output", default="data/outputs/etf_macro_dashboard.html")
     args = parser.parse_args()
     generate_html(build_dashboard_data(args.etf_csv, args.weo_csv, args.metadata_csv), args.output)
-    print(f"HTML Dashboard written: {args.output}")
+    print(f"Drill-down dashboard generated: {args.output}")
 
 if __name__ == "__main__": main()
