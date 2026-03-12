@@ -30,6 +30,7 @@ def main() -> None:
     parser.add_argument("--end-year", type=int, default=2029)
     parser.add_argument("--etf-output", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-output", default="data/outputs/weo_gdp.csv")
+    parser.add_argument("--reer-output", default="data/outputs/bis_reer_metrics.csv")
     parser.add_argument(
         "--metadata-output",
         default="data/outputs/etf_ticker_metadata.csv",
@@ -84,6 +85,13 @@ def main() -> None:
         args.weo_output,
     ]
 
+    reer_cmd = [
+        py,
+        str(script_dir / "fetch_bis_reer.py"),
+        "--output",
+        args.reer_output,
+    ]
+
     combined_cmd = [
         py,
         str(script_dir / "build_combined_etf_weo.py"),
@@ -99,6 +107,7 @@ def main() -> None:
 
     run_step(etf_cmd)
     run_step(weo_cmd)
+    run_step(reer_cmd)
     run_step(combined_cmd)
     if not args.skip_dashboard:
         dashboard_cmd = [

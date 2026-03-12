@@ -804,6 +804,7 @@ def write_dashboard_xlsx(
     cagr_df: pd.DataFrame,
     output_xlsx: str,
     metadata_csv: str | None = "data/outputs/etf_ticker_metadata.csv",
+    reer_csv: str | None = "data/outputs/bis_reer_metrics.csv",
 ) -> None:
     from openpyxl.styles import Font, PatternFill, Alignment
     from openpyxl.formatting.rule import CellIsRule
@@ -866,6 +867,14 @@ def write_dashboard_xlsx(
         timeframe_df.to_excel(writer, sheet_name="ETF_Timeframes", index=False)
         annual_df.to_excel(writer, sheet_name="Annual", index=False)
         cagr_df.to_excel(writer, sheet_name="CAGR", index=False)
+        
+        reer_df = pd.DataFrame()
+        if reer_csv:
+            try:
+                reer_df = pd.read_csv(reer_csv)
+                reer_df.to_excel(writer, sheet_name="REER_Data", index=False)
+            except FileNotFoundError:
+                pass
         lists_df = pd.DataFrame(
             {
                 "country_name": pd.Series(sorted(timeframe_df["country_name"].dropna().unique().tolist())),
@@ -901,28 +910,24 @@ def write_dashboard_xlsx(
         ws_country["B2"] = "5Y"
         ws_country["D2"] = "Sorted by size of economy. Metrics are CAGR (annualized)."
         
-        # Projection Super-Header
-        ws_country.merge_cells("F4:I4")
-        ws_country["F4"] = "Projected Nominal GDP Growth (USD) %"
-        ws_country["F4"].font = Font(bold=True)
-        ws_country["F4"].alignment = Alignment(horizontal="center")
+        # (Super-headers removed)
 
         ws_country["A5"] = "country_name"
         ws_country["B5"] = "ticker_used"
         ws_country["C5"] = "GDP Nominal CAGR % (USD)"
         ws_country["D5"] = "ETF CAGR % (USD)"
         ws_country["E5"] = "Macro Disconnect %"
-        ws_country["F5"] = "2026"
-        ws_country["G5"] = "2027"
-        ws_country["H5"] = "2028"
-        ws_country["I5"] = "2029"
-        ws_country["J5"] = "" # GAP
+        ws_country["F5"] = "Projected 3Y CAGR (26-28) %"
+        ws_country["G5"] = "REER vs 10Y average"
+        ws_country["H5"] = "Interpretation"
+        ws_country["I5"] = "" # GAP
+        ws_country["J5"] = "REER (base year 2020)"
         ws_country["K5"] = "region"
         ws_country["L5"] = "ticker_exchange"
         ws_country["M5"] = "ticker_currency"
         ws_country["N5"] = "GDP Real CAGR %"
         ws_country["O5"] = "GDP Nominal CAGR % (LCU)"
-        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "I5", "K5", "L5", "M5", "N5", "O5"]:
+        for c in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "J5", "K5", "L5", "M5", "N5", "O5"]:
             ws_country[c].font = Font(bold=True)
 
         horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -943,21 +948,43 @@ def write_dashboard_xlsx(
             ws_country[f"D{r}"] = f'=IFERROR(1*INDEX(CAGR!$F:$F, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, CAGR!$K:$K, 0)), NA())'
             ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
             
-            # Forecasts (Nominal USD Growth). Return NA() if value is missing or 0.
-            # (In WEO projections, actual 0.00 is rare, so 0 often implies missing derived data).
-            ws_country[f"F{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2026", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2026", Annual!$K:$K, 0))), NA())'
-            ws_country[f"G{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2027", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2027", Annual!$K:$K, 0))), NA())'
-            ws_country[f"H{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2028", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2028", Annual!$K:$K, 0))), NA())'
-            ws_country[f"I{r}"] = f'=IFERROR(IF(1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2029", Annual!$K:$K, 0))=0, NA(), 1*INDEX(Annual!$H:$H, MATCH($A{r}&"|2029", Annual!$K:$K, 0))), NA())'
+            # Projected 3Y CAGR (26-28). 
+            # Formula: ((1+r26/100)*(1+r27/100)*(1+r28/100))^(1/3)-1)*100
+            idx26 = f'INDEX(Annual!$H:$H, MATCH($A{r}&"|2026", Annual!$K:$K, 0))'
+            idx27 = f'INDEX(Annual!$H:$H, MATCH($A{r}&"|2027", Annual!$K:$K, 0))'
+            idx28 = f'INDEX(Annual!$H:$H, MATCH($A{r}&"|2028", Annual!$K:$K, 0))'
+            cagr_form = f'=IFERROR((( (1+{idx26}/100)*(1+{idx27}/100)*(1+{idx28}/100) )^(1/3)-1)*100, NA())'
+            ws_country[f"F{r}"] = cagr_form
             
-            ws_country[f"J{r}"] = ""
+            # REER Metrics from REER_Data sheet
+            # Column G: REER Over/Under % (REER_Data!E)
+            # Divided by 100 to support % formatting
+            ws_country[f"G{r}"] = f'=IFERROR(INDEX(REER_Data!$E:$E, MATCH($A{r}, REER_Data!$A:$A, 0)) / 100, NA())'
+            # Column H: Interpretation
+            # near neutral: ±0–3%, mild over/undervaluation: ±3–7%, meaningful over/undervaluation: >±7%
+            reer_val_ref = f"$G{r}"
+            interp_formula = (
+                f'=IF(ISNA({reer_val_ref}), "", '
+                f'IF(ABS({reer_val_ref})<=0.03, "near neutral", '
+                f'IF(ABS({reer_val_ref})<=0.07, "mild " & IF({reer_val_ref}>0, "over", "under") & "valuation", '
+                f'"meaningful " & IF({reer_val_ref}>0, "over", "under") & "valuation")))'
+            )
+            ws_country[f"H{r}"] = interp_formula
+
+            # Gap
+            ws_country[f"I{r}"] = ""
+            
+            # Column J: Current REER (REER_Data!C)
+            ws_country[f"J{r}"] = f'=IFERROR(INDEX(REER_Data!$C:$C, MATCH($A{r}, REER_Data!$A:$A, 0)), NA())'
+            
             ws_country[f"K{r}"] = f'=IFERROR(INDEX(Lists!$E$2:$E${country_count+1}, MATCH($A{r}, Lists!$A$2:$A${country_count+1}, 0)), "")'
             ws_country[f"L{r}"] = f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
             ws_country[f"M{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
             ws_country[f"N{r}"] = f'=IFERROR(1*INDEX(CAGR!$G:$G, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
             ws_country[f"O{r}"] = f'=IFERROR(1*INDEX(CAGR!$H:$H, MATCH($A{r}&"|"&$B$2, CAGR!$L:$L, 0)), NA())'
-            for col in ["C", "D", "E", "F", "G", "H", "I", "N", "O"]:
+            for col in ["C", "D", "E", "F", "J", "N", "O"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
+            ws_country[f"G{r}"].number_format = "0.00%"
         ws_country.auto_filter.ref = f"A5:O{country_end_row}"
 
         focus_top_row = country_end_row + 3
@@ -978,7 +1005,7 @@ def write_dashboard_xlsx(
         ws_country.add_data_validation(ticker_dv_focus)
         ticker_dv_focus.add(f"B{focus_top_row + 2}")
         ws_country[f"B{focus_top_row + 2}"] = f'=IFERROR(INDEX(Lists!$D:$D, MATCH($B${focus_top_row + 1}, Lists!$C:$C, 0)),"")'
-        ws_country[f"B{focus_top_row + 3}"] = f'=IFERROR(INDEX(ETF_Timeframes!$F:$F, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&"|MAX", ETF_Timeframes!$I:$I, 0)),"")'
+        ws_country[f"B{focus_top_row + 3}"] = f'=IFERROR(INDEX(ETF_Timeframes!$F:$F, MATCH($B${focus_top_row + 1}&"|"&$B${focus_top_row + 2}&|MAX", ETF_Timeframes!$I:$I, 0)),"")'
         ws_country[f"B{focus_top_row + 4}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B${focus_top_row + 2}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
         ws_country[f"B{focus_top_row + 5}"] = f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B${focus_top_row + 2}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
         ws_country[f"B{focus_top_row + 3}"].number_format = "yyyy-mm-dd"
@@ -1094,11 +1121,12 @@ def write_dashboard_xlsx(
         green_light = PatternFill(start_color="E2F0D9", end_color="E2F0D9", fill_type="solid")
         green_medium = PatternFill(start_color="C6E0B4", end_color="C6E0B4", fill_type="solid")
         green_saturated = PatternFill(start_color="A9D08E", end_color="A9D08E", fill_type="solid")
-        neg_fill = PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid")
+        red_light = PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid")
+        red_saturated = PatternFill(start_color="F8CBAD", end_color="F8CBAD", fill_type="solid")
 
         format_ranges = [
             f"C{country_start_row}:E{country_end_row}",
-            f"F{country_start_row}:I{country_end_row}",
+            f"F{country_start_row}:F{country_end_row}",
             f"N{country_start_row}:O{country_end_row}",
             f"B{timeframe_start_row}:C{timeframe_start_row + len(TIMEFRAME_ORDER) - 1}",
             f"B{annual_start_row}:D{annual_last_row}",
@@ -1110,14 +1138,28 @@ def write_dashboard_xlsx(
             ws_country.conditional_formatting.add(rng, CellIsRule(operator="greaterThanOrEqual", formula=["10"], fill=green_saturated))
             ws_country.conditional_formatting.add(rng, CellIsRule(operator="greaterThanOrEqual", formula=["5"], fill=green_medium))
             ws_country.conditional_formatting.add(rng, CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=green_light))
-            ws_country.conditional_formatting.add(rng, CellIsRule(operator="lessThan", formula=["0"], fill=neg_fill))
+            ws_country.conditional_formatting.add(rng, CellIsRule(operator="lessThan", formula=["0"], fill=red_light))
+
+        # Separate formatting for REER % columns (G and H colored based on G)
+        # Thresholds: meaningful > 7%, mild 3-7%, neutral 0-3%
+        # Colors: flipped (Undervaluation < 0 = Green, Overvaluation > 0 = Red)
+        reer_range = f"G{country_start_row}:H{country_end_row}"
+        from openpyxl.formatting.rule import FormulaRule
+        # Meaningful Overvaluation (> 7%)
+        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"$G{country_start_row}>0.07"], fill=red_saturated))
+        # Mild Overvaluation (3% to 7%)
+        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"AND($G{country_start_row}>0.03, $G{country_start_row}<=0.07)"], fill=red_light))
+        # Mild Undervaluation (-7% to -3%)
+        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"AND($G{country_start_row}<-0.03, $G{country_start_row}>=-0.07)"], fill=green_light))
+        # Meaningful Undervaluation (< -7%)
+        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"$G{country_start_row}<-0.07"], fill=green_saturated))
 
         fit_columns_from_ranges(ws_tf, [(1, ws_tf.max_column, 1, ws_tf.max_row)])
         fit_columns_from_ranges(ws_annual, [(1, ws_annual.max_column, 1, ws_annual.max_row)])
         fit_columns_from_ranges(ws_cagr, [(1, ws_cagr.max_column, 1, ws_cagr.max_row)])
         fit_columns_from_ranges(ws_lists, [(1, ws_lists.max_column, 1, ws_lists.max_row)])
         fit_columns_from_ranges(ws_country, [
-            (1, 15, 5, country_end_row),
+            (1, 15, 5, country_end_row), # Expanded to 15 (O)
             (1, 2, focus_top_row + 1, focus_top_row + 5),
             (1, 4, timeframe_header_row, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
             (1, 10, annual_header_row, annual_last_row),
@@ -1135,13 +1177,14 @@ def main() -> None:
     parser.add_argument("--etf-csv", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-csv", default="data/outputs/weo_gdp.csv")
     parser.add_argument("--metadata-csv", default="data/outputs/etf_ticker_metadata.csv")
+    parser.add_argument("--reer-csv", default="data/outputs/bis_reer_metrics.csv")
     parser.add_argument("--output", default="data/outputs/etf_gdp_dashboard_mvp.xlsx")
     args = parser.parse_args()
 
     timeframe_df, annual_df, cagr_df = build_timeframe_rows(args.etf_csv, args.weo_csv, args.metadata_csv)
     if timeframe_df.empty or annual_df.empty or cagr_df.empty:
         raise RuntimeError("No rows produced. Check ETF and WEO input data.")
-    write_dashboard_xlsx(timeframe_df, annual_df, cagr_df, args.output, metadata_csv=args.metadata_csv)
+    write_dashboard_xlsx(timeframe_df, annual_df, cagr_df, args.output, metadata_csv=args.metadata_csv, reer_csv=args.reer_csv)
     print(f"Wrote dashboard MVP to {args.output}")
 
 

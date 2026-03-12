@@ -25,6 +25,7 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - prefer `USD` ticker first
   - if no USD ticker exists, choose largest `fund_size`
 - Fetch IMF WEO indicators `NGDPD`, `NGDP`, and `NGDP_RPCH` for mapped countries.
+- **Fetch BIS REER (Real Effective Exchange Rate) monthly series and compute current deviation vs 10Y rolling average.**
 - Build annual ETF return output merged with GDP metrics.
   - combined annual output now includes `etf_currency`
   - combined annual output now includes FX decomposition fields:
@@ -47,7 +48,7 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - annual panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
   - annual panel keeps last 10 completed years and adds one projection/YTD row (for 2026 while in 2026)
   - CAGR panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
-  - **ETF cumulative returns table now shows both USD Return % and Quote Currency Return %**
+  - **REER valuation metrics (Over/Under % vs 10Y average and Interpretation) integrated into the screener for valuation context.**
   - **Redundant currency columns (FX Decomposition) now automatically blank out if the ticker is already denominated in USD**
   - **Column headers are dynamic and show the specific quote currency (e.g., "ETF Return (GBP) %")**
   - final-sheet delta columns compute directly from in-row values (`Nominal USD GDP - ETF`) to avoid lookup mismatch
@@ -77,6 +78,7 @@ By default, ETF fetch now uses full Yahoo history (`period=max`) unless `--start
 ```bash
 uv run python src/fetch_etf_prices.py --output data/outputs/etf_prices.csv
 uv run python src/fetch_weo_gdp.py --start-year 2015 --end-year 2026 --output data/outputs/weo_gdp.csv
+uv run python src/fetch_bis_reer.py --output data/outputs/bis_reer_metrics.csv
 uv run python src/build_combined_etf_weo.py --etf-csv data/outputs/etf_prices.csv --weo-csv data/outputs/weo_gdp.csv --output data/outputs/etf_weo_combined_annual.csv
 uv run python src/build_excel_dashboard_mvp.py --etf-csv data/outputs/etf_prices.csv --weo-csv data/outputs/weo_gdp.csv --output data/outputs/etf_gdp_dashboard_mvp.xlsx
 uv run python src/build_etf_history_charts_workbook.py --etf-csv data/outputs/etf_prices.csv --output data/outputs/etf_price_history_charts.xlsx
@@ -118,6 +120,7 @@ uv run jupyter notebook
 - `data/outputs/etf_prices.csv`
 - `data/outputs/etf_ticker_metadata.csv`
 - `data/outputs/weo_gdp.csv`
+- `data/outputs/bis_reer_metrics.csv`
 - `data/outputs/etf_weo_combined_annual.csv`
 - `data/outputs/etf_gdp_dashboard_mvp.xlsx`
 - `data/outputs/etf_price_history_charts.xlsx`
