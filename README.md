@@ -52,6 +52,11 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - **Redundant currency columns (FX Decomposition) now automatically blank out if the ticker is already denominated in USD**
   - **Column headers are dynamic and show the specific quote currency (e.g., "ETF Return (GBP) %")**
   - final-sheet delta columns compute directly from in-row values (`Nominal USD GDP - ETF`) to avoid lookup mismatch
+  - **New screener columns for valuation context (Main Area):**
+    - `FX CAGR %`: Annualized currency movement against USD over selected horizon.
+    - `Inf. Diff CAGR %`: Annualized difference between local and USA inflation CAGRs.
+    - `Currency Gap %`: Sum of FX and Inflation CAGRs (Real currency valuation indicator).
+  - **New stakeholder documentation section:** 10 gap rows added between tables with detailed metric definitions.
   - table widths auto-fit to table ranges (explainer cells do not drive column widths)
 - Build a separate Excel workbook with one full-history ETF chart sheet per ticker.
   - chart workbook sheet columns are auto-fit

@@ -282,24 +282,29 @@ def gdp_cagr(
     return ((compounded ** (1.0 / years)) - 1.0) * 100.0
 
 
-def inflation_diff_cagr(
+def calculate_inflation_metrics(
     inflation_map: dict[tuple[str, int], float],
     country_code: str,
     end_year: int,
     years: int,
-) -> float | None:
-    """Calculate CAGR of the geometric difference between country and USA inflation."""
+) -> tuple[float | None, float | None, float | None]:
+    """Calculate local CAGR, USA CAGR, and the simple difference."""
     start_year = end_year - years + 1
-    finish_year = end_year
-    compounded = 1.0
-    for y in range(start_year, finish_year + 1):
-        v_country = inflation_map.get((country_code, y))
-        v_usa = inflation_map.get(("USA", y))
-        if v_country is None or v_usa is None:
-            return None
-        # Differential as a multiplier: 1 + (inf_country - inf_usa)/100
-        compounded *= (1.0 + (v_country - v_usa) / 100.0)
-    return ((compounded ** (1.0 / years)) - 1.0) * 100.0
+    
+    def get_cagr(cc):
+        compounded = 1.0
+        for y in range(start_year, end_year + 1):
+            v = inflation_map.get((cc, y))
+            if v is None:
+                return None
+            compounded *= (1.0 + v / 100.0)
+        return ((compounded ** (1.0 / years)) - 1.0) * 100.0
+
+    cagr_local = get_cagr(country_code)
+    cagr_usa = get_cagr("USA")
+    
+    diff = (cagr_local - cagr_usa) if (cagr_local is not None and cagr_usa is not None) else None
+    return cagr_local, cagr_usa, diff
 
 
 def fx_level_cagr(
@@ -418,9 +423,9 @@ def fit_columns_from_ranges(
     ws,
     ranges: list[tuple[int, int, int, int]],
     *,
-    min_width: float = 10.0,
+    min_width: float = 12.0,
     max_width: float = 80.0,
-    padding: float = 2.0,
+    padding: float = 6.0,
 ) -> None:
     """Auto-size column widths from specific table ranges only."""
     widths: dict[int, int] = {}
@@ -433,7 +438,14 @@ def fit_columns_from_ranges(
                     continue
                 if isinstance(value, str) and value.startswith("="):
                     continue
-                max_len = max(max_len, len(str(value)))
+                
+                length = len(str(value))
+                # Add extra weight if it's a header row
+                if row_idx == 5: # Main Table Headers
+                    length += 3
+                elif row_idx == min_row: # Other table headers
+                    length += 2
+                max_len = max(max_len, length)
             widths[col_idx] = max_len
 
     for col_idx, max_len in widths.items():
@@ -606,6 +618,11 @@ def build_timeframe_rows(
                 gdp_current_usd_val = gdp_current_usd_map.get((country_code, y))
                 quote_ccy_vs_usd = quote_fx_map.get((ccy_norm, y))
                 
+                # Inflation data for Annual sheet
+                inf_val = inflation_cpi_map.get((country_code, y))
+                usa_inf_val = inflation_cpi_map.get(("USA", y))
+                inf_diff = (inf_val - usa_inf_val) if (inf_val is not None and usa_inf_val is not None) else None
+
                 if etf_return is not None:
                     if ccy_norm == "USD":
                         etf_return_usd = etf_return
@@ -648,6 +665,9 @@ def build_timeframe_rows(
                             if (etf_return_usd is not None and gdp_nominal_usd_same is not None)
                             else None
                         ),
+                        "inflation_cpi_pct": inf_val,
+                        "usa_inflation_cpi_pct": usa_inf_val,
+                        "inflation_cpi_diff": inf_diff,
                         "etf_currency": ticker_to_currency.get(ticker, ""),
                     }
                 )
@@ -693,7 +713,7 @@ def build_timeframe_rows(
             
             # New metrics (FIXED: Ensure these are calculated consistently for all rows)
             fx_cagr_val = fx_level_cagr(gdp_current_lcu_map, gdp_current_usd_map, country_code, cagr_end_year, years)
-            inf_diff_cagr_val = inflation_diff_cagr(inflation_cpi_map, country_code, cagr_end_year, years)
+            inf_cagr_local, inf_cagr_usa, inf_diff_cagr_val = calculate_inflation_metrics(inflation_cpi_map, country_code, cagr_end_year, years)
             
             cagr_rows.append(
                 {
@@ -707,6 +727,8 @@ def build_timeframe_rows(
                     "gdp_nominal_lcu_cagr_pct": gdp_nominal_lcu_cagr,
                     "gdp_nominal_usd_cagr_pct": gdp_nominal_usd_cagr,
                     "fx_cagr_pct": fx_cagr_val,
+                    "inflation_local_cagr_pct": inf_cagr_local,
+                    "inflation_usa_cagr_pct": inf_cagr_usa,
                     "inflation_diff_cagr_pct": inf_diff_cagr_val,
                     "gdp_nominal_usd_minus_etf_cagr_pct": (
                         gdp_nominal_usd_cagr - etf_cagr
@@ -774,6 +796,9 @@ def build_timeframe_rows(
                 "etf_return_usd_pct",
                 "country_lcu_vs_usd_weo_pct",
                 "etf_usd_minus_country_fx_pct",
+                "inflation_cpi_pct",
+                "usa_inflation_cpi_pct",
+                "inflation_cpi_diff",
                 "gdp_current_usd",
             ]
         ]
@@ -799,7 +824,7 @@ def build_timeframe_rows(
             
             # FIXED: Correct calculation for GDP-only rows
             fx_cagr_val = fx_level_cagr(gdp_current_lcu_map, gdp_current_usd_map, country_code, cagr_end_year, years)
-            inf_diff_cagr_val = inflation_diff_cagr(inflation_cpi_map, country_code, cagr_end_year, years)
+            inf_cagr_local, inf_cagr_usa, inf_diff_cagr_val = calculate_inflation_metrics(inflation_cpi_map, country_code, cagr_end_year, years)
             
             if (
                 gdp_real_cagr is None
@@ -819,6 +844,8 @@ def build_timeframe_rows(
                     "gdp_nominal_lcu_cagr_pct": gdp_nominal_lcu_cagr,
                     "gdp_nominal_usd_cagr_pct": gdp_nominal_usd_cagr,
                     "fx_cagr_pct": fx_cagr_val,
+                    "inflation_local_cagr_pct": inf_cagr_local,
+                    "inflation_usa_cagr_pct": inf_cagr_usa,
                     "inflation_diff_cagr_pct": inf_diff_cagr_val,
                     "gdp_nominal_usd_minus_etf_cagr_pct": None,
                     "etf_currency": "",
@@ -857,6 +884,8 @@ def build_timeframe_rows(
                 "gdp_nominal_lcu_cagr_pct",
                 "gdp_nominal_usd_cagr_pct",
                 "fx_cagr_pct",
+                "inflation_local_cagr_pct",
+                "inflation_usa_cagr_pct",
                 "inflation_diff_cagr_pct",
                 "gdp_nominal_usd_minus_etf_cagr_pct",
                 "lookup_key",
@@ -995,24 +1024,25 @@ def write_dashboard_xlsx(
         
         # (Super-headers removed)
 
-        ws_country["A5"] = "country_name"
-        ws_country["B5"] = "ticker_used"
-        ws_country["C5"] = "GDP Nominal CAGR % (USD)"
-        ws_country["D5"] = "ETF CAGR % (USD)"
-        ws_country["E5"] = "Macro Disconnect %"
-        ws_country["F5"] = "FX change CAGR (%)"
-        ws_country["G5"] = "CPI inflation difference CAGR (%)"
-        ws_country["H5"] = "Projected 3Y CAGR (26-28) %"
-        ws_country["I5"] = "" # GAP
-        ws_country["J5"] = "REER vs 10Y average"
-        ws_country["K5"] = "Interpretation"
-        ws_country["L5"] = "REER (base year 2020)"
-        ws_country["M5"] = "region"
-        ws_country["N5"] = "ticker_exchange"
-        ws_country["O5"] = "ticker_currency"
-        ws_country["P5"] = "GDP Real CAGR %"
-        ws_country["Q5"] = "GDP Nominal CAGR % (LCU)"
-        for col_ref in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "J5", "K5", "L5", "M5", "N5", "O5", "P5", "Q5"]:
+        ws_country["A5"] = "Country"
+        ws_country["B5"] = "Ticker"
+        ws_country["C5"] = "GDP CAGR (USD)"
+        ws_country["D5"] = "ETF CAGR (USD)"
+        ws_country["E5"] = "Macro Gap %"
+        ws_country["F5"] = "FX CAGR %"
+        ws_country["G5"] = "Inf. Diff CAGR %"
+        ws_country["H5"] = "Currency Gap %"
+        ws_country["I5"] = "Proj. 3Y (26-28)"
+        ws_country["J5"] = "" # GAP
+        ws_country["K5"] = "REER vs 10Y"
+        ws_country["L5"] = "Valuation"
+        ws_country["M5"] = "REER Index"
+        ws_country["N5"] = "Region"
+        ws_country["O5"] = "Exchange"
+        ws_country["P5"] = "Currency"
+        ws_country["Q5"] = "GDP Real CAGR"
+        ws_country["R5"] = "GDP LCU CAGR"
+        for col_ref in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "I5", "K5", "L5", "M5", "N5", "O5", "P5", "Q5", "R5"]:
             ws_country[col_ref].font = Font(bold=True)
 
         horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -1035,9 +1065,12 @@ def write_dashboard_xlsx(
             ws_country[f"D{r}"] = f'=IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, {c["lookup_key"]}, 0)), NA())'
             ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
             
-            # FX change CAGR (F) and CPI inflation diff CAGR (G)
+            # FX CAGR (F) and Inf. Diff CAGR (G)
             ws_country[f"F{r}"] = f'=IFERROR(1*INDEX({c["fx_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
             ws_country[f"G{r}"] = f'=IFERROR(1*INDEX({c["inflation_diff_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
+            
+            # PPP Gap % (H): FX + Inf Diff
+            ws_country[f"H{r}"] = f"=IF(AND(ISNUMBER(F{r}),ISNUMBER(G{r})),F{r}+G{r},NA())"
 
             # Projected 3Y CAGR (26-28). 
             # Formula: ((1+r26/100)*(1+r27/100)*(1+r28/100))^(1/3)-1)*100
@@ -1045,38 +1078,38 @@ def write_dashboard_xlsx(
             idx27 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2027", {a["country_year_key"]}, 0))'
             idx28 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2028", {a["country_year_key"]}, 0))'
             cagr_form = f'=IFERROR((( (1+{idx26}/100)*(1+{idx27}/100)*(1+{idx28}/100) )^(1/3)-1)*100, NA())'
-            ws_country[f"H{r}"] = cagr_form
+            ws_country[f"I{r}"] = cagr_form
             
             # REER Metrics from REER_Data sheet
-            # Column J: REER Over/Under % (REER_Data!E)
+            # Column K: REER Over/Under % (REER_Data!E)
             # Divided by 100 to support % formatting
-            ws_country[f"J{r}"] = f'=IFERROR(INDEX(REER_Data!$E:$E, MATCH($A{r}, REER_Data!$A:$A, 0)) / 100, NA())'
-            # Column K: Interpretation
+            ws_country[f"K{r}"] = f'=IFERROR(INDEX(REER_Data!$E:$E, MATCH($A{r}, REER_Data!$A:$A, 0)) / 100, NA())'
+            # Column L: Valuation (Interpretation)
             # near neutral: ±0–3%, mild over/undervaluation: ±3–7%, meaningful over/undervaluation: >±7%
-            reer_val_ref = f"$J{r}"
+            reer_val_ref = f"$K{r}"
             interp_formula = (
                 f'=IF(ISNA({reer_val_ref}), "", '
                 f'IF(ABS({reer_val_ref})<=0.03, "near neutral", '
                 f'IF(ABS({reer_val_ref})<=0.07, "mild " & IF({reer_val_ref}>0, "over", "under") & "valuation", '
                 f'"meaningful " & IF({reer_val_ref}>0, "over", "under") & "valuation")))'
             )
-            ws_country[f"K{r}"] = interp_formula
+            ws_country[f"L{r}"] = interp_formula
 
             # Gap
-            ws_country[f"I{r}"] = ""
+            ws_country[f"J{r}"] = ""
             
-            # Column L: Current REER (REER_Data!C)
-            ws_country[f"L{r}"] = f'=IFERROR(INDEX(REER_Data!$C:$C, MATCH($A{r}, REER_Data!$A:$A, 0)), NA())'
+            # Column M: Current REER (REER_Data!C)
+            ws_country[f"M{r}"] = f'=IFERROR(INDEX(REER_Data!$C:$C, MATCH($A{r}, REER_Data!$A:$A, 0)), NA())'
             
-            ws_country[f"M{r}"] = f'=IFERROR(INDEX(Lists!$E$2:$E${country_count+1}, MATCH($A{r}, Lists!$A$2:$A${country_count+1}, 0)), "")'
-            ws_country[f"N{r}"] = f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
-            ws_country[f"O{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
-            ws_country[f"P{r}"] = f'=IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
-            ws_country[f"Q{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
-            for col in ["C", "D", "E", "F", "G", "H", "L", "P", "Q"]:
+            ws_country[f"N{r}"] = f'=IFERROR(INDEX(Lists!$E$2:$E${country_count+1}, MATCH($A{r}, Lists!$A$2:$A${country_count+1}, 0)), "")'
+            ws_country[f"O{r}"] = f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
+            ws_country[f"P{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
+            ws_country[f"Q{r}"] = f'=IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
+            ws_country[f"R{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
+            for col in ["C", "D", "E", "F", "G", "H", "I", "M", "Q", "R"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
-            ws_country[f"J{r}"].number_format = "0.00%"
-        ws_country.auto_filter.ref = f"A5:Q{country_end_row}"
+            ws_country[f"K{r}"].number_format = "0.00%"
+        ws_country.auto_filter.ref = f"A5:R{country_end_row}"
 
         # Stakeholder Definitions (inserted into the gap)
         def_row = country_end_row + 2
@@ -1084,22 +1117,24 @@ def write_dashboard_xlsx(
         ws_country[f"A{def_row}"].font = Font(bold=True, size=12)
         
         definitions = [
-            ("GDP Nominal CAGR % (USD)", "Annualized growth of the country's economy in US Dollar terms. Represents total economic expansion available to a USD investor."),
-            ("ETF CAGR % (USD)", "Annualized price return of the selected ETF in US Dollar terms. Includes both local price movement and currency effects."),
-            ("Macro Disconnect %", "The difference between GDP growth and ETF performance (GDP CAGR minus ETF CAGR). Positive values suggest the economy grew faster than the market."),
-            ("FX change CAGR (%)", "Annualized rate of currency appreciation/depreciation against the USD. Positive = Local Currency strengthened against USD."),
-            ("CPI inflation difference CAGR (%)", "Annualized geometric difference between country inflation and USA inflation. Positive = Local inflation was higher than USA."),
-            ("Projected 3Y CAGR (26-28) %", "IMF's forecasted nominal GDP growth (USD) for the 2026-2028 period."),
-            ("REER vs 10Y average", "Real Effective Exchange Rate deviation from its 10-year mean. Lower values (< -7%) suggest meaningful currency undervaluation."),
+            ("GDP CAGR (USD)", "Annualized growth of the country's economy in US Dollar terms. Represents total economic expansion available to a USD investor."),
+            ("ETF CAGR (USD)", "Annualized price return of the selected ETF in US Dollar terms. Includes both local price movement and currency effects."),
+            ("Macro Gap %", "The difference between GDP growth and ETF performance (GDP CAGR minus ETF CAGR). Positive values suggest the economy grew faster than the market."),
+            ("FX CAGR %", "Annualized rate of currency appreciation/depreciation against the USD. Positive = Local Currency strengthened against USD."),
+            ("Inf. Diff CAGR %", "Annualized simple difference between country inflation CAGR and USA inflation CAGR. Positive = Local inflation was higher than USA."),
+            ("Currency Gap %", "The sum of FX CAGR and Inflation Differential. Near zero suggests currency movement offsets inflation. Positive = Currency is 'stronger' than PPP suggests."),
+            ("Proj. 3Y (26-28)", "IMF's forecasted nominal GDP growth (USD) for the 2026-2028 period."),
+
+            ("REER vs 10Y", "Real Effective Exchange Rate deviation from its 10-year mean. Positive = Currency is stronger than its 10Y historical average."),
         ]
         
         for i, (metric, text) in enumerate(definitions):
             ws_country[f"A{def_row + 1 + i}"] = metric
             ws_country[f"A{def_row + 1 + i}"].font = Font(italic=True)
             ws_country[f"B{def_row + 1 + i}"] = text
-            ws_country[f"B{def_row + 1 + i}"].alignment = Alignment(wrap_text=True)
+            ws_country[f"B{def_row + 1 + i}"].alignment = Alignment(wrap_text=False)
 
-        focus_top_row = country_end_row + 13
+        focus_top_row = country_end_row + 14 # Adjusted for one more definition row
         ws_country[f"A{focus_top_row}"] = "Country Focus Dashboard"
         ws_country[f"A{focus_top_row}"].font = Font(bold=True, size=14)
         ws_country[f"A{focus_top_row + 1}"] = "Country"
@@ -1237,8 +1272,9 @@ def write_dashboard_xlsx(
         red_saturated = PatternFill(start_color="F8CBAD", end_color="F8CBAD", fill_type="solid")
 
         format_ranges = [
-            f"C{country_start_row}:H{country_end_row}", # Expanded to H (Projected 3Y)
-            f"P{country_start_row}:Q{country_end_row}", # Moved from N:O
+            f"C{country_start_row}:I{country_end_row}", # Main Table (GDP to Proj 3Y)
+            f"K{country_start_row}:K{country_end_row}", # REER vs 10Y
+            f"Q{country_start_row}:R{country_end_row}", # GDP Real/LCU CAGRs
             f"B{timeframe_start_row}:C{timeframe_start_row + len(TIMEFRAME_ORDER) - 1}",
             f"B{annual_start_row}:D{annual_last_row}",
             f"F{annual_start_row}:J{annual_last_row}",
@@ -1251,26 +1287,12 @@ def write_dashboard_xlsx(
             ws_country.conditional_formatting.add(rng, CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=green_light))
             ws_country.conditional_formatting.add(rng, CellIsRule(operator="lessThan", formula=["0"], fill=red_light))
 
-        # Separate formatting for REER % columns (J and K colored based on J)
-        # Thresholds: meaningful > 7%, mild 3-7%, neutral 0-3%
-        # Colors: flipped (Undervaluation < 0 = Green, Overvaluation > 0 = Red)
-        reer_range = f"J{country_start_row}:K{country_end_row}"
-        from openpyxl.formatting.rule import FormulaRule
-        # Meaningful Overvaluation (> 7%)
-        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"$J{country_start_row}>0.07"], fill=red_saturated))
-        # Mild Overvaluation (3% to 7%)
-        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"AND($J{country_start_row}>0.03, $J{country_start_row}<=0.07)"], fill=red_light))
-        # Mild Undervaluation (-7% to -3%)
-        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"AND($J{country_start_row}<-0.03, $J{country_start_row}>=-0.07)"], fill=green_light))
-        # Meaningful Undervaluation (< -7%)
-        ws_country.conditional_formatting.add(reer_range, FormulaRule(formula=[f"$J{country_start_row}<-0.07"], fill=green_saturated))
-
         fit_columns_from_ranges(ws_tf, [(1, ws_tf.max_column, 1, ws_tf.max_row)])
         fit_columns_from_ranges(ws_annual, [(1, ws_annual.max_column, 1, ws_annual.max_row)])
         fit_columns_from_ranges(ws_cagr, [(1, ws_cagr.max_column, 1, ws_cagr.max_row)])
         fit_columns_from_ranges(ws_lists, [(1, ws_lists.max_column, 1, ws_lists.max_row)])
         fit_columns_from_ranges(ws_country, [
-            (1, 17, 5, country_end_row), # Expanded to 17 (Q)
+            (1, 18, 5, country_end_row), # Expanded to 18 (R)
             (1, 2, focus_top_row + 1, focus_top_row + 5),
             (1, 4, timeframe_header_row, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
             (1, 10, annual_header_row, annual_last_row),
