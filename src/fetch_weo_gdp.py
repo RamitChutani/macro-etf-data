@@ -17,6 +17,8 @@ INDICATOR_LABELS = {
     "NGDP_RPCH": "Real GDP growth (percent change)",
     "NGDPD_PCH": "Nominal GDP growth (percent change, derived from NGDPD)",
     "NGDP_PCH": "Nominal GDP growth (percent change, derived from NGDP)",
+    "PCPIPCH": "Inflation, average consumer prices (percent change)",
+    "NGDP_D": "Gross domestic product, deflator (index)",
 }
 
 
@@ -177,9 +179,9 @@ def append_derived_growth_rows(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fetch IMF WEO GDP data (NGDPD, NGDP, NGDP_RPCH) for ETF countries."
+        description="Fetch IMF WEO GDP data (NGDPD, NGDP, NGDP_RPCH, PCPIPCH, NGDP_D) for ETF countries."
     )
-    parser.add_argument("--start-year", type=int, default=2015)
+    parser.add_argument("--start-year", type=int, default=2004)
     parser.add_argument("--end-year", type=int, default=2029)
     parser.add_argument(
         "--base-url",
@@ -198,7 +200,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--indicators",
-        default="NGDPD,NGDP,NGDP_RPCH",
+        default="NGDPD,NGDP,NGDP_RPCH,PCPIPCH,NGDP_D",
         help="Comma-separated WEO indicator codes.",
     )
     parser.add_argument(

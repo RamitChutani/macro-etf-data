@@ -218,27 +218,80 @@ def load_weo_gdp(weo_csv: str) -> pd.DataFrame:
             "NGDP": "gdp_current_lcu",
             "NGDP_RPCH": "gdp_real_growth_pct",
             "NGDPD_PCH": "gdp_nominal_growth_pct",
+            "PCPIPCH": "inflation_cpi_pct",
+            "NGDP_D": "gdp_deflator_index",
         }
     )
+    
+    # Calculate GDP Deflator percent change
+    pivot = pivot.sort_values(["country_code", "year"])
+    if "gdp_deflator_index" in pivot.columns:
+        pivot["inflation_deflator_pct"] = (
+            pivot.groupby("country_code")["gdp_deflator_index"].pct_change() * 100.0
+        )
+
     # Backward-compatible fallback if nominal growth rows are missing.
     if "gdp_nominal_growth_pct" not in pivot.columns and "gdp_current_usd" in pivot.columns:
-        pivot = pivot.sort_values(["country_code", "year"]).copy()
         pivot["gdp_nominal_growth_pct"] = (
             pivot.groupby("country_code")["gdp_current_usd"].pct_change() * 100.0
         )
+    
     if "gdp_current_lcu" in pivot.columns and "gdp_current_usd" in pivot.columns:
         # Implied exchange rate (LCU per USD)
         pivot["country_lcu_per_usd_weo"] = (
             pivot["gdp_current_lcu"] / pivot["gdp_current_usd"]
         )
-        pivot = pivot.sort_index().copy()
+        
         # Calculate Local Currency return vs USD (Inverted: USD per LCU)
-        # return = (1 / current_rate) / (1 / prev_rate) - 1 
-        # which simplifies to: (prev_rate / current_rate) - 1
+        # return = (prev_rate / current_rate) - 1
         pivot["country_lcu_vs_usd_weo_pct"] = (
             pivot.groupby("country_code")["country_lcu_per_usd_weo"].shift(1) 
             / pivot["country_lcu_per_usd_weo"] - 1.0
         ) * 100.0
+        
+        # 10Y CAGR of LCU vs USD (USD per LCU terms)
+        # CAGR = ( (1/XR_t) / (1/XR_t-10) )^(1/10) - 1 = (XR_t-10 / XR_t)^(1/10) - 1
+        pivot["country_lcu_vs_usd_10y_cagr"] = (
+            (pivot.groupby("country_code")["country_lcu_per_usd_weo"].shift(10) 
+             / pivot["country_lcu_per_usd_weo"])**(1/10) - 1.0
+        ) * 100.0
+
+    # Inflation Differentials vs USA
+    usa_data = pivot[pivot["country_code"] == "USA"][["year", "inflation_cpi_pct", "inflation_deflator_pct"]].copy()
+    usa_data = usa_data.rename(columns={
+        "inflation_cpi_pct": "usa_inflation_cpi_pct",
+        "inflation_deflator_pct": "usa_inflation_deflator_pct"
+    })
+    
+    pivot = pivot.merge(usa_data, on="year", how="left")
+    
+    # Calculate geometric 10Y CAGR of the differentials
+    # CAGR = [ Product(1 + diff_i/100) ]^(1/10) - 1
+    if "inflation_cpi_pct" in pivot.columns:
+        pivot["inflation_cpi_diff"] = pivot["inflation_cpi_pct"] - pivot["usa_inflation_cpi_pct"]
+        # Convert to multiplier: (1 + diff/100)
+        pivot["_cpi_diff_mult"] = 1.0 + (pivot["inflation_cpi_diff"] / 100.0)
+        pivot["inflation_cpi_diff_10y_avg"] = (
+            pivot.groupby("country_code")["_cpi_diff_mult"].transform(
+                lambda x: (x.rolling(10).apply(lambda window: window.prod(), raw=True))**(1/10) - 1.0
+            )
+        ) * 100.0
+        
+    if "inflation_deflator_pct" in pivot.columns:
+        pivot["inflation_deflator_diff"] = pivot["inflation_deflator_pct"] - pivot["usa_inflation_deflator_pct"]
+        # Convert to multiplier: (1 + diff/100)
+        pivot["_defl_diff_mult"] = 1.0 + (pivot["inflation_deflator_diff"] / 100.0)
+        pivot["inflation_deflator_diff_10y_avg"] = (
+            pivot.groupby("country_code")["_defl_diff_mult"].transform(
+                lambda x: (x.rolling(10).apply(lambda window: window.prod(), raw=True))**(1/10) - 1.0
+            )
+        ) * 100.0
+
+    # Cleanup temporary multiplier columns
+    cols_to_drop = [c for c in ["_cpi_diff_mult", "_defl_diff_mult"] if c in pivot.columns]
+    if cols_to_drop:
+        pivot = pivot.drop(columns=cols_to_drop)
+
     return pivot
 
 
@@ -322,6 +375,9 @@ def build_combined_dataset(
             "quote_ccy_vs_usd_pct",
             "etf_return_usd_pct",
             "country_lcu_vs_usd_weo_pct",
+            "country_lcu_vs_usd_10y_cagr",
+            "inflation_cpi_diff_10y_avg",
+            "inflation_deflator_diff_10y_avg",
             "etf_usd_minus_country_fx_pct",
             "gdp_current_usd",
             "gdp_current_lcu",

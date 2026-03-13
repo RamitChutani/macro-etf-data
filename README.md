@@ -24,7 +24,7 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 - Dashboard default ticker selection for multi-ticker countries:
   - prefer `USD` ticker first
   - if no USD ticker exists, choose largest `fund_size`
-- Fetch IMF WEO indicators `NGDPD`, `NGDP`, and `NGDP_RPCH` for mapped countries.
+- Fetch IMF WEO indicators `NGDPD`, `NGDP`, `NGDP_RPCH`, `PCPIPCH` (CPI inflation), and `NGDP_D` (GDP Deflator) for mapped countries.
 - **Fetch BIS REER (Real Effective Exchange Rate) monthly series and compute current deviation vs 10Y rolling average.**
 - Build annual ETF return output merged with GDP metrics.
   - combined annual output now includes `etf_currency`
@@ -104,6 +104,8 @@ WEO output now includes:
 - `NGDPD` (GDP current USD level)
 - `NGDP` (GDP current domestic-currency level)
 - `NGDP_RPCH` (real GDP growth %)
+- `PCPIPCH` (CPI inflation %)
+- `NGDP_D` (GDP Deflator index)
 - `NGDP_PCH` (nominal GDP growth in domestic currency %, derived from `NGDP`)
 - `NGDPD_PCH` (nominal GDP growth %, derived from `NGDPD`)
 
