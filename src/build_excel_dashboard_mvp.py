@@ -904,6 +904,7 @@ def write_dashboard_xlsx(
     output_xlsx: str,
     metadata_csv: str | None = "data/outputs/etf_ticker_metadata.csv",
     reer_csv: str | None = "data/outputs/bis_reer_metrics.csv",
+    impact_csv: str | None = "data/outputs/crude_oil_import_impact.csv",
 ) -> None:
     from openpyxl.styles import Font, PatternFill, Alignment
     from openpyxl.formatting.rule import CellIsRule
@@ -912,6 +913,23 @@ def write_dashboard_xlsx(
     with pd.ExcelWriter(output_xlsx, engine="openpyxl") as writer:
         ticker_fund_size_map = load_ticker_fund_size_map(metadata_csv)
         ticker_exchange_map = load_ticker_exchange_map(metadata_csv)
+        
+        # Load Crude Oil Impact data
+        impact_df = pd.DataFrame()
+        if impact_csv:
+            try:
+                impact_df = pd.read_csv(impact_csv)
+                # Round and rename for display
+                display_impact = impact_df.copy()
+                display_impact.columns = [
+                    "Country", "ISO3", "Year", 
+                    "Qty (1000 MT)", "Qty (MT)", "Qty (Barrels)", 
+                    "Value @ $10 Change (USD)", "Nominal GDP (USD)", "Impact (% of GDP)"
+                ]
+                display_impact.to_excel(writer, sheet_name="Crude_Oil_Impact", index=False)
+            except FileNotFoundError:
+                pass
+
         default_map = (
             timeframe_df[timeframe_df["timeframe"] == "MAX"][
                 ["country_name", "ticker", "etf_currency"]
@@ -1009,6 +1027,15 @@ def write_dashboard_xlsx(
         ws_lists = wb["Lists"]
         ws_country = wb["Country_CAGR_Summary"]
 
+        if "Crude_Oil_Impact" in wb.sheetnames:
+            ws_impact = wb["Crude_Oil_Impact"]
+            ws_impact.freeze_panes = "A2"
+            fit_columns_from_ranges(ws_impact, [(1, ws_impact.max_column, 1, ws_impact.max_row)])
+            # Apply number format to last column (Impact % of GDP)
+            for cell in ws_impact[get_column_letter(ws_impact.max_column)]:
+                if cell.row > 1:
+                    cell.number_format = "0.000"
+
         ws_tf.auto_filter.ref = ws_tf.dimensions
         ws_tf.freeze_panes = "A2"
         ws_annual.auto_filter.ref = ws_annual.dimensions
@@ -1032,17 +1059,18 @@ def write_dashboard_xlsx(
         ws_country["F5"] = "FX CAGR %"
         ws_country["G5"] = "Inf. Diff CAGR %"
         ws_country["H5"] = "Currency Gap %"
-        ws_country["I5"] = "Proj. 3Y (26-28)"
-        ws_country["J5"] = "" # GAP
-        ws_country["K5"] = "REER vs 10Y"
-        ws_country["L5"] = "Valuation"
-        ws_country["M5"] = "REER Index"
-        ws_country["N5"] = "Region"
-        ws_country["O5"] = "Exchange"
-        ws_country["P5"] = "Currency"
-        ws_country["Q5"] = "GDP Real CAGR"
-        ws_country["R5"] = "GDP LCU CAGR"
-        for col_ref in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "I5", "K5", "L5", "M5", "N5", "O5", "P5", "Q5", "R5"]:
+        ws_country["I5"] = "Oil Impact %"
+        ws_country["J5"] = "Proj. 3Y (26-28)"
+        ws_country["K5"] = "" # GAP
+        ws_country["L5"] = "REER vs 10Y"
+        ws_country["M5"] = "Valuation"
+        ws_country["N5"] = "REER Index"
+        ws_country["O5"] = "Region"
+        ws_country["P5"] = "Exchange"
+        ws_country["Q5"] = "Currency"
+        ws_country["R5"] = "GDP Real CAGR"
+        ws_country["S5"] = "GDP LCU CAGR"
+        for col_ref in ["A2", "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5", "I5", "J5", "L5", "M5", "N5", "O5", "P5", "Q5", "R5", "S5"]:
             ws_country[col_ref].font = Font(bold=True)
 
         horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -1072,44 +1100,48 @@ def write_dashboard_xlsx(
             # PPP Gap % (H): FX + Inf Diff
             ws_country[f"H{r}"] = f"=IF(AND(ISNUMBER(F{r}),ISNUMBER(G{r})),F{r}+G{r},NA())"
 
-            # Projected 3Y CAGR (26-28). 
+            # Oil Impact % (I): Value of $10 price change as % of GDP
+            ws_country[f"I{r}"] = f'=IFERROR(INDEX(Crude_Oil_Impact!$I:$I, MATCH($A{r}, Crude_Oil_Impact!$A:$A, 0)), NA())'
+
+            # Projected 3Y CAGR (J). 
             # Formula: ((1+r26/100)*(1+r27/100)*(1+r28/100))^(1/3)-1)*100
             idx26 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2026", {a["country_year_key"]}, 0))'
             idx27 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2027", {a["country_year_key"]}, 0))'
             idx28 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2028", {a["country_year_key"]}, 0))'
             cagr_form = f'=IFERROR((( (1+{idx26}/100)*(1+{idx27}/100)*(1+{idx28}/100) )^(1/3)-1)*100, NA())'
-            ws_country[f"I{r}"] = cagr_form
+            ws_country[f"J{r}"] = cagr_form
             
             # REER Metrics from REER_Data sheet
-            # Column K: REER Over/Under % (REER_Data!E)
+            # Column L: REER Over/Under % (REER_Data!E)
             # Divided by 100 to support % formatting
-            ws_country[f"K{r}"] = f'=IFERROR(INDEX(REER_Data!$E:$E, MATCH($A{r}, REER_Data!$A:$A, 0)) / 100, NA())'
-            # Column L: Valuation (Interpretation)
+            ws_country[f"L{r}"] = f'=IFERROR(INDEX(REER_Data!$E:$E, MATCH($A{r}, REER_Data!$A:$A, 0)) / 100, NA())'
+            # Column M: Valuation (Interpretation)
             # near neutral: ±0–3%, mild over/undervaluation: ±3–7%, meaningful over/undervaluation: >±7%
-            reer_val_ref = f"$K{r}"
+            reer_val_ref = f"$L{r}"
             interp_formula = (
                 f'=IF(ISNA({reer_val_ref}), "", '
                 f'IF(ABS({reer_val_ref})<=0.03, "near neutral", '
                 f'IF(ABS({reer_val_ref})<=0.07, "mild " & IF({reer_val_ref}>0, "over", "under") & "valuation", '
                 f'"meaningful " & IF({reer_val_ref}>0, "over", "under") & "valuation")))'
             )
-            ws_country[f"L{r}"] = interp_formula
+            ws_country[f"M{r}"] = interp_formula
 
             # Gap
-            ws_country[f"J{r}"] = ""
+            ws_country[f"K{r}"] = ""
             
-            # Column M: Current REER (REER_Data!C)
-            ws_country[f"M{r}"] = f'=IFERROR(INDEX(REER_Data!$C:$C, MATCH($A{r}, REER_Data!$A:$A, 0)), NA())'
+            # Column N: Current REER (REER_Data!C)
+            ws_country[f"N{r}"] = f'=IFERROR(INDEX(REER_Data!$C:$C, MATCH($A{r}, REER_Data!$A:$A, 0)), NA())'
             
-            ws_country[f"N{r}"] = f'=IFERROR(INDEX(Lists!$E$2:$E${country_count+1}, MATCH($A{r}, Lists!$A$2:$A${country_count+1}, 0)), "")'
-            ws_country[f"O{r}"] = f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
-            ws_country[f"P{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
-            ws_country[f"Q{r}"] = f'=IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
-            ws_country[f"R{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
-            for col in ["C", "D", "E", "F", "G", "H", "I", "M", "Q", "R"]:
+            ws_country[f"O{r}"] = f'=IFERROR(INDEX(Lists!$E$2:$E${country_count+1}, MATCH($A{r}, Lists!$A$2:$A${country_count+1}, 0)), "")'
+            ws_country[f"P{r}"] = f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
+            ws_country[f"Q{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
+            ws_country[f"R{r}"] = f'=IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
+            ws_country[f"S{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
+            for col in ["C", "D", "E", "F", "G", "H", "J", "N", "R", "S"]:
                 ws_country[f"{col}{r}"].number_format = "0.00"
-            ws_country[f"K{r}"].number_format = "0.00%"
-        ws_country.auto_filter.ref = f"A5:R{country_end_row}"
+            ws_country[f"I{r}"].number_format = "0.000"
+            ws_country[f"L{r}"].number_format = "0.00%"
+        ws_country.auto_filter.ref = f"A5:S{country_end_row}"
 
         # Stakeholder Definitions (inserted into the gap)
         def_row = country_end_row + 2
@@ -1123,6 +1155,7 @@ def write_dashboard_xlsx(
             ("FX CAGR %", "Annualized rate of currency appreciation/depreciation against the USD. Positive = Local Currency strengthened against USD."),
             ("Inf. Diff CAGR %", "Annualized simple difference between country inflation CAGR and USA inflation CAGR. Positive = Local inflation was higher than USA."),
             ("Currency Gap %", "The sum of FX CAGR and Inflation Differential. Near zero suggests currency movement offsets inflation. Positive = Currency is 'stronger' than PPP suggests."),
+            ("Oil Impact %", "Value of a $10/barrel price change in crude oil imports as a percentage of nominal GDP. Higher values indicate greater sensitivity to oil prices."),
             ("Proj. 3Y (26-28)", "IMF's forecasted nominal GDP growth (USD) for the 2026-2028 period."),
 
             ("REER vs 10Y", "Real Effective Exchange Rate deviation from its 10-year mean. Positive = Currency is stronger than its 10Y historical average."),
@@ -1272,9 +1305,9 @@ def write_dashboard_xlsx(
         red_saturated = PatternFill(start_color="F8CBAD", end_color="F8CBAD", fill_type="solid")
 
         format_ranges = [
-            f"C{country_start_row}:I{country_end_row}", # Main Table (GDP to Proj 3Y)
-            f"K{country_start_row}:K{country_end_row}", # REER vs 10Y
-            f"Q{country_start_row}:R{country_end_row}", # GDP Real/LCU CAGRs
+            f"C{country_start_row}:J{country_end_row}", # Main Table (GDP to Proj 3Y)
+            f"L{country_start_row}:L{country_end_row}", # REER vs 10Y
+            f"R{country_start_row}:S{country_end_row}", # GDP Real/LCU CAGRs
             f"B{timeframe_start_row}:C{timeframe_start_row + len(TIMEFRAME_ORDER) - 1}",
             f"B{annual_start_row}:D{annual_last_row}",
             f"F{annual_start_row}:J{annual_last_row}",
@@ -1292,7 +1325,7 @@ def write_dashboard_xlsx(
         fit_columns_from_ranges(ws_cagr, [(1, ws_cagr.max_column, 1, ws_cagr.max_row)])
         fit_columns_from_ranges(ws_lists, [(1, ws_lists.max_column, 1, ws_lists.max_row)])
         fit_columns_from_ranges(ws_country, [
-            (1, 18, 5, country_end_row), # Expanded to 18 (R)
+            (1, 19, 5, country_end_row), # Expanded to 19 (S)
             (1, 2, focus_top_row + 1, focus_top_row + 5),
             (1, 4, timeframe_header_row, timeframe_start_row + len(TIMEFRAME_ORDER) - 1),
             (1, 10, annual_header_row, annual_last_row),
@@ -1311,13 +1344,18 @@ def main() -> None:
     parser.add_argument("--weo-csv", default="data/outputs/weo_gdp.csv")
     parser.add_argument("--metadata-csv", default="data/outputs/etf_ticker_metadata.csv")
     parser.add_argument("--reer-csv", default="data/outputs/bis_reer_metrics.csv")
+    parser.add_argument("--crude-impact-csv", default="data/outputs/crude_oil_import_impact.csv")
     parser.add_argument("--output", default="data/outputs/etf_gdp_dashboard_mvp.xlsx")
     args = parser.parse_args()
 
     timeframe_df, annual_df, cagr_df = build_timeframe_rows(args.etf_csv, args.weo_csv, args.metadata_csv)
     if timeframe_df.empty or annual_df.empty or cagr_df.empty:
         raise RuntimeError("No rows produced. Check ETF and WEO input data.")
-    write_dashboard_xlsx(timeframe_df, annual_df, cagr_df, args.output, metadata_csv=args.metadata_csv, reer_csv=args.reer_csv)
+    write_dashboard_xlsx(
+        timeframe_df, annual_df, cagr_df, args.output, 
+        metadata_csv=args.metadata_csv, reer_csv=args.reer_csv, 
+        impact_csv=args.crude_impact_csv
+    )
     print(f"Wrote dashboard MVP to {args.output}")
 
 

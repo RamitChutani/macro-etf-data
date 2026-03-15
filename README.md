@@ -25,6 +25,10 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - prefer `USD` ticker first
   - if no USD ticker exists, choose largest `fund_size`
 - Fetch IMF WEO indicators `NGDPD`, `NGDP`, `NGDP_RPCH`, `PCPIPCH` (CPI inflation), and `NGDP_D` (GDP Deflator) for mapped countries.
+- **Calculate Crude Oil Import Impact:**
+  - Compute the economic sensitivity to oil price changes (Value of a $10/barrel price change in crude oil imports as % of nominal GDP).
+  - Uses UN Energy Statistics (Metric tons, thousand) and WEO GDP (USD).
+  - Includes full conversion steps: Metric Tons -> Barrels -> USD Value -> % GDP.
 - **Fetch BIS REER (Real Effective Exchange Rate) monthly series and compute current deviation vs 10Y rolling average.**
 - Build annual ETF return output merged with GDP metrics.
   - combined annual output now includes `etf_currency`
@@ -56,6 +60,9 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
     - `FX CAGR %`: Annualized currency movement against USD over selected horizon.
     - `Inf. Diff CAGR %`: Annualized difference between local and USA inflation CAGRs.
     - `Currency Gap %`: Sum of FX and Inflation CAGRs (Real currency valuation indicator).
+    - `Oil Impact %`: Value of a $10/barrel price change in crude oil imports as % of nominal GDP.
+  - **New Crude_Oil_Impact sheet:**
+    - Detailed calculation steps for all countries (Metric Tons, Barrels, USD Value, GDP).
   - **New stakeholder documentation section:** 10 gap rows added between tables with detailed metric definitions.
   - table widths auto-fit to table ranges (explainer cells do not drive column widths)
 - Build a separate Excel workbook with one full-history ETF chart sheet per ticker.
@@ -84,6 +91,7 @@ By default, ETF fetch now uses full Yahoo history (`period=max`) unless `--start
 uv run python src/fetch_etf_prices.py --output data/outputs/etf_prices.csv
 uv run python src/fetch_weo_gdp.py --start-year 2015 --end-year 2026 --output data/outputs/weo_gdp.csv
 uv run python src/fetch_bis_reer.py --output data/outputs/bis_reer_metrics.csv
+uv run python src/build_crude_oil_import_impact.py --weo-csv data/outputs/weo_gdp.csv --output data/outputs/crude_oil_import_impact.csv
 uv run python src/build_combined_etf_weo.py --etf-csv data/outputs/etf_prices.csv --weo-csv data/outputs/weo_gdp.csv --output data/outputs/etf_weo_combined_annual.csv
 uv run python src/build_excel_dashboard_mvp.py --etf-csv data/outputs/etf_prices.csv --weo-csv data/outputs/weo_gdp.csv --output data/outputs/etf_gdp_dashboard_mvp.xlsx
 uv run python src/build_etf_history_charts_workbook.py --etf-csv data/outputs/etf_prices.csv --output data/outputs/etf_price_history_charts.xlsx
@@ -128,6 +136,7 @@ uv run jupyter notebook
 - `data/outputs/etf_ticker_metadata.csv`
 - `data/outputs/weo_gdp.csv`
 - `data/outputs/bis_reer_metrics.csv`
+- `data/outputs/crude_oil_import_impact.csv`
 - `data/outputs/etf_weo_combined_annual.csv`
 - `data/outputs/etf_gdp_dashboard_mvp.xlsx`
 - `data/outputs/etf_price_history_charts.xlsx`
