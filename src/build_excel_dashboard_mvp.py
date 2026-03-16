@@ -364,6 +364,28 @@ def load_ticker_currency_map(metadata_csv: str | None) -> dict[str, str]:
     )
 
 
+def load_ticker_accumulating_map(metadata_csv: str | None) -> dict[str, str]:
+    """Load ticker -> is_accumulating mapping from metadata."""
+    if not metadata_csv:
+        return {}
+    try:
+        meta = pd.read_csv(metadata_csv)
+    except FileNotFoundError:
+        return {}
+    required = {"ticker", "is_accumulating"}
+    if not required.issubset(set(meta.columns)):
+        return {}
+    meta = meta.copy()
+    meta["ticker"] = meta["ticker"].astype(str)
+    meta["is_accumulating"] = meta["is_accumulating"].fillna("").astype(str)
+    return (
+        meta[["ticker", "is_accumulating"]]
+        .drop_duplicates(subset=["ticker"], keep="first")
+        .set_index("ticker")["is_accumulating"]
+        .to_dict()
+    )
+
+
 def load_ticker_exchange_map(metadata_csv: str | None) -> dict[str, str]:
     if not metadata_csv:
         return {}
@@ -970,8 +992,20 @@ def write_dashboard_xlsx(
             .set_index("ticker")["etf_currency"]
             .to_dict()
         )
-        country_summary_df = default_map.rename(columns={"ticker": "ticker_used"}).copy()
         
+        # Load ticker accumulating map and create display ticker function
+        ticker_accumulating_map = load_ticker_accumulating_map(metadata_csv)
+        
+        def make_display_ticker(ticker):
+            is_acc = ticker_accumulating_map.get(ticker, "yes")
+            if is_acc == "no":
+                return ticker + "*"
+            return ticker
+
+        country_summary_df = default_map.rename(columns={"ticker": "ticker_used"}).copy()
+        # Add display ticker
+        country_summary_df["ticker_used_display"] = country_summary_df["ticker_used"].apply(make_display_ticker)
+
         latest_gdp = (
             annual_df.dropna(subset=["gdp_current_usd"])
             .sort_values("year")
@@ -979,23 +1013,25 @@ def write_dashboard_xlsx(
             .last()[["gdp_current_usd"]]
         )
         country_summary_df = country_summary_df.merge(latest_gdp, on="country_name", how="left")
-        
+
         country_summary_df["ticker_exchange"] = country_summary_df["ticker_used"].map(ticker_exchange_map).fillna("")
         country_summary_df["ticker_currency"] = country_summary_df["ticker_used"].map(ticker_currency_map).fillna("")
         country_summary_df["region"] = country_summary_df["country_name"].map(COUNTRY_TO_REGION).fillna("Other")
         country_summary_df = country_summary_df.sort_values("gdp_current_usd", ascending=False).reset_index(drop=True)
-        country_summary_df_export = country_summary_df[["country_name", "ticker_used"]]
-        
+        country_summary_df_export = country_summary_df[["country_name", "ticker_used_display"]]
+
         country_ticker_options_df = (
             timeframe_df[["country_name", "ticker"]]
             .drop_duplicates(subset=["country_name", "ticker"], keep="first")
             .sort_values(["country_name", "ticker"], ascending=[True, True])
             .reset_index(drop=True)
         )
+
         ticker_attrs_df = (
             timeframe_df[["ticker"]]
             .drop_duplicates(subset=["ticker"], keep="first")
             .assign(
+                ticker_display=lambda d: d["ticker"].apply(make_display_ticker),
                 ticker_exchange=lambda d: d["ticker"].map(ticker_exchange_map).fillna(""),
                 ticker_currency=lambda d: d["ticker"].map(ticker_currency_map).fillna(""),
             )
@@ -1027,19 +1063,26 @@ def write_dashboard_xlsx(
                 reer_df.to_excel(writer, sheet_name="REER_Data", index=False)
             except FileNotFoundError:
                 pass
+        # Create default map with display ticker
+        default_map_display = default_map.copy()
+        default_map_display["ticker_display"] = default_map_display["ticker"].apply(make_display_ticker)
+        
         lists_df = pd.DataFrame(
             {
                 "country_name": pd.Series(sorted(timeframe_df["country_name"].dropna().unique().tolist())),
                 "ticker": pd.Series(sorted(timeframe_df["ticker"].dropna().unique().tolist())),
                 "country_for_default": pd.Series(default_map["country_name"].tolist()),
-                "default_ticker": pd.Series(default_map["ticker"].tolist()),
+                "default_ticker": pd.Series(default_map_display["ticker_display"].tolist()),
             }
         )
         lists_df["region"] = lists_df["country_name"].map(COUNTRY_TO_REGION).fillna("Other")
-        
+
         lists_df.to_excel(writer, sheet_name="Lists", index=False)
-        country_ticker_options_df.to_excel(writer, sheet_name="Lists", index=False, startcol=5)
-        ticker_attrs_df.to_excel(writer, sheet_name="Lists", index=False, startcol=8)
+        # Write country_ticker_options with display ticker
+        country_ticker_options_df_with_display = country_ticker_options_df.copy()
+        country_ticker_options_df_with_display["ticker_display"] = country_ticker_options_df_with_display["ticker"].apply(make_display_ticker)
+        country_ticker_options_df_with_display.to_excel(writer, sheet_name="Lists", index=False, startcol=5)
+        ticker_attrs_df.to_excel(writer, sheet_name="Lists", index=False, startcol=9)
         country_summary_df_export.to_excel(writer, sheet_name="Country_CAGR_Summary", index=False, startrow=4)
 
         wb = writer.book
@@ -1102,11 +1145,12 @@ def write_dashboard_xlsx(
 
         country_start_row = 6
         country_end_row = 5 + len(country_summary_df)
-        country_ticker_end_row = 1 + len(country_ticker_options_df)
+        country_ticker_end_row = 1 + len(country_ticker_options_df_with_display)
         ticker_attrs_end_row = 1 + len(ticker_attrs_df)
         country_count = ws_lists.max_row - 1
         for r in range(country_start_row, country_end_row + 1):
-            ticker_formula_row = f'=OFFSET(Lists!$G$2,IFERROR(MATCH($A{r},Lists!$F$2:$F${country_ticker_end_row},0)-1,0),0,COUNTIF(Lists!$F$2:$F${country_ticker_end_row},$A{r}),1)'
+            # Use ticker_display column (H) for dropdown, match on country_name (F)
+            ticker_formula_row = f'=OFFSET(Lists!$H$2,IFERROR(MATCH($A{r},Lists!$F$2:$F${country_ticker_end_row},0)-1,0),0,COUNTIF(Lists!$F$2:$F${country_ticker_end_row},$A{r}),1)'
             ticker_dv_row = DataValidation(type="list", formula1=ticker_formula_row, allow_blank=False)
             ws_country.add_data_validation(ticker_dv_row)
             ticker_dv_row.add(f"B{r}")
@@ -1184,8 +1228,8 @@ def write_dashboard_xlsx(
             ("Currency Gap %", "The sum of FX CAGR and Inflation Differential. Near zero suggests currency movement offsets inflation. Positive = Currency is 'stronger' than PPP suggests."),
             ("Oil Impact %", "Value of a $10/barrel price change in crude oil imports as a percentage of nominal GDP. Higher values indicate greater sensitivity to oil prices."),
             ("Proj. 3Y (26-28)", "IMF's forecasted nominal GDP growth (USD) for the 2026-2028 period."),
-
             ("REER vs 10Y", "Real Effective Exchange Rate deviation from its 10-year mean. Positive = Currency is stronger than its 10Y historical average."),
+            ("Ticker*", "An asterisk (*) next to the ticker indicates a Distributing ETF. Adjusted Close price is used for comparability with Accumulating ETFs."),
         ]
         
         for i, (metric, text) in enumerate(definitions):
@@ -1207,7 +1251,8 @@ def write_dashboard_xlsx(
         ws_country.add_data_validation(country_dv_focus)
         country_dv_focus.add(f"B{focus_top_row + 1}")
         ws_country[f"B{focus_top_row + 1}"] = timeframe_df["country_name"].iloc[0]
-        ticker_formula_focus = f'=OFFSET(Lists!$G$2,IFERROR(MATCH($B${focus_top_row + 1},Lists!$F$2:$F${country_ticker_end_row},0)-1,0),0,COUNTIF(Lists!$F$2:$F${country_ticker_end_row},$B${focus_top_row + 1}),1)'
+        # Use ticker_display column (H) for dropdown
+        ticker_formula_focus = f'=OFFSET(Lists!$H$2,IFERROR(MATCH($B${focus_top_row + 1},Lists!$F$2:$F${country_ticker_end_row},0)-1,0),0,COUNTIF(Lists!$F$2:$F${country_ticker_end_row},$B${focus_top_row + 1}),1)'
         ticker_dv_focus = DataValidation(type="list", formula1=ticker_formula_focus, allow_blank=False)
         ws_country.add_data_validation(ticker_dv_focus)
         ticker_dv_focus.add(f"B{focus_top_row + 2}")

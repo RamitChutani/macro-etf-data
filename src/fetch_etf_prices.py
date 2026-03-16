@@ -9,10 +9,11 @@ from datetime import datetime
 import pandas as pd
 import yfinance as yf
 
-from etf_mapping import build_label_to_ticker_map
+from etf_mapping import ALLOW_DIST_COUNTRIES, COUNTRY_TO_ISO3, build_label_to_ticker_map, build_ticker_country_map
 
 
 ETF_LABEL_TO_TICKER = build_label_to_ticker_map()
+TICKER_TO_COUNTRY = build_ticker_country_map()
 
 
 DISALLOWED_EXCHANGES: set[str] = {
@@ -91,8 +92,9 @@ def check_if_accumulating(tk: yf.Ticker, info: dict) -> tuple[bool, str]:
     return True, "no dividends or yield found and no Dist/Income markers in name"
 
 
-def build_pretty_col(label: str, ticker: str) -> str:
-    return f"{label} - {ticker} - Close"
+def build_pretty_col(label: str, ticker: str, use_adj_close: bool = False) -> str:
+    price_field = "Adj Close" if use_adj_close else "Close"
+    return f"{label} - {ticker} - {price_field}"
 
 
 def fetch_ticker_history_close(
@@ -139,9 +141,14 @@ def fetch_ticker_history_close(
         long_name = str(info.get("longName") or "")
         short_name = str(info.get("shortName") or "")
         hedged_flag, hedged_basis = detect_currency_hedged(f"{long_name} {short_name}")
-        
+
         is_acc, acc_basis = check_if_accumulating(tk, info)
-        
+
+        # Check if this country is allowed to use distributing ETFs
+        country_name = TICKER_TO_COUNTRY.get(ticker, "")
+        allow_dist = country_name in ALLOW_DIST_COUNTRIES
+        use_adj_close = not is_acc  # Use Adj Close for distributing ETFs
+
         fund_size = total_assets
         if fund_size is None:
             fund_size = net_assets
@@ -170,7 +177,8 @@ def fetch_ticker_history_close(
         if quote_type != REQUIRED_QUOTE_TYPE:
             info_row["reason"] = f"unsupported quoteType {quote_type}"
             return None, info_row
-        if not is_acc:
+        # Skip accumulating check for allowed dist countries
+        if not is_acc and not allow_dist:
             info_row["reason"] = f"not accumulating ({acc_basis})"
             return None, info_row
         if not currency:
@@ -236,7 +244,16 @@ def fetch_ticker_history_close(
         if currency == "GBp":
             close = close * 0.01
 
-        close.name = build_pretty_col(label, ticker)
+        # Use Adj Close for distributing ETFs (to make comparable with Accumulating)
+        if use_adj_close and "Adj Close" in hist.columns:
+            close = hist["Adj Close"].copy().dropna()
+            if close.empty:
+                info_row["reason"] = "Adj Close series is empty after dropna"
+                return None, info_row
+            if getattr(close.index, "tz", None) is not None:
+                close.index = close.index.tz_localize(None)
+
+        close.name = build_pretty_col(label, ticker, use_adj_close)
 
         info_row["included"] = "yes"
         info_row["reason"] = ""
@@ -274,7 +291,18 @@ def fetch_daily_prices(
         raise RuntimeError("No ETF close series were produced from configured tickers.")
 
     prices = pd.concat(all_series, axis=1, sort=True)
-    desired_order = [build_pretty_col(label, ticker) for label, ticker in ETF_LABEL_TO_TICKER.items()]
+    # Build desired order with correct price field (Adj Close for dist countries)
+    desired_order = []
+    for label, ticker in ETF_LABEL_TO_TICKER.items():
+        country_name = TICKER_TO_COUNTRY.get(ticker, "")
+        allow_dist = country_name in ALLOW_DIST_COUNTRIES
+        # For dist countries, we don't know is_acc here, so try both
+        if allow_dist:
+            # Try Adj Close first, then Close
+            desired_order.append(build_pretty_col(label, ticker, use_adj_close=True))
+            desired_order.append(build_pretty_col(label, ticker, use_adj_close=False))
+        else:
+            desired_order.append(build_pretty_col(label, ticker, use_adj_close=False))
     prices = prices.reindex(columns=[c for c in desired_order if c in prices.columns])
     prices = prices.sort_index().dropna(how="all")
 
@@ -321,7 +349,11 @@ def inspect_tickers(
             hedged_flag, hedged_basis = detect_currency_hedged(f"{long_name} {short_name}")
             
             is_acc, acc_basis = check_if_accumulating(tk, info)
-            
+
+            # Check if this country is allowed to use distributing ETFs
+            country_name = TICKER_TO_COUNTRY.get(ticker, "")
+            allow_dist = country_name in ALLOW_DIST_COUNTRIES
+
             row: dict[str, object | None] = {
                 "label": label,
                 "ticker": ticker,
@@ -346,7 +378,8 @@ def inspect_tickers(
                 reasons.append(f"disallowed exchange {exchange}")
             if quote_type != REQUIRED_QUOTE_TYPE:
                 reasons.append(f"unsupported quoteType {quote_type}")
-            if not is_acc:
+            # Skip accumulating check for allowed dist countries
+            if not is_acc and not allow_dist:
                 reasons.append(f"not accumulating ({acc_basis})")
             if not currency:
                 reasons.append("missing currency")

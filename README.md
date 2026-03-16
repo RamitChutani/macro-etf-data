@@ -72,6 +72,11 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - `FX Jan 1st CAGR %` now correctly uses **Country LCU vs USD** (not ETF quote currency).
   - Both `FX CAGR %` and `FX Jan 1st CAGR %` now measure the same underlying metric (country currency vs USD).
   - Values differ due to methodology: FX CAGR uses IMF WEO GDP levels (year-end), FX Jan 1st CAGR uses Yahoo FX (Jan 1 point-to-point).
+- **Distributing ETF Support for Top 60 Economies (v0.10):**
+  - Added 10 missing top 60 economies: Austria, Belgium, Bulgaria, Greece, Hong Kong, Italy, Kuwait, Netherlands, Singapore, Sweden.
+  - These countries use **Distributing ETFs** with **Adjusted Close** prices for comparability with Accumulating ETFs.
+  - Distributing tickers are marked with asterisk (*) in dashboard column B.
+  - Ticker selection for multi-ticker countries uses largest AUM as decider.
 - Build a separate Excel workbook with one full-history ETF chart sheet per ticker.
   - chart workbook sheet columns are auto-fit
 - Validate a single ticker interactively in notebook:

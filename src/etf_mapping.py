@@ -121,6 +121,22 @@ COUNTRY_TO_LCU: dict[str, str] = {
 }
 
 
+# Countries allowed to use Distributing ETFs (for top 60 economies not passing Accumulating filter)
+# These countries will use Adjusted Close price for comparability with Accumulating ETFs
+ALLOW_DIST_COUNTRIES: set[str] = {
+    "Austria",
+    "Belgium",
+    "Bulgaria",
+    "Greece",
+    "Hong Kong",
+    "Italy",
+    "Kuwait",
+    "Netherlands",
+    "Singapore",
+    "Sweden",
+}
+
+
 COUNTRIES_WITH_SUFFIXED_PRIMARY = {
     "China",
     "France",

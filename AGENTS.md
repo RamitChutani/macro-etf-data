@@ -180,3 +180,8 @@ This section describes current reality as of March 6, 2026 (updated after Sessio
   - Added `COUNTRY_TO_LCU` mapping to `src/etf_mapping.py`.
   - Added `country_lcu_vs_usd_jan1_pct` column to combined output CSV.
   - Fixed syntax error in `src/build_combined_etf_weo.py`.
+- **v0.10 (2026-03-16) - Distributing ETF Support for Top 60 Economies:**
+  - Added 10 missing top 60 economies (Austria, Belgium, Bulgaria, Greece, Hong Kong, Italy, Kuwait, Netherlands, Singapore, Sweden).
+  - Added `ALLOW_DIST_COUNTRIES` set to allow Distributing ETFs for specific countries.
+  - Distributing ETFs use Adjusted Close price for comparability with Accumulating ETFs.
+  - Dashboard marks distributing tickers with asterisk (*) and includes definition.
