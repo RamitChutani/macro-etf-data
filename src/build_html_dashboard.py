@@ -27,7 +27,8 @@ MAIN_TIMEFRAMES = ["1Y", "3Y", "5Y", "10Y"]
 SHORT_TIMEFRAMES = ["1D", "1W", "1M", "YTD"]
 
 def get_gdp_cagr(cc, years, maps, end_year=2025):
-    _, _, _, _, current_usd_map = maps
+    # current_usd_map is the 5th element in the 7-tuple
+    current_usd_map = maps[4]
     try:
         v_start = current_usd_map.get((cc, end_year - years))
         v_end = current_usd_map.get((cc, end_year))
@@ -48,7 +49,8 @@ def build_dashboard_data(etf_csv: str, weo_csv: str, metadata_csv: str) -> dict:
     metadata = pd.read_csv(metadata_csv)
     ticker_info = metadata.set_index("ticker").to_dict(orient="index")
     gdp_maps = load_gdp_growth_maps(weo_csv)
-    (gdp_real_map, gdp_lcu_map, gdp_usd_map, fx_map, _) = gdp_maps
+    # Unpack all 7 values from load_gdp_growth_maps
+    (gdp_real_map, gdp_lcu_map, gdp_usd_map, fx_map, current_usd_map, current_lcu_map, inflation_cpi_map) = gdp_maps
     
     latest_date = prices_raw["Date"].max()
     as_of_str = latest_date.strftime("%b %d, %Y").upper()

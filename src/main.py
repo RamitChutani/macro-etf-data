@@ -31,6 +31,7 @@ def main() -> None:
     parser.add_argument("--etf-output", default="data/outputs/etf_prices.csv")
     parser.add_argument("--weo-output", default="data/outputs/weo_gdp.csv")
     parser.add_argument("--reer-output", default="data/outputs/bis_reer_metrics.csv")
+    parser.add_argument("--fx-output", default="data/outputs/fx_prices.csv")
     parser.add_argument("--crude-impact-output", default="data/outputs/crude_oil_import_impact.csv")
     parser.add_argument(
         "--metadata-output",
@@ -93,6 +94,15 @@ def main() -> None:
         args.reer_output,
     ]
 
+    fx_cmd = [
+        py,
+        str(script_dir / "fetch_fx_prices.py"),
+        "--metadata",
+        args.metadata_output,
+        "--output",
+        args.fx_output,
+    ]
+
     crude_impact_cmd = [
         py,
         str(script_dir / "build_crude_oil_import_impact.py"),
@@ -118,6 +128,7 @@ def main() -> None:
     run_step(etf_cmd)
     run_step(weo_cmd)
     run_step(reer_cmd)
+    run_step(fx_cmd)
     run_step(crude_impact_cmd)
     run_step(combined_cmd)
     if not args.skip_dashboard:

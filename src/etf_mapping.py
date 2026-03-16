@@ -30,7 +30,7 @@ ETF_COUNTRY_TO_TICKERS: dict[str, list[str]] = {
     "Singapore": ["0JLR.L", "EWS"],
     "South Africa": ["SRSA.L", "IRSA.L", "EZA"],
     "South Korea": ["CSKR.L", "FLRK.L", "EWY"],
-    "Spain": ["EWP"],
+    "Spain": ["XESP.DE", "EWP"],
     "Sweden": ["OMXS.L", "EWD"],
     "Switzerland": ["CSWG.L", "EWL", "CSW.PA"],
     "Taiwan": ["XMTW.L", "EWT"],
