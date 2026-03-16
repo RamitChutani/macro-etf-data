@@ -32,10 +32,10 @@ ETF_COUNTRY_TO_TICKERS: dict[str, list[str]] = {
     "South Korea": ["CSKR.L", "FLRK.L", "EWY"],
     "Spain": ["XESP.DE", "EWP"],
     "Sweden": ["OMXS.L", "EWD"],
-    "Switzerland": ["CSWG.L", "EWL", "CSW.PA"],
+    "Switzerland": ["EWL", "CSWG.L", "CSW.PA"],
     "Taiwan": ["XMTW.L", "EWT"],
     "Thailand": ["XCX4.L", "THD"],
-    "Turkey": ["TURL.L", "TUR"],
+    "Turkey": ["TUR", "TURL.L"],
     "United Kingdom": ["CUKX.L", "CSUK.L", "EWU"],
     "United States": ["CSPX.L", "VUAA.L", "VUSA.L", "CSUS.L"],
     "Vietnam": ["XFVT.L", "VNAM"],
@@ -134,6 +134,8 @@ ALLOW_DIST_COUNTRIES: set[str] = {
     "Netherlands",
     "Singapore",
     "Sweden",
+    "Switzerland",  # EWL (USD) preferred over Accumulating alternatives
+    "Turkey",       # TUR (USD) preferred over Accumulating alternatives
 }
 
 

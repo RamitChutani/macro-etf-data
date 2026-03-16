@@ -153,6 +153,51 @@ uv run jupyter notebook
 - `data/outputs/etf_gdp_dashboard_mvp.xlsx`
 - `data/outputs/etf_price_history_charts.xlsx`
 
+## Dashboard Conditional Formatting
+
+The Excel dashboard (`etf_gdp_dashboard_mvp.xlsx`) uses color-coded conditional formatting:
+
+**Main Metrics** (GDP CAGR, ETF CAGR, Macro Gap, Proj. 3Y, REER vs 10Y, GDP Real/LCU CAGR):
+- 0% to 5%: Light green
+- 5% to 10%: Dark green
+- 10%+: Darker green
+- Negative values: Red (same scale)
+
+**Oil Impact %**:
+- ≤1%: Dark green (minimal oil sensitivity)
+- ≤3%: Light green (low sensitivity)
+- >3%: Light red (moderate sensitivity)
+- >6%: Dark red (high sensitivity)
+
+**REER Index**:
+- 100: No color (neutral, at 10-year average)
+- 100-110: Light green (slightly above average)
+- 110+: Dark green (significantly above average)
+- 90-100: Light red (slightly below average)
+- <90: Dark red (significantly below average)
+
+## Dashboard Column Definitions
+
+**Main Table (Columns A-I):**
+- **Country**: Country name
+- **Ticker**: ETF ticker (asterisk * indicates Distributing ETF using Adjusted Close)
+- **GDP CAGR (USD)**: Annualized growth of the country's economy in USD terms
+- **ETF CAGR (USD)**: Annualized ETF price return in USD terms (includes currency effects)
+- **Macro Gap %**: GDP CAGR minus ETF CAGR. Positive = economy grew faster than market
+- **Oil Impact %**: Value of $10/barrel oil price change as % of GDP. Lower = less sensitivity
+- **Proj. 3Y (26-28)**: IMF forecast for nominal USD GDP growth (2026-2028)
+- **REER vs 10Y**: REER deviation from 10-year mean. Positive = currency stronger than average
+- **REER Index**: Current REER level. 100 = at 10-year average
+
+**Reference Section (Columns M-V):**
+- **Valuation**: Interpretation (near neutral / mild / meaningful over/undervaluation)
+- **FX CAGR %**: Annualized currency movement vs USD
+- **FX Jan 1st CAGR %**: Currency movement using Jan 1 point-to-point rates
+- **Inf. Diff CAGR %**: Country inflation CAGR minus USA inflation CAGR
+- **Currency Gap %**: FX CAGR + Inflation Differential (PPP alignment indicator)
+- **Region, Exchange, Currency**: Ticker metadata
+- **GDP Real CAGR, GDP LCU CAGR**: Additional GDP growth metrics
+
 ## Current Eligibility Policy
 
 When screening candidate ETFs for inclusion in mapping updates, current hard checks are:
