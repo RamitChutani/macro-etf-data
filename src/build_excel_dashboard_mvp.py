@@ -963,12 +963,13 @@ def write_dashboard_xlsx(
         if impact_csv:
             try:
                 impact_df = pd.read_csv(impact_csv)
-                # Round and rename for display
+                # Round and rename for display (BOE methodology with data source)
                 display_impact = impact_df.copy()
                 display_impact.columns = [
-                    "Country", "ISO3", "Year", 
-                    "Qty (1000 MT)", "Qty (MT)", "Qty (Barrels)", 
-                    "Value @ $10 Change (USD)", "Nominal GDP (USD)", "Impact (% of GDP)"
+                    "Country", "ISO3",
+                    "Crude Oil (Mbbl)", "Natural Gas (Mbbl BOE)", "Total BOE (Mbbl)",
+                    "Value @ $10 Change (USD)", "Nominal GDP (USD)", "Impact (% of GDP)",
+                    "Data Source"
                 ]
                 display_impact.to_excel(writer, sheet_name="Crude_Oil_Impact", index=False)
             except FileNotFoundError:
@@ -1162,8 +1163,9 @@ def write_dashboard_xlsx(
             ws_country[f"D{r}"] = f'=IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, {c["lookup_key"]}, 0)), NA())'
             ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
 
-            # Oil Impact % (F): Value of $10 price change as % of GDP
-            ws_country[f"F{r}"] = f'=IFERROR(INDEX(Crude_Oil_Impact!$I:$I, MATCH($A{r}, Crude_Oil_Impact!$A:$A, 0)), NA())'
+            # Oil Impact % (F): Value of $10 price change as % of GDP (BOE methodology)
+            # Column H in Crude_Oil_Impact sheet (Impact % of GDP)
+            ws_country[f"F{r}"] = f'=IFERROR(INDEX(Crude_Oil_Impact!$H:$H, MATCH($A{r}, Crude_Oil_Impact!$A:$A, 0)), NA())'
 
             # Projected 3Y CAGR (G).
             # Formula: ((1+r26/100)*(1+r27/100)*(1+r28/100))^(1/3)-1)*100
@@ -1215,6 +1217,20 @@ def write_dashboard_xlsx(
                 ws_country[f"{col}{r}"].number_format = "0.00"
             ws_country[f"F{r}"].number_format = "0.000"
             ws_country[f"H{r}"].number_format = "0.00%"
+
+        # Apply yellow fill to Oil Impact cells for UN fallback countries
+        yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+        if impact_csv:
+            try:
+                un_countries_df = pd.read_csv(impact_csv)
+                if "data_source" in un_countries_df.columns:
+                    un_countries = set(un_countries_df[un_countries_df["data_source"] == "UN"]["country_name"].tolist())
+                    for r in range(country_start_row, country_end_row + 1):
+                        country = ws_country.cell(row=r, column=1).value
+                        if country in un_countries:
+                            ws_country.cell(row=r, column=6).fill = yellow_fill  # Column F
+            except Exception:
+                pass  # Silently ignore if unable to read
         ws_country.auto_filter.ref = f"A5:V{country_end_row}"
 
         # Stakeholder Definitions (inserted into the gap)

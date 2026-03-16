@@ -163,11 +163,22 @@ The Excel dashboard (`etf_gdp_dashboard_mvp.xlsx`) uses color-coded conditional 
 - 10%+: Darker green
 - Negative values: Red (same scale)
 
-**Oil Impact %**:
-- ≤1%: Dark green (minimal oil sensitivity)
-- ≤3%: Light green (low sensitivity)
-- >3%: Light red (moderate sensitivity)
-- >6%: Dark red (high sensitivity)
+**Oil Impact % (BOE Methodology)**:
+Economic sensitivity to oil price changes, calculated using Barrels of Oil Equivalent (BOE):
+- **Primary data source**: WITS 2024 crude oil + natural gas import data (individual countries only)
+- **Fallback data source**: UN Energy Statistics (crude oil only, latest available year)
+- **Data source selection rules**:
+  1. Use WITS when BOTH crude oil AND natural gas data exist
+  2. Use WITS when ONLY crude oil exists (no natural gas)
+  3. Use UN fallback when ONLY natural gas exists (no crude oil)
+  4. Use UN fallback when NEITHER exists
+- **Yellow highlighting**: Indicates UN fallback data (not WITS)
+- Crude oil: Kg → MT (÷1000) → bbl (×7.33 for WITS, ×7.53 for UN) → Mbbl (÷1,000,000)
+- Natural gas: Kg → MT (÷1000) → bbl BOE (×8.4) → Mbbl BOE (÷1,000,000)
+- Total BOE = Crude Oil + Natural Gas (in Mbbl/year)
+- Impact % = (Total BOE × $10 / GDP_USD) × 100
+- Lower values indicate less sensitivity to oil prices (closer to 0 is better)
+- N/A for countries without any import data
 
 **REER Index**:
 - 100: No color (neutral, at 10-year average)
@@ -184,7 +195,7 @@ The Excel dashboard (`etf_gdp_dashboard_mvp.xlsx`) uses color-coded conditional 
 - **GDP CAGR (USD)**: Annualized growth of the country's economy in USD terms
 - **ETF CAGR (USD)**: Annualized ETF price return in USD terms (includes currency effects)
 - **Macro Gap %**: GDP CAGR minus ETF CAGR. Positive = economy grew faster than market
-- **Oil Impact %**: Value of $10/barrel oil price change as % of GDP. Lower = less sensitivity
+- **Oil Impact %**: Economic sensitivity to $10/barrel oil price change using BOE methodology. Combines crude oil + natural gas imports (WITS 2024 data, UN fallback for some countries). Yellow highlight = UN fallback data. Lower = less sensitivity. N/A if no data.
 - **Proj. 3Y (26-28)**: IMF forecast for nominal USD GDP growth (2026-2028)
 - **REER vs 10Y**: REER deviation from 10-year mean. Positive = currency stronger than average
 - **REER Index**: Current REER level. 100 = at 10-year average

@@ -105,7 +105,11 @@ def main() -> None:
 
     crude_impact_cmd = [
         py,
-        str(script_dir / "build_crude_oil_import_impact.py"),
+        str(script_dir / "build_crude_oil_import_impact_v2.py"),
+        "--crude-csv",
+        "data/inputs/crude oil data_WITS-By-HS6Product (1).xlsx",
+        "--gas-csv",
+        "data/inputs/natural gas data_WITS-By-HS6Product.xlsx",
         "--weo-csv",
         args.weo_output,
         "--output",
