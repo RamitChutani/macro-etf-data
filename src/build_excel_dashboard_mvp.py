@@ -1122,7 +1122,7 @@ def write_dashboard_xlsx(
         ws_country["C5"] = "GDP CAGR (USD)"
         ws_country["D5"] = "ETF CAGR (USD)"
         ws_country["E5"] = "Macro Gap %"
-        ws_country["F5"] = "Oil Impact %"
+        ws_country["F5"] = "BOE Price Impact (% of GDP)"
         ws_country["G5"] = "Proj. 3Y (26-28)"
         ws_country["H5"] = "REER vs 10Y"
         ws_country["I5"] = "REER Index"
@@ -1163,7 +1163,7 @@ def write_dashboard_xlsx(
             ws_country[f"D{r}"] = f'=IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, {c["lookup_key"]}, 0)), NA())'
             ws_country[f"E{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
 
-            # Oil Impact % (F): Value of $10 price change as % of GDP (BOE methodology)
+            # BOE Price Impact % (F): Value of $10 price change as % of GDP (BOE methodology)
             # Column H in Crude_Oil_Impact sheet (Impact % of GDP)
             ws_country[f"F{r}"] = f'=IFERROR(INDEX(Crude_Oil_Impact!$H:$H, MATCH($A{r}, Crude_Oil_Impact!$A:$A, 0)), NA())'
 
@@ -1218,7 +1218,7 @@ def write_dashboard_xlsx(
             ws_country[f"F{r}"].number_format = "0.000"
             ws_country[f"H{r}"].number_format = "0.00%"
 
-        # Apply yellow fill to Oil Impact cells for UN fallback countries
+        # Apply yellow fill to BOE Price Impact cells for UN fallback countries (column F)
         yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
         if impact_csv:
             try:
@@ -1243,7 +1243,7 @@ def write_dashboard_xlsx(
             ("GDP CAGR (USD)", "Annualized growth of the country's economy in US Dollar terms. Represents total economic expansion available to a USD investor."),
             ("ETF CAGR (USD)", "Annualized price return of the selected ETF in US Dollar terms. Includes both local price movement and currency effects."),
             ("Macro Gap %", "The difference between GDP growth and ETF performance (GDP CAGR minus ETF CAGR). Positive values suggest the economy grew faster than the market."),
-            ("Oil Impact %", "Value of a $10/barrel price change in crude oil imports as a percentage of nominal GDP. Lower values indicate less sensitivity to oil prices (closer to 0 is better)."),
+            ("BOE Price Impact (% of GDP)", "Value of a $10/barrel price change in crude oil imports as a percentage of nominal GDP. Lower values indicate less sensitivity to oil prices (closer to 0 is better)."),
             ("Proj. 3Y (26-28)", "IMF's forecasted nominal GDP growth (USD) for the 2026-2028 period."),
             ("REER vs 10Y", "Real Effective Exchange Rate deviation from its 10-year mean. Positive = Currency is stronger than its 10Y historical average."),
             ("REER Index", "Current Real Effective Exchange Rate level. 100 = at 10-year average. Above 100 = currency stronger than average; Below 100 = weaker than average."),
@@ -1420,7 +1420,8 @@ def write_dashboard_xlsx(
             ws_country.conditional_formatting.add(rng, CellIsRule(operator="greaterThanOrEqual", formula=["0"], fill=green_light))
             ws_country.conditional_formatting.add(rng, CellIsRule(operator="lessThan", formula=["0"], fill=red_light))
 
-        # Oil Impact % (F): 0 is green, larger values trend to red
+        # BOE Price Impact % (F): 0 is green, larger values trend to red
+        # Thresholds: ≤1% dark green, ≤3% light green, >3% light red, >6% dark red
         oil_range = f"F{country_start_row}:F{country_end_row}"
         ws_country.conditional_formatting.add(oil_range, CellIsRule(operator="lessThanOrEqual", formula=["1"], fill=green_saturated))
         ws_country.conditional_formatting.add(oil_range, CellIsRule(operator="lessThanOrEqual", formula=["3"], fill=green_light))

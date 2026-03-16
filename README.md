@@ -163,7 +163,7 @@ The Excel dashboard (`etf_gdp_dashboard_mvp.xlsx`) uses color-coded conditional 
 - 10%+: Darker green
 - Negative values: Red (same scale)
 
-**Oil Impact % (BOE Methodology)**:
+**BOE Price Impact (% of GDP)**:
 Economic sensitivity to oil price changes, calculated using Barrels of Oil Equivalent (BOE):
 - **Primary data source**: WITS 2024 crude oil + natural gas import data (individual countries only)
 - **Fallback data source**: UN Energy Statistics (crude oil only, latest available year)
@@ -195,7 +195,7 @@ Economic sensitivity to oil price changes, calculated using Barrels of Oil Equiv
 - **GDP CAGR (USD)**: Annualized growth of the country's economy in USD terms
 - **ETF CAGR (USD)**: Annualized ETF price return in USD terms (includes currency effects)
 - **Macro Gap %**: GDP CAGR minus ETF CAGR. Positive = economy grew faster than market
-- **Oil Impact %**: Economic sensitivity to $10/barrel oil price change using BOE methodology. Combines crude oil + natural gas imports (WITS 2024 data, UN fallback for some countries). Yellow highlight = UN fallback data. Lower = less sensitivity. N/A if no data.
+- **BOE Price Impact (% of GDP)**: Economic sensitivity to $10/barrel oil price change using BOE methodology. Combines crude oil + natural gas imports (WITS 2024 data, UN fallback for some countries). Yellow highlight = UN fallback data. Lower = less sensitivity. N/A if no data.
 - **Proj. 3Y (26-28)**: IMF forecast for nominal USD GDP growth (2026-2028)
 - **REER vs 10Y**: REER deviation from 10-year mean. Positive = currency stronger than average
 - **REER Index**: Current REER level. 100 = at 10-year average
