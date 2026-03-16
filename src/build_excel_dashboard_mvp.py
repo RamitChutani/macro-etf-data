@@ -14,8 +14,10 @@ from openpyxl.utils import get_column_letter
 
 from build_combined_etf_weo import (
     COUNTRY_TO_ISO3,
+    COUNTRY_TO_LCU,
     build_ticker_country_map,
     compute_annual_fx_quote_to_usd_returns,
+    compute_annual_jan1_fx_returns,
     normalize_currency_code,
 )
 
@@ -489,8 +491,10 @@ def build_timeframe_rows(
     
     # Pre-fetch all needed data
     quote_fx_map = compute_annual_fx_quote_to_usd_returns(currencies, min_year, max_year)
-    from build_combined_etf_weo import compute_annual_jan1_fx_returns
     quote_fx_jan1_map = compute_annual_jan1_fx_returns(currencies, min_year, max_year)
+    # Country LCU Jan 1 FX returns (for FX Jan 1 CAGR column - matches FX CAGR methodology)
+    country_lcu_currencies = set(COUNTRY_TO_LCU.values())
+    country_lcu_fx_jan1_map = compute_annual_jan1_fx_returns(country_lcu_currencies, min_year, max_year)
     daily_fx_series = fetch_daily_fx_series(currencies)
 
     timeframe_rows: list[dict[str, object]] = []
@@ -692,19 +696,20 @@ def build_timeframe_rows(
             # New metrics (FIXED: Ensure these are calculated consistently for all rows)
             fx_cagr_val = fx_level_cagr(gdp_current_lcu_map, gdp_current_usd_map, country_code, cagr_end_year, years)
             inf_cagr_local, inf_cagr_usa, inf_diff_cagr_val = calculate_inflation_metrics(inflation_cpi_map, country_code, cagr_end_year, years)
-            
-            # Jan 1st FX CAGR
+
+            # Jan 1st FX CAGR (using Country LCU vs USD, consistent with FX CAGR methodology)
             fx_jan1_cagr_val = None
-            if ccy_norm != "USD":
+            country_lcu = COUNTRY_TO_LCU.get(country_name)
+            if country_lcu and country_lcu != "USD":
                 jan1_fx_compounded = 1.0
                 valid_jan1_fx = True
                 for y in range(start_year, cagr_end_year + 1):
-                    ann_fx_jan1 = quote_fx_jan1_map.get((ccy_norm, y))
+                    ann_fx_jan1 = country_lcu_fx_jan1_map.get((country_lcu, y))
                     if ann_fx_jan1 is None:
                         valid_jan1_fx = False
                         break
                     jan1_fx_compounded *= (1.0 + (ann_fx_jan1 / 100.0))
-                
+
                 if valid_jan1_fx:
                     fx_jan1_cagr_val = cagr_from_total_return((jan1_fx_compounded - 1.0) * 100.0, years)
             else:
@@ -822,17 +827,16 @@ def build_timeframe_rows(
             # FIXED: Correct calculation for GDP-only rows
             fx_cagr_val = fx_level_cagr(gdp_current_lcu_map, gdp_current_usd_map, country_code, cagr_end_year, years)
             inf_cagr_local, inf_cagr_usa, inf_diff_cagr_val = calculate_inflation_metrics(inflation_cpi_map, country_code, cagr_end_year, years)
-            
-            # Jan 1st FX CAGR for GDP-only rows
-            country_tickers = [t for t, c in ticker_to_country.items() if c == country_name]
-            ccy_norm_primary = normalize_currency_code(ticker_to_currency.get(country_tickers[0], "")) if country_tickers else "USD"
+
+            # Jan 1st FX CAGR for GDP-only rows (using Country LCU vs USD, consistent with FX CAGR)
+            country_lcu = COUNTRY_TO_LCU.get(country_name)
             fx_jan1_cagr_val = None
-            if ccy_norm_primary != "USD":
+            if country_lcu and country_lcu != "USD":
                 jan1_fx_compounded = 1.0
                 valid_jan1_fx = True
                 start_year_gdp = cagr_end_year - years + 1
                 for y in range(start_year_gdp, cagr_end_year + 1):
-                    ann_fx_jan1 = quote_fx_jan1_map.get((ccy_norm_primary, y))
+                    ann_fx_jan1 = country_lcu_fx_jan1_map.get((country_lcu, y))
                     if ann_fx_jan1 is None:
                         valid_jan1_fx = False
                         break

@@ -81,6 +81,46 @@ COUNTRY_TO_ISO3: dict[str, str] = {
 }
 
 
+# Local Currency Unit (LCU) for each country - used for FX calculations vs USD
+COUNTRY_TO_LCU: dict[str, str] = {
+    "Australia": "AUD",
+    "Austria": "EUR",
+    "Belgium": "EUR",
+    "Brazil": "BRL",
+    "Bulgaria": "BGN",
+    "Canada": "CAD",
+    "China": "CNY",
+    "France": "EUR",
+    "Germany": "EUR",
+    "Greece": "EUR",
+    "Hong Kong": "HKD",
+    "India": "INR",
+    "Indonesia": "IDR",
+    "Italy": "EUR",
+    "Japan": "JPY",
+    "Kuwait": "KWD",
+    "Malaysia": "MYR",
+    "Mexico": "MXN",
+    "Netherlands": "EUR",
+    "Pakistan": "PKR",
+    "Philippines": "PHP",
+    "Poland": "PLN",
+    "Saudi Arabia": "SAR",
+    "Singapore": "SGD",
+    "South Africa": "ZAR",
+    "South Korea": "KRW",
+    "Spain": "EUR",
+    "Sweden": "SEK",
+    "Switzerland": "CHF",
+    "Taiwan": "TWD",
+    "Thailand": "THB",
+    "Turkey": "TRY",
+    "United Kingdom": "GBP",
+    "United States": "USD",
+    "Vietnam": "VND",
+}
+
+
 COUNTRIES_WITH_SUFFIXED_PRIMARY = {
     "China",
     "France",

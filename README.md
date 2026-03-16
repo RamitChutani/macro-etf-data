@@ -6,6 +6,7 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
 
 - `src/`: pipeline scripts
   - `src/etf_mapping.py`: canonical country/ticker + ISO3 mappings (single source of truth)
+  - `COUNTRY_TO_LCU`: country name to local currency unit (LCU) mapping for FX calculations
 - `data/outputs/`: generated CSV outputs
 - `notebooks/`: interactive validation notebooks
 - `docs/`: references and worklogs
@@ -37,8 +38,10 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
     - `quote_ccy_vs_usd_pct`
     - `etf_return_usd_pct`
     - `country_lcu_vs_usd_weo_pct`
+    - `country_lcu_vs_usd_10y_cagr`
     - `etf_usd_minus_country_fx_pct`
   - combined annual output includes `currency_hedged` (name-based detection from Yahoo ETF names; `yes` / `no` / `unknown`)
+  - **combined annual output includes `country_lcu_vs_usd_jan1_pct` (Jan 1 point-to-point FX return for country LCU vs USD)**
 - Run full pipeline from one command via `main.py`.
 - Build an interactive Excel KPI dashboard (MVP) for stakeholder review with:
   - country-level CAGR disconnect screener sheet with selectable horizon (1Y/3Y/5Y/10Y, default 5Y)
@@ -65,6 +68,10 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
     - Detailed calculation steps for all countries (Metric Tons, Barrels, USD Value, GDP).
   - **New stakeholder documentation section:** 10 gap rows added between tables with detailed metric definitions.
   - table widths auto-fit to table ranges (explainer cells do not drive column widths)
+- **FX Jan 1st CAGR Fix (v0.9):**
+  - `FX Jan 1st CAGR %` now correctly uses **Country LCU vs USD** (not ETF quote currency).
+  - Both `FX CAGR %` and `FX Jan 1st CAGR %` now measure the same underlying metric (country currency vs USD).
+  - Values differ due to methodology: FX CAGR uses IMF WEO GDP levels (year-end), FX Jan 1st CAGR uses Yahoo FX (Jan 1 point-to-point).
 - Build a separate Excel workbook with one full-history ETF chart sheet per ticker.
   - chart workbook sheet columns are auto-fit
 - Validate a single ticker interactively in notebook:

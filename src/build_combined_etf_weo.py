@@ -9,7 +9,7 @@ import re
 import pandas as pd
 import yfinance as yf
 
-from etf_mapping import COUNTRY_TO_ISO3, build_ticker_country_map
+from etf_mapping import COUNTRY_TO_ISO3, COUNTRY_TO_LCU, build_ticker_country_map
 
 
 def choose_etf_price_columns(columns: list[str]) -> dict[str, tuple[str, str]]:
@@ -360,12 +360,22 @@ def build_combined_dataset(
     currencies = set(etf_annual["etf_currency_normalized"].dropna().astype(str).tolist())
     fx_map = compute_annual_fx_quote_to_usd_returns(currencies, min_year, max_year)
     fx_jan1_map = compute_annual_jan1_fx_returns(currencies, min_year, max_year)
+    
+    # Compute Jan 1 FX returns for country LCUs (for dashboard FX Jan 1 CAGR column)
+    country_lcu_currencies = set(COUNTRY_TO_LCU.values())
+    country_lcu_fx_jan1_map = compute_annual_jan1_fx_returns(country_lcu_currencies, min_year, max_year)
+    
     etf_annual["quote_ccy_vs_usd_pct"] = etf_annual.apply(
         lambda r: fx_map.get((str(r.etf_currency_normalized), int(r.year))),
         axis=1,
     )
     etf_annual["quote_ccy_vs_usd_jan1_pct"] = etf_annual.apply(
         lambda r: fx_jan1_map.get((str(r.etf_currency_normalized), int(r.year))),
+        axis=1,
+    )
+    # Country LCU vs USD Jan 1 return (for dashboard consistency with FX CAGR)
+    etf_annual["country_lcu_vs_usd_jan1_pct"] = etf_annual.apply(
+        lambda r: country_lcu_fx_jan1_map.get((COUNTRY_TO_LCU.get(r.country_name), int(r.year))),
         axis=1,
     )
     etf_annual["etf_return_quote_pct"] = etf_annual["etf_return_pct"]
@@ -444,21 +454,10 @@ def build_combined_dataset(
             "gdp_real_minus_etf_growth_pct",
             "gdp_nominal_minus_etf_growth_pct",
             "gdp_minus_etf_growth_pct",
-            "quote_ccy_vs_usd_jan1_pct", # Add this new column
-            ]
-            .sort_values(["country_name", "ticker", "year"])
-
-            return merged
-
-
-
-
-
-
-
-            return merged
-
-
+            "quote_ccy_vs_usd_jan1_pct",
+            "country_lcu_vs_usd_jan1_pct",
+        ]
+    ].sort_values(["country_name", "ticker", "year"])
 
 
 def main() -> None:

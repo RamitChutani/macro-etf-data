@@ -175,3 +175,8 @@ This section describes current reality as of March 6, 2026 (updated after Sessio
 - v0.6 - Added metadata enrichment and quality gates.
 - v0.7 - Reformatted dashboard layout and unified USD-based returns.
 - v0.8 - Hardened selection (2016 start, Accumulating only) and aligned dashboard focus tables.
+- **v0.9 (2026-03-16) - FX Jan 1st CAGR Fix:**
+  - Fixed `FX Jan 1st CAGR %` to use Country LCU vs USD (was incorrectly using ETF quote currency).
+  - Added `COUNTRY_TO_LCU` mapping to `src/etf_mapping.py`.
+  - Added `country_lcu_vs_usd_jan1_pct` column to combined output CSV.
+  - Fixed syntax error in `src/build_combined_etf_weo.py`.
