@@ -93,6 +93,7 @@ def compute_annual_fx_quote_to_usd_returns(
     min_year: int,
     max_year: int,
 ) -> dict[tuple[str, int], float]:
+    """Calculate annual FX return within each year (First vs Last trade day)."""
     out: dict[tuple[str, int], float] = {}
     for currency in sorted(currencies):
         ccy = normalize_currency_code(currency)
@@ -138,6 +139,58 @@ def compute_annual_fx_quote_to_usd_returns(
             year = int(row.year)
             if min_year <= year <= max_year:
                 out[(ccy, year)] = float(row.fx_quote_vs_usd_pct)
+    return out
+
+
+def compute_annual_jan1_fx_returns(
+    currencies: set[str],
+    min_year: int,
+    max_year: int,
+) -> dict[tuple[str, int], float]:
+    """Calculate point-to-point FX returns (Jan 1st of year t to Jan 1st of year t+1)."""
+    out: dict[tuple[str, int], float] = {}
+    for currency in sorted(currencies):
+        ccy = normalize_currency_code(currency)
+        if not ccy or ccy == "USD":
+            for year in range(min_year, max_year + 1):
+                out[(ccy, year)] = 0.0
+            continue
+
+        series: pd.Series | None = None
+        for pair, invert in ((f"{ccy}USD=X", False), (f"USD{ccy}=X", True)):
+            hist = yf.Ticker(pair).history(period="max", interval="1d", auto_adjust=True, actions=False)
+            if hist.empty or "Close" not in hist.columns:
+                continue
+            s = hist["Close"].dropna()
+            if s.empty:
+                continue
+            if getattr(s.index, "tz", None) is not None:
+                s.index = s.index.tz_localize(None)
+            if invert:
+                s = 1.0 / s
+            series = s
+            break
+
+        if series is None or series.empty:
+            continue
+
+        # Get first trading day for each year
+        first_days = series.to_frame(name="fx").assign(year=series.index.year).groupby("year").head(1)
+        
+        # Shift back to get previous Jan 1st for calculating current year return
+        first_days["prev_jan1_fx"] = first_days["fx"].shift(1)
+        first_days["jan1_fx_pct"] = ((first_days["fx"] / first_days["prev_jan1_fx"]) - 1.0) * 100.0
+        
+        # IMPORTANT: jan1_fx_pct at year T represents return over the period Jan 1 T-1 to Jan 1 T.
+        # However, for annual data comparison (e.g. GDP for year T), 
+        # the user usually wants the return OVER the course of year T (Jan 1 T to Jan 1 T+1).
+        first_days["fx_over_year_pct"] = first_days["jan1_fx_pct"].shift(-1)
+
+        for row in first_days.itertuples():
+            year_val = int(row.Index.year)
+            pct = row.fx_over_year_pct
+            if min_year <= year_val <= max_year:
+                out[(ccy, year_val)] = float(pct)
     return out
 
 
@@ -306,8 +359,13 @@ def build_combined_dataset(
     max_year = int(etf_annual["year"].max())
     currencies = set(etf_annual["etf_currency_normalized"].dropna().astype(str).tolist())
     fx_map = compute_annual_fx_quote_to_usd_returns(currencies, min_year, max_year)
+    fx_jan1_map = compute_annual_jan1_fx_returns(currencies, min_year, max_year)
     etf_annual["quote_ccy_vs_usd_pct"] = etf_annual.apply(
         lambda r: fx_map.get((str(r.etf_currency_normalized), int(r.year))),
+        axis=1,
+    )
+    etf_annual["quote_ccy_vs_usd_jan1_pct"] = etf_annual.apply(
+        lambda r: fx_jan1_map.get((str(r.etf_currency_normalized), int(r.year))),
         axis=1,
     )
     etf_annual["etf_return_quote_pct"] = etf_annual["etf_return_pct"]
@@ -386,8 +444,21 @@ def build_combined_dataset(
             "gdp_real_minus_etf_growth_pct",
             "gdp_nominal_minus_etf_growth_pct",
             "gdp_minus_etf_growth_pct",
-        ]
-    ].sort_values(["country_name", "ticker", "year"])
+            "quote_ccy_vs_usd_jan1_pct", # Add this new column
+            ]
+            .sort_values(["country_name", "ticker", "year"])
+
+            return merged
+
+
+
+
+
+
+
+            return merged
+
+
 
 
 def main() -> None:
