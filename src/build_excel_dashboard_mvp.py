@@ -1235,6 +1235,10 @@ def write_comparing_countries_sheet(
     ws.add_data_validation(region_dv)
     region_dv.add("E2")
     
+    # Note: VBA macro for auto-hiding rows is provided in docs/reference/region_filter_macro.bas
+    # Users can import this macro to enable automatic row hiding when region filter changes
+    # Without VBA, users can manually filter column Z (Region) using Excel's AutoFilter
+    
     # Write data rows
     country_start_row = 5
     country_count = len(countries)
@@ -1251,10 +1255,6 @@ def write_comparing_countries_sheet(
         ws[f"A{r}"] = country
         ws[f"B{r}"] = default_ticker
         ws[f"Z{r}"] = region  # Store region for filtering (column Z)
-
-        # Region filter formula: Check if region matches filter (or filter is ALL)
-        # Returns 1 if match, 0 if no match
-        region_check = f'IF($E$2="ALL",1,IF($Z{r}=$E$2,1,0))'
         
         # Add ticker dropdown
         country_ticker_options_df = lists_df[lists_df["country_name"] == country][["ticker_display"]].drop_duplicates()
@@ -1265,92 +1265,92 @@ def write_comparing_countries_sheet(
             ws.add_data_validation(ticker_dv)
             ticker_dv.add(f"B{r}")
         
-        # GDP CAGR (USD) - Column C (with region filter)
-        ws[f"C{r}"] = f'=IF({region_check}, IFERROR(1*INDEX({c["gdp_nominal_usd_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA()), NA())'
+        # GDP CAGR (USD) - Column C
+        ws[f"C{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_usd_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
 
-        # ETF CAGR (USD) - Column D (with region filter)
-        ws[f"D{r}"] = f'=IF({region_check}, IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, {c["lookup_key"]}, 0)), NA()), NA())'
+        # ETF CAGR (USD) - Column D
+        ws[f"D{r}"] = f'=IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, {c["lookup_key"]}, 0)), NA())'
 
-        # MSCI Index Return (USD) CAGR (%) - Column E (with region filter)
+        # MSCI Index Return (USD) CAGR (%) - Column E
         # Lookup from hidden MSCI sheet based on horizon selector
         if msci_df is not None and not msci_df.empty and msci_country_map:
             msci_country = msci_country_map.get(country)
             if msci_country and msci_country in msci_df['Country'].values:
                 # Formula: INDEX(MSCI!$B:$E, MATCH(country, MSCI!$A:$A, 0), MATCH(horizon, MSCI!$B$1:$E$1, 0))
-                ws[f"E{r}"] = f'=IF({region_check}, IFERROR(INDEX(MSCI!$B:$E, MATCH("{msci_country}", MSCI!$A:$A, 0), MATCH($B$2, MSCI!$B$1:$E$1, 0)), NA()), NA())'
+                ws[f"E{r}"] = f'=IFERROR(INDEX(MSCI!$B:$E, MATCH("{msci_country}", MSCI!$A:$A, 0), MATCH($B$2, MSCI!$B$1:$E$1, 0)), NA())'
             else:
                 ws[f"E{r}"] = 'NA()'  # No MSCI data for this country (e.g., Bulgaria, Kuwait)
         else:
             ws[f"E{r}"] = 'NA()'  # MSCI data not provided
 
-        # Macro Gap - Column F (with region filter)
-        ws[f"F{r}"] = f"=IF({region_check}, IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA()), NA())"
+        # Macro Gap - Column F
+        ws[f"F{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
 
-        # Projected Growth 2026-28 - Column G (with region filter)
+        # Projected Growth 2026-28 - Column G
         idx26 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2026", {a["country_year_key"]}, 0))'
         idx27 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2027", {a["country_year_key"]}, 0))'
         idx28 = f'INDEX({a["gdp_nominal_usd_growth_pct"]}, MATCH($A{r}&"|2028", {a["country_year_key"]}, 0))'
-        cagr_form = f'=IF({region_check}, IFERROR((( (1+{idx26}/100)*(1+{idx27}/100)*(1+{idx28}/100) )^(1/3)-1)*100, NA()), NA())'
+        cagr_form = f'=IFERROR((( (1+{idx26}/100)*(1+{idx27}/100)*(1+{idx28}/100) )^(1/3)-1)*100, NA())'
         ws[f"G{r}"] = cagr_form
 
-        # Oil Impact - Column H (with region filter)
-        ws[f"H{r}"] = f'=IF({region_check}, IFERROR(INDEX(Crude_Oil_Impact!$H:$H, MATCH($A{r}, Crude_Oil_Impact!$A:$A, 0)), NA()), NA())'
+        # Oil Impact - Column H
+        ws[f"H{r}"] = f'=IFERROR(INDEX(Crude_Oil_Impact!$H:$H, MATCH($A{r}, Crude_Oil_Impact!$A:$A, 0)), NA())'
 
-        # REER Index - Column I (with region filter)
-        ws[f"I{r}"] = f'=IF({region_check}, IFERROR(INDEX(REER_Data!$C:$C, MATCH($A{r}, REER_Data!$A:$A, 0)), NA()), NA())'
+        # REER Index - Column I
+        ws[f"I{r}"] = f'=IFERROR(INDEX(REER_Data!$C:$C, MATCH($A{r}, REER_Data!$A:$A, 0)), NA())'
 
-        # REER vs 10Y - Column J (divide by 100 for % formatting, with region filter)
-        ws[f"J{r}"] = f'=IF({region_check}, IFERROR(INDEX(REER_Data!$E:$E, MATCH($A{r}, REER_Data!$A:$A, 0)) / 100, NA()), NA())'
+        # REER vs 10Y - Column J (divide by 100 for % formatting)
+        ws[f"J{r}"] = f'=IFERROR(INDEX(REER_Data!$E:$E, MATCH($A{r}, REER_Data!$A:$A, 0)) / 100, NA())'
 
         # Futures rate - Column K (placeholder)
         ws[f"K{r}"] = "NA()"
 
-        # nGDP (USD) 2025 - Column M (from WEO levels, with region filter)
+        # nGDP (USD) 2025 - Column M (from WEO levels)
         country_code = COUNTRY_TO_ISO3.get(country)
         gdp_2025_val = gdp_current_usd_map.get((country_code, 2025)) if country_code else None
         if gdp_2025_val is not None:
-            ws[f"M{r}"] = f'=IF({region_check}, {gdp_2025_val}, NA())'
+            ws[f"M{r}"] = gdp_2025_val
         else:
-            ws[f"M{r}"] = f'=IF({region_check}, IFERROR(INDEX({a["gdp_current_usd"]}, MATCH($A{r}&"|2025", {a["country_year_key"]}, 0)), NA()), NA())'
+            ws[f"M{r}"] = f'=IFERROR(INDEX({a["gdp_current_usd"]}, MATCH($A{r}&"|2025", {a["country_year_key"]}, 0)), NA())'
 
-        # FX CAGR - Column Q (with region filter)
-        ws[f"Q{r}"] = f'=IF({region_check}, IFERROR(1*INDEX({c["fx_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA()), NA())'
+        # FX CAGR - Column Q
+        ws[f"Q{r}"] = f'=IFERROR(1*INDEX({c["fx_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
 
-        # FX Jan 1st CAGR - Column R (with region filter)
-        ws[f"R{r}"] = f'=IF({region_check}, IFERROR(1*INDEX({c["fx_jan1_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA()), NA())'
+        # FX Jan 1st CAGR - Column R
+        ws[f"R{r}"] = f'=IFERROR(1*INDEX({c["fx_jan1_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
-        # Spot FX rate - Column S (with region filter)
+        # Spot FX rate - Column S
         country_ticker_data = timeframe_df[timeframe_df["country_name"] == country][["ticker", "etf_currency"]].drop_duplicates()
         if not country_ticker_data.empty:
             currency = country_ticker_data["etf_currency"].iloc[0]
             spot_rate = spot_fx_rates.get(currency)
             if spot_rate is not None:
-                ws[f"S{r}"] = f'=IF({region_check}, {spot_rate}, NA())'
+                ws[f"S{r}"] = spot_rate
 
         # Futures rate 2y out - Column T (placeholder)
         ws[f"T{r}"] = "NA()"
 
-        # Inf. Diff CAGR - Column V (with region filter)
-        ws[f"V{r}"] = f'=IF({region_check}, IFERROR(1*INDEX({c["inflation_diff_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA()), NA())'
+        # Inf. Diff CAGR - Column V
+        ws[f"V{r}"] = f'=IFERROR(1*INDEX({c["inflation_diff_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
 
-        # Currency Gap - Column X (with region filter)
-        ws[f"X{r}"] = f"=IF({region_check}, IF(AND(ISNUMBER(Q{r}),ISNUMBER(V{r})),Q{r}+V{r},NA()), NA())"
+        # Currency Gap - Column X
+        ws[f"X{r}"] = f"=IF(AND(ISNUMBER(Q{r}),ISNUMBER(V{r})),Q{r}+V{r},NA())"
 
-        # LCU - Column AA (with region filter)
+        # LCU - Column AA
         lcu = COUNTRY_TO_LCU.get(country, "")
-        ws[f"AA{r}"] = f'=IF({region_check}, "{lcu}", "")'
+        ws[f"AA{r}"] = lcu
 
-        # Exchange - Column AC (with region filter)
-        ws[f"AC{r}"] = f'=IF({region_check}, IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),""), "")'
+        # Exchange - Column AC
+        ws[f"AC{r}"] = f'=IFERROR(INDEX(Lists!$J$2:$J${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
 
-        # Currency - Column AD (with region filter)
-        ws[f"AD{r}"] = f'=IF({region_check}, IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),""), "")'
+        # Currency - Column AD
+        ws[f"AD{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
 
-        # nGDP (LCU) CAGR - Column N (with region filter)
-        ws[f"N{r}"] = f'=IF({region_check}, IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA()), NA())'
+        # nGDP (LCU) CAGR - Column N
+        ws[f"N{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
 
-        # rGDP (LCU) CAGR - Column O (with region filter)
-        ws[f"O{r}"] = f'=IF({region_check}, IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA()), NA())'
+        # rGDP (LCU) CAGR - Column O
+        ws[f"O{r}"] = f'=IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
         # Apply number formats
         for col in ["C", "D", "F", "G", "H", "J", "N", "O", "Q", "R", "V", "X"]:
@@ -1441,6 +1441,9 @@ def write_comparing_countries_sheet(
     # Set autofilter and freeze
     ws.auto_filter.ref = f"A4:AD{country_end_row}"
     ws.freeze_panes = "A5"
+    
+    # Note: Users can filter by Region (column Z) manually using Excel's AutoFilter
+    # Or import the VBA macro from docs/reference/region_filter_macro.bas for automatic filtering
 
 
 def write_country_focus_sheet(
