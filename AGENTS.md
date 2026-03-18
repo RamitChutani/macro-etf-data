@@ -154,6 +154,11 @@ This section describes current reality as of March 6, 2026 (updated after Sessio
 
 - Default to minimal, targeted edits.
 - Any structural refactor requires explicit user approval.
+- **ALWAYS verify output before committing:**
+  - After making changes, run the code and print the output
+  - Show the user the output (tables, structures, values) for verification
+  - Wait for explicit user approval ("ok", "proceed", "commit") before committing
+  - This applies to ALL changes: code, documentation, data files, dashboards
 
 ---
 
