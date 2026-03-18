@@ -710,72 +710,90 @@ def build_timeframe_rows(
                 )
 
         # CAGR rows
+        # For ETF CAGR: Use actual end_date (e.g., Feb 27, 2026) to match MSCI methodology
+        # For GDP CAGR: Use calendar years (GDP is annual data)
+        etf_end_date = end_pt.date  # Actual latest date (e.g., 2026-02-27)
+        
         for years in CAGR_HORIZONS:
-            start_year = cagr_end_year - years + 1
-            if start_year < inception_year:
+            # ETF CAGR: Calculate from exact anniversary date
+            etf_start_target = etf_end_date - pd.DateOffset(years=years)
+            start_pt = last_on_or_before(series, etf_start_target)
+            
+            if start_pt is None or start_pt.value <= 0:
                 continue
             
-            start_pt = first_in_year(series, start_year)
-            end_year_pt = last_in_year(series, cagr_end_year)
-            if start_pt is None or end_year_pt is None or start_pt.value <= 0:
-                continue
-            
-            total_ret_local = pct_return(start_pt.value, end_year_pt.value)
-            
+            # Use actual dates for ETF CAGR calculation
+            total_ret_local = pct_return(start_pt.value, end_pt.value)
+
             if ccy_norm == "USD":
                 total_ret_usd = total_ret_local
             else:
+                # Use annual FX returns for the years spanned by this CAGR
+                start_year = start_pt.date.year
+                end_year = end_pt.date.year
                 fx_compounded = 1.0
                 valid_fx = True
-                for y in range(start_year, cagr_end_year + 1):
+                for y in range(start_year, end_year + 1):
                     ann_fx = quote_fx_map.get((ccy_norm, y))
                     if ann_fx is None:
                         valid_fx = False
                         break
                     fx_compounded *= (1.0 + (ann_fx / 100.0))
-                
+
                 if valid_fx:
                     total_ret_usd = ((1.0 + (total_ret_local / 100.0)) * fx_compounded - 1.0) * 100.0
                 else:
                     total_ret_usd = None
-            
+
             if total_ret_usd is not None:
                 etf_cagr = cagr_from_total_return(total_ret_usd, years)
             else:
                 etf_cagr = None
 
-            gdp_real_cagr = gdp_cagr(gdp_real_growth_map, country_code, cagr_end_year, years)
-            gdp_nominal_lcu_cagr = gdp_cagr(gdp_nominal_lcu_growth_map, country_code, cagr_end_year, years)
-            gdp_nominal_usd_cagr = gdp_cagr(gdp_nominal_usd_growth_map, country_code, cagr_end_year, years)
-            
-            # New metrics (FIXED: Ensure these are calculated consistently for all rows)
-            fx_cagr_val = fx_level_cagr(gdp_current_lcu_map, gdp_current_usd_map, country_code, cagr_end_year, years)
-            inf_cagr_local, inf_cagr_usa, inf_diff_cagr_val = calculate_inflation_metrics(inflation_cpi_map, country_code, cagr_end_year, years)
-
-            # Jan 1st FX CAGR (using Country LCU vs USD, consistent with FX CAGR methodology)
-            fx_jan1_cagr_val = None
-            country_lcu = COUNTRY_TO_LCU.get(country_name)
-            if country_lcu and country_lcu != "USD":
-                jan1_fx_compounded = 1.0
-                valid_jan1_fx = True
-                for y in range(start_year, cagr_end_year + 1):
-                    ann_fx_jan1 = country_lcu_fx_jan1_map.get((country_lcu, y))
-                    if ann_fx_jan1 is None:
-                        valid_jan1_fx = False
-                        break
-                    jan1_fx_compounded *= (1.0 + (ann_fx_jan1 / 100.0))
-
-                if valid_jan1_fx:
-                    fx_jan1_cagr_val = cagr_from_total_return((jan1_fx_compounded - 1.0) * 100.0, years)
+            # GDP CAGR: Use calendar years (annual data)
+            gdp_end_year = min(completed_year, gdp_year_max)
+            gdp_start_year = gdp_end_year - years + 1
+            if gdp_start_year < 2015:  # WEO data starts at 2015
+                gdp_real_cagr = None
+                gdp_nominal_lcu_cagr = None
+                gdp_nominal_usd_cagr = None
+                fx_cagr_val = None
+                inf_cagr_local = None
+                inf_cagr_usa = None
+                inf_diff_cagr_val = None
+                fx_jan1_cagr_val = None
             else:
-                fx_jan1_cagr_val = 0.0
+                gdp_real_cagr = gdp_cagr(gdp_real_growth_map, country_code, gdp_end_year, years)
+                gdp_nominal_lcu_cagr = gdp_cagr(gdp_nominal_lcu_growth_map, country_code, gdp_end_year, years)
+                gdp_nominal_usd_cagr = gdp_cagr(gdp_nominal_usd_growth_map, country_code, gdp_end_year, years)
+
+                fx_cagr_val = fx_level_cagr(gdp_current_lcu_map, gdp_current_usd_map, country_code, gdp_end_year, years)
+                inf_cagr_local, inf_cagr_usa, inf_diff_cagr_val = calculate_inflation_metrics(inflation_cpi_map, country_code, gdp_end_year, years)
+
+                # Jan 1st FX CAGR (using Country LCU vs USD, consistent with FX CAGR methodology)
+                fx_jan1_cagr_val = None
+                country_lcu = COUNTRY_TO_LCU.get(country_name)
+                if country_lcu and country_lcu != "USD":
+                    jan1_fx_compounded = 1.0
+                    valid_jan1_fx = True
+                    for y in range(gdp_start_year, gdp_end_year + 1):
+                        ann_fx_jan1 = country_lcu_fx_jan1_map.get((country_lcu, y))
+                        if ann_fx_jan1 is None:
+                            valid_jan1_fx = False
+                            break
+                        jan1_fx_compounded *= (1.0 + (ann_fx_jan1 / 100.0))
+
+                    if valid_jan1_fx:
+                        fx_jan1_cagr_val = cagr_from_total_return((jan1_fx_compounded - 1.0) * 100.0, years)
+                else:
+                    fx_jan1_cagr_val = 0.0
 
             cagr_rows.append(
                 {
                     "country_name": country_name,
                     "country_code": country_code,
                     "ticker": ticker,
-                    "as_of_date": end_year_pt.date.date(),
+                    "as_of_date": etf_end_date.date(),  # Use actual ETF end date (e.g., 2026-02-27)
                     "horizon": f"{years}Y",
                     "etf_cagr_pct": etf_cagr,
                     "gdp_real_cagr_pct": gdp_real_cagr,
