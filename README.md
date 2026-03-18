@@ -56,6 +56,10 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
     - Both sheets use Excel formulas for dynamic lookups from underlying data sheets (CAGR, Annual, ETF_Timeframes).
     - Placeholder columns for MSCI Index Returns and FX Futures rates (hidden, for future data integration).
     - Populated nGDP (USD) 2025 levels from WEO data and spot FX rates from yfinance.
+    - **MSCI Factsheet Link column (AE)**: Raw URL text linking to MSCI index factsheet PDFs for each country.
+    - **Metric Definitions section**: Added after data table with definitions for all main and reference columns.
+    - Horizon filter simplified (default 10Y), region filter removed (Region column is reference only).
+    - Dashboard title shows ETF snapshot date (Feb 27, 2026) instead of generation date.
   - annual panel FX decomposition columns (`Quote CCY vs USD %`, `ETF Return % (USD)`, `Country LCU vs USD % (WEO)`, `ETF USD - Country FX %`) render only for non-USD ticker selections
   - annual panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
   - annual panel keeps last 10 completed years and adds one projection/YTD row (for 2026 while in 2026)
