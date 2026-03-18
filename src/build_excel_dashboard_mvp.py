@@ -1044,7 +1044,7 @@ def load_msci_returns(filepath: str) -> tuple[pd.DataFrame, dict[str, str]]:
         '3Y': pd.to_numeric(msci_raw[3], errors='coerce'),
         '5Y': pd.to_numeric(msci_raw[4], errors='coerce'),
         '10Y': pd.to_numeric(msci_raw[5], errors='coerce'),
-        'Link': msci_raw[7].values if 7 in msci_raw.columns else None
+        'Link': msci_raw[11].values if 11 in msci_raw.columns else None  # Column 11 has the PDF links
     }).reset_index(drop=True)  # Reset index for continuous row numbering
     
     # Build country mapping (our country names -> MSCI country names)
@@ -1185,10 +1185,14 @@ def write_comparing_countries_sheet(
     ws["AB4"].font = Font(bold=True)
     ws["AC4"] = "Exchange name for ETF ticker"
     ws["AD4"] = "ETF ticker currency"
+    
+    # MSCI Factsheet Links section
+    ws["AE4"] = "MSCI Factsheet Link"
+    ws["AE4"].font = Font(bold=True)
 
     # Apply bold to all header cells
     for col_ref in ["A2", "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4", "I4", "J4", "K4",
-                    "M4", "N4", "O4", "Q4", "R4", "S4", "T4", "V4", "X4", "Z4", "AA4", "AC4", "AD4"]:
+                    "M4", "N4", "O4", "Q4", "R4", "S4", "T4", "V4", "X4", "Z4", "AA4", "AC4", "AD4", "AE4"]:
         ws[col_ref].font = Font(bold=True)
 
     # Create hidden MSCI reference sheet if data provided
@@ -1333,6 +1337,23 @@ def write_comparing_countries_sheet(
         # Currency - Column AD
         ws[f"AD{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
 
+        # MSCI Factsheet Link - Column AE (from hidden MSCI sheet)
+        if msci_df is not None and not msci_df.empty and msci_country_map:
+            msci_country = msci_country_map.get(country)
+            if msci_country and msci_country in msci_df['Country'].values:
+                msci_row = msci_df[msci_df['Country'] == msci_country].iloc[0]
+                link_val = msci_row['Link'] if 'Link' in msci_df.columns else None
+                if pd.notna(link_val) and isinstance(link_val, str) and link_val.startswith('http'):
+                    ws[f"AE{r}"] = "Factsheet"
+                    # Note: Hyperlinks in formulas require VBA or manual setup
+                    # For now, just show the link text
+                else:
+                    ws[f"AE{r}"] = ""
+            else:
+                ws[f"AE{r}"] = ""
+        else:
+            ws[f"AE{r}"] = ""
+
         # nGDP (LCU) CAGR - Column N
         ws[f"N{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
 
@@ -1420,14 +1441,62 @@ def write_comparing_countries_sheet(
     ws.column_dimensions["AA"].width = 12  # LCU
     ws.column_dimensions["AC"].width = 20  # Exchange
     ws.column_dimensions["AD"].width = 12  # Currency
+    ws.column_dimensions["AE"].width = 20  # MSCI Factsheet Link
 
     # Hide placeholder columns (K, T) - Column E now has MSCI data
     ws.column_dimensions["K"].hidden = True
     ws.column_dimensions["T"].hidden = True
 
     # Set autofilter and freeze
-    ws.auto_filter.ref = f"A4:AD{country_end_row}"
+    ws.auto_filter.ref = f"A4:AE{country_end_row}"
     ws.freeze_panes = "A5"
+    
+    # Add metric definitions section (after data rows)
+    def_row = country_end_row + 2
+    ws[f"A{def_row}"] = "Metric Definitions & Interpretation"
+    ws[f"A{def_row}"].font = Font(bold=True, size=12)
+    
+    # Main Columns section
+    def_row += 1
+    ws[f"A{def_row}"] = "Main Columns:"
+    ws[f"A{def_row}"].font = Font(bold=True, italic=True)
+    
+    definitions_main = [
+        ("ETF Ticker", "An asterisk (*) next to the ticker indicates a Distributing ETF. Adjusted Close price is used for comparability with Accumulating ETFs."),
+        ("nGDP (USD) CAGR (%)", "Annualized growth of the country's economy in US Dollar terms. Represents total economic expansion available to a USD investor."),
+        ("ETF CAGR (USD)", "Annualized price return of the selected ETF in US Dollar terms. Includes both local price movement and currency effects."),
+        ("Macro Gap %", "The difference between GDP growth and ETF performance (GDP CAGR minus ETF CAGR). Positive values suggest the economy grew faster than the market."),
+        ("Oil Impact %", "Value of a $10/barrel price change in crude oil imports as a percentage of nominal GDP. Lower values indicate less sensitivity to oil prices (closer to 0 is better)."),
+        ("Proj. 3Y (26-28)", "IMF's forecasted nominal GDP growth (USD) for the 2026-2028 period."),
+        ("REER vs 10Y", "Real Effective Exchange Rate deviation from its 10-year mean. Positive = Currency is stronger than its 10Y historical average."),
+        ("REER Index", "Current Real Effective Exchange Rate level. 100 = at 10-year average. Above 100 = currency stronger than average; Below 100 = weaker than average."),
+    ]
+    
+    for i, (metric, text) in enumerate(definitions_main):
+        row = def_row + 1 + i
+        ws[f"A{row}"] = metric
+        ws[f"A{row}"].font = Font(italic=True)
+        ws[f"B{row}"] = text
+        ws[f"B{row}"].alignment = Alignment(wrap_text=False)
+    
+    # Reference Columns section
+    def_row_ref = def_row + len(definitions_main) + 1
+    ws[f"A{def_row_ref}"] = "Reference Columns:"
+    ws[f"A{def_row_ref}"].font = Font(bold=True, italic=True)
+    
+    definitions_ref = [
+        ("FX CAGR %", "Annualized rate of currency appreciation/depreciation against the USD. Positive = Local Currency strengthened against USD."),
+        ("FX Jan 1st CAGR %", "Annualized rate of currency movement calculated using point-to-point 1st January FX rates. More consistent with standard asset return windows."),
+        ("Inf. Diff CAGR %", "Annualized simple difference between country inflation CAGR and USA inflation CAGR. Positive = Local inflation was higher than USA."),
+        ("Currency Gap %", "The sum of FX CAGR and Inflation Differential. Near zero suggests currency movement offsets inflation. Positive = Currency is 'stronger' than PPP suggests."),
+    ]
+    
+    for i, (metric, text) in enumerate(definitions_ref):
+        row = def_row_ref + 1 + i
+        ws[f"A{row}"] = metric
+        ws[f"A{row}"].font = Font(italic=True)
+        ws[f"B{row}"] = text
+        ws[f"B{row}"].alignment = Alignment(wrap_text=False)
 
 
 def write_country_focus_sheet(
