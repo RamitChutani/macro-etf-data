@@ -26,6 +26,15 @@ def main() -> None:
         help="Optional ETF start date (YYYY-MM-DD). If omitted, fetches full ETF history.",
     )
     parser.add_argument("--end-date")
+    parser.add_argument(
+        "--snapshot-date",
+        default="2026-02-27",
+        help=(
+            "Snapshot end date for ETF history (YYYY-MM-DD). Default: 2026-02-27 (MSCI factsheet date). "
+            "Filters ETF output to end on or before this date for consistent comparison with MSCI data. "
+            "Change only when explicitly needed."
+        ),
+    )
     parser.add_argument("--start-year", type=int, default=2015)
     parser.add_argument("--end-year", type=int, default=2029)
     parser.add_argument("--etf-output", default="data/outputs/etf_prices.csv")
@@ -75,6 +84,8 @@ def main() -> None:
         etf_cmd.extend(["--start", args.start_date])
     if args.end_date:
         etf_cmd.extend(["--end", args.end_date])
+    if args.snapshot_date:
+        etf_cmd.extend(["--snapshot-date", args.snapshot_date])
 
     weo_cmd = [
         py,

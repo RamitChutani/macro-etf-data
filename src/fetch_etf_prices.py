@@ -443,6 +443,15 @@ def main() -> None:
         help="Optional start date (YYYY-MM-DD). If omitted, fetches full Yahoo history.",
     )
     parser.add_argument("--end", default=datetime.today().strftime("%Y-%m-%d"))
+    parser.add_argument(
+        "--snapshot-date",
+        default="2026-02-27",  # Fixed to align with MSCI factsheet date (Feb 27, 2026)
+        help=(
+            "Snapshot end date for ETF history (YYYY-MM-DD). Default: 2026-02-27 (MSCI factsheet date). "
+            "Filters output to end on or before this date for consistent comparison with MSCI data. "
+            "Change only when explicitly needed."
+        ),
+    )
     parser.add_argument("--output", default="data/outputs/etf_prices.csv")
     parser.add_argument(
         "--metadata-output",
@@ -513,12 +522,22 @@ def main() -> None:
         min_history_start=args.min_history_start or None,
     )
     df = to_export_frame(prices)
+    
+    # Filter to snapshot date for consistent comparison with MSCI factsheet data
+    if args.snapshot_date:
+        snapshot_dt = pd.to_datetime(args.snapshot_date)
+        df["Date"] = pd.to_datetime(df["Date"])
+        df = df[df["Date"] <= snapshot_dt].copy()
+        # Also update metadata to reflect snapshot filtering
+        metadata["snapshot_date"] = args.snapshot_date
+        print(f"Filtered ETF data to snapshot date: {args.snapshot_date}")
+    
     df.to_csv(args.output, index=False)
     metadata.to_csv(args.metadata_output, index=False)
     included = int((metadata["included"] == "yes").sum())
     print(
         f"Wrote {len(df)} rows and {len(df.columns)} columns to {args.output} "
-        f"for {args.start or 'MAX'} to {args.end}"
+        f"for {args.start or 'MAX'} to {args.snapshot_date or args.end}"
     )
     print(
         f"Wrote ticker metadata to {args.metadata_output}. "
