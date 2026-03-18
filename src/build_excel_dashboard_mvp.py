@@ -1133,10 +1133,8 @@ def write_comparing_countries_sheet(
     # Controls row
     ws["A2"] = "Horizon"
     ws["B2"] = "10Y"  # Default to 10Y
-    ws["D2"] = "Region Filter"
-    ws["E2"] = "ALL"  # Default to ALL regions
-    ws["G2"] = "Sort by (choice of GDP size)"
-    ws["H2"] = "nGDP"
+    ws["D2"] = "Sort by (choice of GDP size)"
+    ws["E2"] = "nGDP"
     
     # Section headers (row 4)
     ws["A4"] = "Country"
@@ -1150,14 +1148,14 @@ def write_comparing_countries_sheet(
     ws["I4"] = "REER Index"
     ws["J4"] = "REER vs 10Y"
     ws["K4"] = "Futures rate for USD/LCU 2 years out (%)"  # Placeholder - not available
-    
+
     # GDP Metrics section
     ws["L4"] = "GDP Metrics"
     ws["L4"].font = Font(bold=True)
     ws["M4"] = "nGDP (USD) 2025"
     ws["N4"] = "nGDP (LCU) CAGR (%)"
     ws["O4"] = "rGDP (LCU) CAGR (%)"
-    
+
     # Exchange Rate Metrics section
     ws["P4"] = "Exchange Rate Metrics"
     ws["P4"].font = Font(bold=True)
@@ -1165,29 +1163,29 @@ def write_comparing_countries_sheet(
     ws["R4"] = "FX Jan 1st CAGR %"
     ws["S4"] = "USD/LCU spot rate as of \"today\""
     ws["T4"] = "Futures rate for USD/LCU (2 years out from \"today\")"  # Placeholder
-    
+
     # Inflation Metrics section
     ws["U4"] = "Inflation Metrics"
     ws["U4"].font = Font(bold=True)
     ws["V4"] = "Inf. Diff CAGR %"
-    
+
     # Differential section
     ws["W4"] = "Differential"
     ws["W4"].font = Font(bold=True)
     ws["X4"] = "Currency Gap %"
-    
+
     # Country Info section
     ws["Y4"] = "Country Info"
     ws["Y4"].font = Font(bold=True)
     ws["Z4"] = "Region"
     ws["AA4"] = "Local Currency Unit (LCU)"
-    
+
     # ETF Info section
     ws["AB4"] = "ETF Info"
     ws["AB4"].font = Font(bold=True)
     ws["AC4"] = "Exchange name for ETF ticker"
     ws["AD4"] = "ETF ticker currency"
-    
+
     # Apply bold to all header cells
     for col_ref in ["A2", "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4", "I4", "J4", "K4",
                     "M4", "N4", "O4", "Q4", "R4", "S4", "T4", "V4", "X4", "Z4", "AA4", "AC4", "AD4"]:
@@ -1227,17 +1225,6 @@ def write_comparing_countries_sheet(
     horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
     ws.add_data_validation(horizon_dv)
     horizon_dv.add("B2")
-
-    # Add region dropdown (ALL + unique regions from COUNTRY_TO_REGION)
-    unique_regions = sorted(set(COUNTRY_TO_REGION.values()))
-    region_options = '","'.join(["ALL"] + unique_regions)
-    region_dv = DataValidation(type="list", formula1=f'"{region_options}"', allow_blank=False)
-    ws.add_data_validation(region_dv)
-    region_dv.add("E2")
-    
-    # Note: VBA macro for auto-hiding rows is provided in docs/reference/region_filter_macro.bas
-    # Users can import this macro to enable automatic row hiding when region filter changes
-    # Without VBA, users can manually filter column Z (Region) using Excel's AutoFilter
     
     # Write data rows
     country_start_row = 5
@@ -1254,7 +1241,7 @@ def write_comparing_countries_sheet(
 
         ws[f"A{r}"] = country
         ws[f"B{r}"] = default_ticker
-        ws[f"Z{r}"] = region  # Store region for filtering (column Z)
+        ws[f"Z{r}"] = region  # Store region as reference data (column Z)
         
         # Add ticker dropdown
         country_ticker_options_df = lists_df[lists_df["country_name"] == country][["ticker_display"]].drop_duplicates()
@@ -1441,9 +1428,6 @@ def write_comparing_countries_sheet(
     # Set autofilter and freeze
     ws.auto_filter.ref = f"A4:AD{country_end_row}"
     ws.freeze_panes = "A5"
-    
-    # Note: Users can filter by Region (column Z) manually using Excel's AutoFilter
-    # Or import the VBA macro from docs/reference/region_filter_macro.bas for automatic filtering
 
 
 def write_country_focus_sheet(

@@ -23,17 +23,15 @@ This document tracks the source, reference date, and update frequency for all da
 
 ## Dashboard Filters
 
-### Region Filter (Cell E2)
-- **Options:** ALL, Africa, Asia, Europe, Latin America, Middle East, North America, Oceania
-- **Default:** ALL (shows all countries)
-- **Usage:**
-  - **Manual:** Click the filter dropdown on any column header and filter by Region (column Z)
-  - **Automatic (optional):** Import the VBA macro from `docs/reference/region_filter_macro.bas` to auto-hide rows when region changes
-
 ### Horizon Filter (Cell B2)
 - **Options:** 1Y, 3Y, 5Y, 10Y
 - **Default:** 10Y
 - **Usage:** Select horizon from dropdown; all CAGR metrics update automatically
+
+### Region Reference (Column Z)
+- **Purpose:** Reference information showing which region each country belongs to
+- **Regions:** Africa, Asia, Europe, Latin America, Middle East, North America, Oceania
+- **Note:** This is reference data only, not a filter
 
 ---
 
