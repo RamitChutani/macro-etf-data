@@ -1003,8 +1003,6 @@ def write_comparing_countries_sheet(
     c = {col: f"CAGR!${get_col(cagr_df, col)}:${get_col(cagr_df, col)}" for col in cagr_df.columns}
     a = {col: f"Annual!${get_col(annual_df, col)}:${get_col(annual_df, col)}" for col in annual_df.columns}
 
-    # Build country-level summary using horizon from cell B2
-    horizon_ref = "$B$2"  # Reference to horizon selector cell
     countries = sorted(cagr_df["country_name"].dropna().unique().tolist())
 
     # Header row
@@ -1104,10 +1102,10 @@ def write_comparing_countries_sheet(
             ticker_dv.add(f"B{r}")
         
         # GDP CAGR (USD) - Column C
-        ws[f"C{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_usd_cagr_pct"]}, MATCH($A{r}&"|"{horizon_ref}, {c["country_horizon_key"]}, 0)), NA())'
+        ws[f"C{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_usd_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
         # ETF CAGR (USD) - Column D
-        ws[f"D{r}"] = f'=IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"{horizon_ref}, {c["lookup_key"]}, 0)), NA())'
+        ws[f"D{r}"] = f'=IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, {c["lookup_key"]}, 0)), NA())'
         
         # MSCI Index Return - Column E (placeholder - not available)
         ws[f"E{r}"] = "NA()"
@@ -1143,10 +1141,10 @@ def write_comparing_countries_sheet(
             ws[f"M{r}"] = f'=IFERROR(INDEX({a["gdp_current_usd"]}, MATCH($A{r}&"|2025", {a["country_year_key"]}, 0)), NA())'
         
         # FX CAGR - Column Q
-        ws[f"Q{r}"] = f'=IFERROR(1*INDEX({c["fx_cagr_pct"]}, MATCH($A{r}&"|"{horizon_ref}, {c["country_horizon_key"]}, 0)), NA())'
+        ws[f"Q{r}"] = f'=IFERROR(1*INDEX({c["fx_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
         # FX Jan 1st CAGR - Column R
-        ws[f"R{r}"] = f'=IFERROR(1*INDEX({c["fx_jan1_cagr_pct"]}, MATCH($A{r}&"|"{horizon_ref}, {c["country_horizon_key"]}, 0)), NA())'
+        ws[f"R{r}"] = f'=IFERROR(1*INDEX({c["fx_jan1_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
         # Spot FX rate - Column S
         country_ticker_data = timeframe_df[timeframe_df["country_name"] == country][["ticker", "etf_currency"]].drop_duplicates()
@@ -1160,7 +1158,7 @@ def write_comparing_countries_sheet(
         ws[f"T{r}"] = "NA()"
         
         # Inf. Diff CAGR - Column V
-        ws[f"V{r}"] = f'=IFERROR(1*INDEX({c["inflation_diff_cagr_pct"]}, MATCH($A{r}&"|"{horizon_ref}, {c["country_horizon_key"]}, 0)), NA())'
+        ws[f"V{r}"] = f'=IFERROR(1*INDEX({c["inflation_diff_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
         # Currency Gap - Column X
         ws[f"X{r}"] = f"=IF(AND(ISNUMBER(Q{r}),ISNUMBER(V{r})),Q{r}+V{r},NA())"
@@ -1180,10 +1178,10 @@ def write_comparing_countries_sheet(
         ws[f"AD{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
         
         # nGDP (LCU) CAGR - Column N
-        ws[f"N{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"{horizon_ref}, {c["country_horizon_key"]}, 0)), NA())'
+        ws[f"N{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_lcu_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
         # rGDP (LCU) CAGR - Column O
-        ws[f"O{r}"] = f'=IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"{horizon_ref}, {c["country_horizon_key"]}, 0)), NA())'
+        ws[f"O{r}"] = f'=IFERROR(1*INDEX({c["gdp_real_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
         
         # Apply number formats
         for col in ["C", "D", "F", "G", "H", "J", "N", "O", "Q", "R", "V", "X"]:
