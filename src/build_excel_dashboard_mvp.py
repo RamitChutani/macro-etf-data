@@ -1243,8 +1243,7 @@ def write_comparing_countries_sheet(
             msci_country = msci_country_map.get(country)
             if msci_country and msci_country in msci_df['Country'].values:
                 # Formula: INDEX(MSCI!$B:$E, MATCH(country, MSCI!$A:$A, 0), MATCH(horizon, MSCI!$B$1:$E$1, 0))
-                # Multiply by 100 to display as percentage (e.g., 32% not 0.32)
-                ws[f"E{r}"] = f'=IFERROR(INDEX(MSCI!$B:$E, MATCH("{msci_country}", MSCI!$A:$A, 0), MATCH($B$2, MSCI!$B$1:$E$1, 0)) * 100, NA())'
+                ws[f"E{r}"] = f'=IFERROR(INDEX(MSCI!$B:$E, MATCH("{msci_country}", MSCI!$A:$A, 0), MATCH($B$2, MSCI!$B$1:$E$1, 0)), NA())'
             else:
                 ws[f"E{r}"] = 'NA()'  # No MSCI data for this country (e.g., Bulgaria, Kuwait)
         else:
@@ -1326,7 +1325,6 @@ def write_comparing_countries_sheet(
         # Apply number formats
         for col in ["C", "D", "F", "G", "H", "J", "N", "O", "Q", "R", "V", "X"]:
             ws[f"{col}{r}"].number_format = "0.00"
-        ws[f"E{r}"].number_format = "0%"  # MSCI column as percentage
         ws[f"I{r}"].number_format = "0.00"
         ws[f"S{r}"].number_format = "0.0000"
     
@@ -1342,7 +1340,6 @@ def write_comparing_countries_sheet(
     # Main metrics formatting
     format_ranges = [
         f"C{country_start_row}:D{country_end_row}",  # GDP/ETF CAGR
-        f"E{country_start_row}:E{country_end_row}",  # MSCI Index Return
         f"F{country_start_row}:G{country_end_row}",  # Macro Gap, Proj 3Y
         f"J{country_start_row}:J{country_end_row}",  # REER vs 10Y
         f"N{country_start_row}:O{country_end_row}",  # GDP LCU/Real CAGR
