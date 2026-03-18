@@ -974,8 +974,106 @@ def build_timeframe_rows(
     return timeframe_df, annual_df, cagr_df
 
 
+def load_msci_returns(filepath: str) -> tuple[pd.DataFrame, dict[str, str]]:
+    """Load MSCI country index returns from factsheet Excel file.
+    
+    Returns:
+        msci_df: DataFrame with columns [Country, 1Y, 3Y, 5Y, 10Y, Link]
+        country_map: Dict mapping our country names to MSCI country names
+    """
+    raw = pd.read_excel(filepath, sheet_name='Sheet1', header=None)
+    
+    # First pass: collect all valid country rows
+    # Prefer 'gross' rows (type is NaN), fall back to 'net' rows if no gross exists
+    gross_rows = []
+    net_rows = []
+    
+    for idx, row in raw.iterrows():
+        if idx == 0:  # Skip header
+            continue
+        type_val = row[0]
+        country = row[1]
+        
+        # Skip index rows (ACWI, WORLD, EM)
+        if country in ['ACWI', 'WORLD', 'EM']:
+            continue
+        # Skip rows without country name or return data
+        if pd.isna(country) or pd.isna(row[2]):
+            continue
+        
+        if type_val == 'net':
+            net_rows.append((idx, row))
+        elif pd.isna(type_val) or type_val == 'type':
+            gross_rows.append((idx, row))
+    
+    # Build country -> row mapping, preferring gross over net
+    country_rows = {}
+    for idx, row in gross_rows:
+        country_rows[row[1]] = (idx, row)
+    
+    # Add net rows only for countries without gross data
+    for idx, row in net_rows:
+        if row[1] not in country_rows:
+            country_rows[row[1]] = (idx, row)
+    
+    # Build clean dataframe
+    valid_rows = sorted(country_rows.values(), key=lambda x: x[0])  # Sort by original index
+    msci_raw = pd.DataFrame([row for idx, row in valid_rows])
+    
+    msci_df = pd.DataFrame({
+        'Country': msci_raw[1].values,
+        '1Y': pd.to_numeric(msci_raw[2], errors='coerce'),
+        '3Y': pd.to_numeric(msci_raw[3], errors='coerce'),
+        '5Y': pd.to_numeric(msci_raw[4], errors='coerce'),
+        '10Y': pd.to_numeric(msci_raw[5], errors='coerce'),
+        'Link': msci_raw[7].values if 7 in msci_raw.columns else None
+    }).reset_index(drop=True)  # Reset index for continuous row numbering
+    
+    # Build country mapping (our country names -> MSCI country names)
+    # Most countries match exactly by name
+    country_map = {
+        'Australia': 'Australia',
+        'Austria': 'Austria',
+        'Belgium': 'Belgium',
+        'Brazil': 'Brazil',
+        'Canada': 'Canada',
+        'China': 'China',
+        'France': 'France',
+        'Germany': 'Germany',
+        'Greece': 'Greece',
+        'Hong Kong': 'Hong Kong',
+        'India': 'India',
+        'Indonesia': 'Indonesia',
+        'Italy': 'Italy',
+        'Japan': 'Japan',
+        'Malaysia': 'Malaysia',
+        'Mexico': 'Mexico',
+        'Netherlands': 'Netherlands',
+        'Pakistan': 'Pakistan',
+        'Philippines': 'Philippines',
+        'Poland': 'Poland',
+        'Saudi Arabia': 'Saudi Arabia',
+        'Singapore': 'Singapore',
+        'South Africa': 'South Africa',
+        'South Korea': 'South Korea',
+        'Spain': 'Spain',
+        'Sweden': 'Sweden',
+        'Switzerland': 'Switzerland',
+        'Taiwan': 'Taiwan',
+        'Thailand': 'Thailand',
+        'Turkey': 'Turkey',
+        'United Kingdom': 'United Kingdom',
+        'United States': 'United States',
+        'Vietnam': 'Vietnam',
+        # No MSCI data for: Bulgaria, Kuwait
+    }
+    
+    return msci_df, country_map
+
+
 def write_comparing_countries_sheet(
     ws,
+    wb,
     cagr_df: pd.DataFrame,
     annual_df: pd.DataFrame,
     timeframe_df: pd.DataFrame,
@@ -986,6 +1084,8 @@ def write_comparing_countries_sheet(
     country_summary_df: pd.DataFrame,
     spot_fx_rates: dict[str, float],
     gdp_current_usd_map: dict[tuple[str, int], float],
+    msci_df: pd.DataFrame | None = None,
+    msci_country_map: dict[str, str] | None = None,
 ) -> None:
     """Write the 'Comparing Countries' sheet (country screener)."""
     from openpyxl.styles import Font, PatternFill, Alignment
@@ -1071,6 +1171,36 @@ def write_comparing_countries_sheet(
     for col_ref in ["A2", "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4", "I4", "J4", "K4",
                     "M4", "N4", "O4", "Q4", "R4", "S4", "T4", "V4", "X4", "Z4", "AA4", "AC4", "AD4"]:
         ws[col_ref].font = Font(bold=True)
+
+    # Create hidden MSCI reference sheet if data provided
+    if msci_df is not None and not msci_df.empty:
+        msci_ws = wb.create_sheet(title="MSCI")
+        msci_ws.sheet_state = "hidden"
+        
+        # Write header row
+        headers = ["Country", "1Y", "3Y", "5Y", "10Y", "Factsheet Link"]
+        for col, header in enumerate(headers, 1):
+            msci_ws.cell(row=1, column=col, value=header)
+            msci_ws.cell(row=1, column=col).font = Font(bold=True)
+        
+        # Write data rows
+        for r, row in enumerate(msci_df.itertuples(index=False), start=2):
+            msci_ws.cell(row=r, column=1, value=row[0])  # Country
+            msci_ws.cell(row=r, column=2, value=row[1])  # 1Y
+            msci_ws.cell(row=r, column=3, value=row[2])  # 3Y
+            msci_ws.cell(row=r, column=4, value=row[3])  # 5Y
+            msci_ws.cell(row=r, column=5, value=row[4])  # 10Y
+            link_val = row[5] if len(row) > 5 else None
+            if pd.notna(link_val) and isinstance(link_val, str) and link_val:
+                # Add hyperlink
+                cell = msci_ws.cell(row=r, column=6, value="Factsheet")
+                cell.hyperlink = link_val
+                cell.style = "Hyperlink"
+        
+        # Auto-fit columns
+        for col in range(1, 7):
+            msci_ws.column_dimensions[get_column_letter(col)].width = 15
+        msci_ws.column_dimensions["F"].width = 40  # Link column wider
     
     # Add horizon dropdown
     horizon_dv = DataValidation(type="list", formula1='"1Y,3Y,5Y,10Y"', allow_blank=False)
@@ -1103,13 +1233,22 @@ def write_comparing_countries_sheet(
         
         # GDP CAGR (USD) - Column C
         ws[f"C{r}"] = f'=IFERROR(1*INDEX({c["gdp_nominal_usd_cagr_pct"]}, MATCH($A{r}&"|"&$B$2, {c["country_horizon_key"]}, 0)), NA())'
-        
+
         # ETF CAGR (USD) - Column D
         ws[f"D{r}"] = f'=IFERROR(1*INDEX({c["etf_cagr_pct"]}, MATCH($A{r}&"|"&$B{r}&"|"&$B$2, {c["lookup_key"]}, 0)), NA())'
-        
-        # MSCI Index Return - Column E (placeholder - not available)
-        ws[f"E{r}"] = "NA()"
-        
+
+        # MSCI Index Return (USD) CAGR (%) - Column E
+        # Lookup from hidden MSCI sheet based on horizon selector
+        if msci_df is not None and not msci_df.empty and msci_country_map:
+            msci_country = msci_country_map.get(country)
+            if msci_country and msci_country in msci_df['Country'].values:
+                # Formula: INDEX(MSCI!$B:$E, MATCH(country, MSCI!$A:$A, 0), MATCH(horizon, MSCI!$B$1:$E$1, 0))
+                ws[f"E{r}"] = f'=IFERROR(INDEX(MSCI!$B:$E, MATCH("{msci_country}", MSCI!$A:$A, 0), MATCH($B$2, MSCI!$B$1:$E$1, 0)), NA())'
+            else:
+                ws[f"E{r}"] = 'NA()'  # No MSCI data for this country (e.g., Bulgaria, Kuwait)
+        else:
+            ws[f"E{r}"] = 'NA()'  # MSCI data not provided
+
         # Macro Gap - Column F
         ws[f"F{r}"] = f"=IF(AND(ISNUMBER(C{r}),ISNUMBER(D{r})),C{r}-D{r},NA())"
         
@@ -1481,6 +1620,7 @@ def write_dashboard_xlsx(
     metadata_csv: str | None = "data/outputs/etf_ticker_metadata.csv",
     reer_csv: str | None = "data/outputs/bis_reer_metrics.csv",
     impact_csv: str | None = "data/outputs/crude_oil_import_impact.csv",
+    msci_xlsx: str | None = "data/inputs/MSCI factsheet data manual_feb 27 2026.xlsx",
 ) -> None:
     from openpyxl.styles import Font, PatternFill, Alignment
     from openpyxl.formatting.rule import CellIsRule
@@ -1634,6 +1774,19 @@ def write_dashboard_xlsx(
                 if country_code and year and pd.notna(gdp_usd):
                     gdp_current_usd_map[(str(country_code), int(year))] = float(gdp_usd)
 
+        # Load MSCI returns data
+        msci_df = pd.DataFrame()
+        msci_country_map = {}
+        if msci_xlsx:
+            try:
+                import os
+                if os.path.exists(msci_xlsx):
+                    msci_df, msci_country_map = load_msci_returns(msci_xlsx)
+                else:
+                    print(f"Warning: MSCI file not found: {msci_xlsx}")
+            except Exception as e:
+                print(f"Warning: Could not load MSCI data: {e}")
+
         wb = writer.book
         ws_tf = wb["ETF_Timeframes"]
         ws_annual = wb["Annual"]
@@ -1671,6 +1824,7 @@ def write_dashboard_xlsx(
         # Write the two new dashboard sheets
         write_comparing_countries_sheet(
             ws_comparing,
+            wb,
             cagr_df=cagr_df,
             annual_df=annual_df,
             timeframe_df=timeframe_df,
@@ -1681,6 +1835,8 @@ def write_dashboard_xlsx(
             country_summary_df=country_summary_df,
             spot_fx_rates=spot_fx_rates,
             gdp_current_usd_map=gdp_current_usd_map,
+            msci_df=msci_df,
+            msci_country_map=msci_country_map,
         )
 
         write_country_focus_sheet(
@@ -1705,6 +1861,7 @@ def main() -> None:
     parser.add_argument("--metadata-csv", default="data/outputs/etf_ticker_metadata.csv")
     parser.add_argument("--reer-csv", default="data/outputs/bis_reer_metrics.csv")
     parser.add_argument("--crude-impact-csv", default="data/outputs/crude_oil_import_impact.csv")
+    parser.add_argument("--msci-xlsx", default="data/inputs/MSCI factsheet data manual_feb 27 2026.xlsx")
     parser.add_argument("--output", default="data/outputs/etf_gdp_dashboard_mvp.xlsx")
     args = parser.parse_args()
 
@@ -1712,9 +1869,10 @@ def main() -> None:
     if timeframe_df.empty or annual_df.empty or cagr_df.empty:
         raise RuntimeError("No rows produced. Check ETF and WEO input data.")
     write_dashboard_xlsx(
-        timeframe_df, annual_df, cagr_df, args.output, 
-        metadata_csv=args.metadata_csv, reer_csv=args.reer_csv, 
-        impact_csv=args.crude_impact_csv
+        timeframe_df, annual_df, cagr_df, args.output,
+        metadata_csv=args.metadata_csv, reer_csv=args.reer_csv,
+        impact_csv=args.crude_impact_csv,
+        msci_xlsx=args.msci_xlsx
     )
     print(f"Wrote dashboard MVP to {args.output}")
 
