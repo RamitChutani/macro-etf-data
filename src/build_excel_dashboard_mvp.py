@@ -1325,6 +1325,7 @@ def write_comparing_countries_sheet(
         # Apply number formats
         for col in ["C", "D", "F", "G", "H", "J", "N", "O", "Q", "R", "V", "X"]:
             ws[f"{col}{r}"].number_format = "0.00"
+        ws[f"E{r}"].number_format = "0.00%"  # MSCI column as percentage
         ws[f"I{r}"].number_format = "0.00"
         ws[f"S{r}"].number_format = "0.0000"
     
@@ -1340,6 +1341,7 @@ def write_comparing_countries_sheet(
     # Main metrics formatting
     format_ranges = [
         f"C{country_start_row}:D{country_end_row}",  # GDP/ETF CAGR
+        f"E{country_start_row}:E{country_end_row}",  # MSCI Index Return
         f"F{country_start_row}:G{country_end_row}",  # Macro Gap, Proj 3Y
         f"J{country_start_row}:J{country_end_row}",  # REER vs 10Y
         f"N{country_start_row}:O{country_end_row}",  # GDP LCU/Real CAGR
@@ -1401,12 +1403,11 @@ def write_comparing_countries_sheet(
     ws.column_dimensions["AA"].width = 12  # LCU
     ws.column_dimensions["AC"].width = 20  # Exchange
     ws.column_dimensions["AD"].width = 12  # Currency
-    
-    # Hide placeholder columns (E, K, T)
-    ws.column_dimensions["E"].hidden = True
+
+    # Hide placeholder columns (K, T) - Column E now has MSCI data
     ws.column_dimensions["K"].hidden = True
     ws.column_dimensions["T"].hidden = True
-    
+
     # Set autofilter and freeze
     ws.auto_filter.ref = f"A4:AD{country_end_row}"
     ws.freeze_panes = "A5"
