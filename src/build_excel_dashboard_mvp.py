@@ -1337,16 +1337,14 @@ def write_comparing_countries_sheet(
         # Currency - Column AD
         ws[f"AD{r}"] = f'=IFERROR(INDEX(Lists!$K$2:$K${ticker_attrs_end_row}, MATCH($B{r}, Lists!$I$2:$I${ticker_attrs_end_row}, 0)),"")'
 
-        # MSCI Factsheet Link - Column AE (from hidden MSCI sheet)
+        # MSCI Factsheet Link - Column AE (URL text from MSCI sheet)
         if msci_df is not None and not msci_df.empty and msci_country_map:
             msci_country = msci_country_map.get(country)
             if msci_country and msci_country in msci_df['Country'].values:
                 msci_row = msci_df[msci_df['Country'] == msci_country].iloc[0]
                 link_val = msci_row['Link'] if 'Link' in msci_df.columns else None
-                if pd.notna(link_val) and isinstance(link_val, str) and link_val.startswith('http'):
-                    ws[f"AE{r}"] = "Factsheet"
-                    # Note: Hyperlinks in formulas require VBA or manual setup
-                    # For now, just show the link text
+                if pd.notna(link_val) and isinstance(link_val, str) and link_val:
+                    ws[f"AE{r}"] = link_val  # Just the URL text, no formatting
                 else:
                     ws[f"AE{r}"] = ""
             else:
