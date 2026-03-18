@@ -50,7 +50,12 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - country focus panel ticker dropdown depends on selected country and cascades to linked ETF/GDP tables
   - country focus controls include country, ticker, as-of date, ticker currency, and ticker exchange
   - screener `ticker_exchange` values are human-readable (for example `NYSE Arca`, `London Stock Exchange`)
-  - country focus panel is on the same sheet (`Country_CAGR_Summary`) below the screener (with row gap separation)
+  - **New Dashboard Structure (v0.11):** Dashboard split into two dedicated sheets matching reference format:
+    - `Comparing Countries`: Country screener with horizon selector, per-country ticker dropdowns, and comprehensive metrics (GDP CAGR, ETF CAGR, Macro Gap, Oil Impact, REER, FX metrics, inflation differentials, currency gap).
+    - `Country Focus`: Interactive single-country detail panel with ETF cumulative returns table, annual ETF vs GDP + FX decomposition (last 10 years + projection), and CAGR comparison (3Y/5Y/10Y).
+    - Both sheets use Excel formulas for dynamic lookups from underlying data sheets (CAGR, Annual, ETF_Timeframes).
+    - Placeholder columns for MSCI Index Returns and FX Futures rates (hidden, for future data integration).
+    - Populated nGDP (USD) 2025 levels from WEO data and spot FX rates from yfinance.
   - annual panel FX decomposition columns (`Quote CCY vs USD %`, `ETF Return % (USD)`, `Country LCU vs USD % (WEO)`, `ETF USD - Country FX %`) render only for non-USD ticker selections
   - annual panel shows real GDP, nominal GDP (LCU), nominal GDP (USD), and `Nominal USD GDP - ETF`
   - annual panel keeps last 10 completed years and adds one projection/YTD row (for 2026 while in 2026)

@@ -6,7 +6,7 @@
 
 **Purpose:** Enable stakeholders to compare ETF performance versus underlying country economic performance and identify potential market mispricing for investment decision support.
 
-**Current Version:** v0.8 (as of March 2026)
+**Current Version:** v0.11 (as of March 18, 2026)
 
 ## Repository Structure
 
@@ -172,17 +172,34 @@ Tickers must pass ALL checks to be included:
 
 ## Excel Dashboard Features
 
-### Sheet 1: Country CAGR Summary (Screener)
-- Selectable horizon (1Y/3Y/5Y/10Y, default 5Y)
-- Per-country ticker dropdowns
-- CAGR columns: Real GDP, Nominal GDP (LCU/USD), ETF Return, Disconnect
-- Valuation context: REER Over/Under %, FX CAGR %, Inflation Diff CAGR %, Currency Gap %, Oil Impact %
+### Sheet 1: Comparing Countries (Country Screener)
+- Header: "Country Disconnect Dashboard (As of [date])"
+- Controls: Horizon selector (1Y/3Y/5Y/10Y, default 5Y), Region filter (hidden reference columns), Sort by GDP size
+- **Main columns:**
+  - Country, ETF Ticker (with * for Distributing), nGDP (USD) CAGR %, ETF Return (USD) CAGR %
+  - Macro Gap %, Projected Growth (2026-28) CAGR %, Oil Impact % of GDP
+  - REER Index, REER vs 10Y
+- **GDP Metrics section:** nGDP (USD) 2025, nGDP (LCU) CAGR %, rGDP (LCU) CAGR %
+- **Exchange Rate Metrics:** FX CAGR %, FX Jan 1st CAGR %, USD/LCU spot rate, FX Futures 2y out (placeholder)
+- **Inflation Metrics:** Inf. Diff CAGR %
+- **Differential:** Currency Gap %
+- **Country Info:** Region, Local Currency Unit (LCU)
+- **ETF Info:** Exchange name, ETF ticker currency
+- Conditional formatting: Green scale for positive values, red for negative; Oil Impact (lower=better); REER Index (100=neutral)
+- Placeholder columns hidden: MSCI Index Returns, FX Futures rates
 
-### Sheet 2: Country Focus Panel
-- Country/ticker/date selectors
-- Linked ETF/GDP tables
-- Annual panel (last 10 years + projection)
-- FX decomposition (for non-USD tickers)
+### Sheet 2: Country Focus (Detailed Single-Country View)
+- Header: "Country Focus Dashboard"
+- Selectors: Country (dropdown), Ticker (dynamic dropdown), As-of Date, Ticker Currency, Ticker Exchange
+- **Section 1: ETF Cumulative Returns**
+  - Timeframe table: YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX
+  - Columns: Timeframe | ETF Return (USD) % | ETF Return (LCU) % (if non-USD) | Start Date
+- **Section 2: Annual ETF vs GDP + FX Decomposition (Last 10 Years, %)**
+  - Columns: Year | Nominal GDP Growth (USD) % | ETF Return (USD) % | Macro Disconnect % | Real GDP Growth % | Nominal GDP Growth (LCU) % | ETF Return (LCU) % | FX Change (vs USD) % | WEO LCU Return vs USD % | Jan 1st FX Change %
+  - Special projection row: "2026 (Proj GDP / ETF YTD)" with footnote
+- **Section 3: CAGR Comparison (%)**
+  - Horizons: 3Y, 5Y, 10Y
+  - Columns: Horizon | Nominal GDP CAGR % (USD) | ETF CAGR % (USD) | Real GDP CAGR % | Nominal GDP CAGR % (LCU)
 
 ## Development Conventions
 

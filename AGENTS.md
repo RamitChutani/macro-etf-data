@@ -185,3 +185,14 @@ This section describes current reality as of March 6, 2026 (updated after Sessio
   - Added `ALLOW_DIST_COUNTRIES` set to allow Distributing ETFs for specific countries.
   - Distributing ETFs use Adjusted Close price for comparability with Accumulating ETFs.
   - Dashboard marks distributing tickers with asterisk (*) and includes definition.
+- **v0.11 (2026-03-18) - Dashboard Restructure to Match Reference Format:**
+  - Split single `Country_CAGR_Summary` sheet into two dedicated sheets:
+    - `Comparing Countries`: Country screener with reference-format column order and grouping
+    - `Country Focus`: Interactive single-country detail panel with three sections (ETF returns, annual decomposition, CAGR comparison)
+  - Added `get_spot_fx_rates()` function to fetch latest FX spot rates from yfinance
+  - Added `write_comparing_countries_sheet()` and `write_country_focus_sheet()` functions
+  - Aligned column names and order with reference dashboard format
+  - Added placeholder columns for MSCI Index Returns and FX Futures rates (hidden)
+  - Populated nGDP (USD) 2025 levels from WEO data
+  - Populated USD/LCU spot rates from yfinance
+  - Maintains 6 underlying data sheets: Crude_Oil_Impact, ETF_Timeframes, Annual, CAGR, REER_Data, Lists
