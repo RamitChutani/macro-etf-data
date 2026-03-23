@@ -9,6 +9,9 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - `COUNTRY_TO_LCU`: country name to local currency unit (LCU) mapping for FX calculations
 - `data/outputs/`: generated CSV outputs
 - `notebooks/`: interactive validation notebooks
+  - `dashboard_prototype.ipynb`: **Live dashboard editor for prototyping** (see below)
+- `scripts/`: utility scripts
+  - `watch_dashboard.py`: File watcher for Excel dashboard changes
 - `docs/`: references and worklogs
 
 ## Current Capabilities
@@ -93,6 +96,10 @@ Python pipeline to fetch daily ETF prices from Yahoo Finance, fetch IMF WEO GDP 
   - GBP/GBp checks
   - close-price diagnostics charts
   - return windows: YTD, 1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y, MAX, 2025, 2024, 2023, 2022
+- **Live Dashboard Prototyping:**
+  - Edit `notebooks/dashboard_prototype.ipynb` for live table editing with conditional formatting
+  - No need to download Excel files - see changes immediately in Jupyter
+  - Export prototypes to CSV/XLSX for comparison
 
 ## Run Pipeline
 
@@ -236,3 +243,56 @@ Currency-hedged metadata:
 Preference (not exclusion):
 - prefer `USD` where multiple eligible tickers exist for a country
 - prefer LSE-listed UCITS (Ireland-domiciled) for tax efficiency and accumulation policy
+
+---
+
+## 🚀 Live Dashboard Prototyping
+
+For rapid prototyping without downloading Excel files, use the Jupyter notebook editor:
+
+### Option 1: Interactive Jupyter Notebook (Recommended)
+
+```bash
+# Open Jupyter and navigate to the prototype notebook
+uv run jupyter notebook
+# Open: notebooks/dashboard_prototype.ipynb
+```
+
+**Workflow:**
+1. Run all cells to load the dashboard data
+2. Edit the configuration cell to change:
+   - Horizon (1Y/3Y/5Y/10Y)
+   - Region filter
+   - Column selection and order
+3. Make data edits in the "EDIT DATA HERE" cell
+4. Re-run the "DISPLAY TABLE" cell to see changes with conditional formatting
+5. Export to CSV/XLSX using the "EXPORT OPTIONS" cell
+
+**Features:**
+- ✅ Live editing of column values
+- ✅ Conditional formatting (green/red scale, REER valuation)
+- ✅ Column reordering and filtering
+- ✅ Export to CSV/XLSX
+- ✅ No need to download Excel files
+
+### Option 2: File Watcher for Excel Dashboard
+
+If you're editing the Excel dashboard generator (`src/build_excel_dashboard_mvp.py`):
+
+```bash
+# Terminal 1: Run the file watcher
+uv run python scripts/watch_dashboard.py
+
+# Terminal 2: Edit and re-run the dashboard generator
+uv run python src/build_excel_dashboard_mvp.py --etf-csv data/outputs/etf_prices.csv --weo-csv data/outputs/weo_gdp.csv --output data/outputs/etf_gdp_dashboard_mvp.xlsx
+```
+
+The watcher will notify you when the Excel file is updated.
+
+### Comparison
+
+| Method | Best For | Live Updates |
+|--------|----------|--------------|
+| **Jupyter Notebook** | Column/value prototyping, formatting tests | ✅ Yes (re-run cell) |
+| **File Watcher** | Testing Excel generator code changes | ⚠️ Manual re-run |
+| **Download Excel** | Final validation | ❌ No |
