@@ -1466,8 +1466,8 @@ def write_comparing_countries_sheet(
         ("Macro Gap %", "The difference between GDP growth and ETF performance (GDP CAGR minus ETF CAGR). Positive values suggest the economy grew faster than the market."),
         ("Oil Impact %", "Value of a $10/barrel price change in crude oil imports as a percentage of nominal GDP. Lower values indicate less sensitivity to oil prices (closer to 0 is better)."),
         ("Proj. 3Y (26-28)", "IMF's forecasted nominal GDP growth (USD) for the 2026-2028 period."),
-        ("REER vs 10Y", "Real Effective Exchange Rate deviation from its 10-year mean. Positive = Currency is stronger than its 10Y historical average."),
-        ("REER Index", "Current Real Effective Exchange Rate level. 100 = at 10-year average. Above 100 = currency stronger than average; Below 100 = weaker than average."),
+        ("REER vs 10Y", "Real Effective Exchange Rate deviation from its 10-year mean. Positive = Currency is stronger than its 10Y historical average. Note: This is a custom metric, not official BIS methodology."),
+        ("REER Index", "Current BIS Real Effective Exchange Rate level (base year 2020=100). Shows currency change since 2020, not over/undervaluation. For valuation context, see REER vs 10Y."),
     ]
     
     for i, (metric, text) in enumerate(definitions_main):

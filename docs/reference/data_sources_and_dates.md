@@ -9,12 +9,12 @@ This document tracks the source, reference date, and update frequency for all da
 
 ## Quick Reference Table
 
-| Data Type | As Of / Period | Source | Update Frequency |
-|-----------|---------------|--------|-----------------|
+| Data Type | As Of / Reference Period | Source | Update Frequency |
+|-----------|-------------------------|--------|-----------------|
 | ETF Prices | **Feb 27, 2026** (fixed snapshot) | Yahoo Finance | Daily (filtered to snapshot) |
 | MSCI Returns | Feb 27, 2026 | MSCI Factsheet | Monthly |
 | GDP (WEO) | Oct 2025 baseline | IMF WEO API | Semi-annual (Apr/Oct) |
-| REER | Latest month | BIS API | Monthly |
+| REER | **Feb 2026** | BIS API | Monthly (~6-8 week lag) |
 | Oil Impact | 2024 | WITS / UN | Annual |
 | FX Rates | Latest day | Yahoo Finance | Daily |
 | Dashboard Date | Generation date | System date | Per run |
@@ -120,18 +120,24 @@ This document tracks the source, reference date, and update frequency for all da
 
 | Property | Value |
 |----------|-------|
-| **As of Date** | Latest available month (typically 1-2 months lag) |
+| **As of Date** | **February 2026** (latest available; ~1-2 month publication lag) |
 | **Data Range** | 2016-01-01 to current |
 | **Source** | BIS Statistics API |
-| **Metric** | REER index level + 10-year rolling average |
-| **Derived** | REER % difference vs 10Y average (over/undervaluation) |
+| **Metric** | REER index level (base year 2020=100) + project's custom 10-year average deviation |
+| **Derived** | REER % difference vs 10-year average (custom valuation metric) |
+| **Frequency** | Monthly |
+| **Publication Lag** | ~6-8 weeks (BIS releases mid-month for prior month) |
 | **Script** | `src/fetch_bis_reer.py` |
 | **Output** | `data/outputs/bis_reer_metrics.csv` |
 
-**Interpretation:**
-- 100 = at 10-year average (neutral)
-- >100 = currency stronger than average
-- <100 = currency weaker than average
+**Important:** The BIS REER uses **base year 2020=100**, not a rolling 10-year average. An index level of 120 means 20% appreciation since 2020. BIS explicitly states that REER levels "do not provide information concerning over- or undervaluation."
+
+**Project's Custom Metric (REER vs 10Y):**
+- The project calculates a custom deviation metric: `((current REER − 10yr average REER) / 10yr average REER) × 100`
+- This shows how far the current REER deviates from its 10-year historical average
+- Positive % = Currency stronger than its 10Y average
+- Negative % = Currency weaker than its 10Y average
+- This is a **heuristic overlay** for valuation context, not official BIS methodology
 
 ---
 
@@ -188,7 +194,7 @@ This document tracks the source, reference date, and update frequency for all da
 | ETF Prices | Daily (market days) | Automatic via yfinance |
 | MSCI Returns | Monthly (factsheet release) | Manual file update required |
 | GDP (WEO) | April 2026 | IMF WEO Spring Meetings |
-| REER (BIS) | Monthly (mid-month) | Automatic via BIS API |
+| REER (BIS) | **Mid-April 2026** (for March 2026 data) | Monthly, ~6-8 week publication lag |
 | Oil Impact | Annual (Q2) | WITS/UN data lag ~1 year |
 | FX Rates | Daily | Automatic via yfinance |
 
@@ -208,5 +214,5 @@ This document tracks the source, reference date, and update frequency for all da
 - **ETF prices** reflect the most recent trading day when the pipeline was run
 - **MSCI data** is from a static factsheet file; update by replacing the input file
 - **GDP projections** (2025-2029) are IMF forecasts, not actual data
-- **REER data** has a 1-2 month publication lag from BIS
+- **REER data** has a ~6-8 week publication lag from BIS (e.g., February 2026 data available in late March 2026)
 - **Oil import data** has approximately 1-year lag (2024 data available in 2025-2026)

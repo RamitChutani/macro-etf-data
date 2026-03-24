@@ -185,7 +185,7 @@ Tickers must pass ALL checks to be included:
 - **Differential:** Currency Gap %
 - **Country Info:** Region, Local Currency Unit (LCU)
 - **ETF Info:** Exchange name, ETF ticker currency
-- Conditional formatting: Green scale for positive values, red for negative; Oil Impact (lower=better); REER Index (100=neutral)
+- Conditional formatting: Green scale for positive values, red for negative; Oil Impact (lower=better); REER Index (BIS base year 2020=100; for valuation context see REER vs 10Y)
 - Placeholder columns hidden: MSCI Index Returns, FX Futures rates
 
 ### Sheet 2: Country Focus (Detailed Single-Country View)

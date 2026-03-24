@@ -196,12 +196,10 @@ Economic sensitivity to oil price changes, calculated using Barrels of Oil Equiv
 - Lower values indicate less sensitivity to oil prices (closer to 0 is better)
 - N/A for countries without any import data
 
-**REER Index**:
-- 100: No color (neutral, at 10-year average)
-- 100-110: Light green (slightly above average)
-- 110+: Dark green (significantly above average)
-- 90-100: Light red (slightly below average)
-- <90: Dark red (significantly below average)
+**REER Index** (BIS base year 2020=100):
+- Shows currency change since 2020, not over/undervaluation
+- For valuation context, see REER vs 10Y (project's custom metric)
+- Conditional formatting: 110+ dark green, 100-110 light green, 90-100 light red, <90 dark red
 
 ## Dashboard Column Definitions
 
@@ -213,8 +211,8 @@ Economic sensitivity to oil price changes, calculated using Barrels of Oil Equiv
 - **Macro Gap %**: GDP CAGR minus ETF CAGR. Positive = economy grew faster than market
 - **BOE Price Impact (% of GDP)**: Economic sensitivity to $10/barrel oil price change using BOE methodology. Combines crude oil + natural gas imports (WITS 2024 data, UN fallback for some countries). Yellow highlight = UN fallback data. Lower = less sensitivity. N/A if no data.
 - **Proj. 3Y (26-28)**: IMF forecast for nominal USD GDP growth (2026-2028)
-- **REER vs 10Y**: REER deviation from 10-year mean. Positive = currency stronger than average
-- **REER Index**: Current REER level. 100 = at 10-year average
+- **REER vs 10Y**: REER deviation from 10-year mean (project's custom metric). Positive = currency stronger than its 10Y historical average.
+- **REER Index**: Current BIS Real Effective Exchange Rate level (base year 2020=100). Shows currency change since 2020, not over/undervaluation. For valuation context, see REER vs 10Y.
 
 **Reference Section (Columns M-V):**
 - **Valuation**: Interpretation (near neutral / mild / meaningful over/undervaluation)
